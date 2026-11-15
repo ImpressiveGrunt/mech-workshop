@@ -87,7 +87,7 @@ func _setup_cockpit() -> void:
 func _make_screen_label(marker: Node3D, big: bool) -> Label3D:
     var l := Label3D.new()
     l.font_size = 34 if big else 30
-    l.pixel_size = 0.00065 if big else 0.0006   # sized so the longest lines fit the screen glass
+    l.pixel_size = 0.00055 if big else 0.00052   # sized so the longest lines fit the overhead screens
     l.modulate = Color(0.45, 1.0, 0.75)
     l.outline_size = 0
     l.shaded = false

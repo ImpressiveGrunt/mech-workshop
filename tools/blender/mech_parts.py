@@ -482,8 +482,6 @@ def cockpit_interior(pal):
     for s_ in (-1, 1):
         box(f"bulkhead_side_{s_:+d}", (.3, .05, .8), F(.63 * s_, 0, .05), dark, root, rot=rot, bevel=0)
     # caution lamps on the frame
-    box("lamp_master_caution", (.1, .015, .035), F(-.24, .19, .072), lamp["#FFB347"], root, rot=rot, bevel=0)
-    box("lamp_warning", (.1, .015, .035), F(.24, .19, .072), lamp["#FF4B3A"], root, rot=rot, bevel=0)
 
     # --- dashboard: sloped console facing the pilot
     SL = -.6
@@ -494,15 +492,15 @@ def cockpit_interior(pal):
     def D(lx, ly, h=0.0):
         return tuple(Cd + Rd @ Vector((lx, ly, 0)) + n * h)
     drot = (SL, 0, 0)
-    # centre dashboard: nav / target screen, lamp row, toggles
+    # centre dashboard: switch panel (caution lamps, keypad, lamp row, toggles)
     box("dash_top", (.46, .3, .05), D(0, 0), panel, root, rot=drot, bevel=.012)
     box("dash_body", (.46, .3, .3), (0, -.34, -.38), dark, root, bevel=.02)
     box("dash_lip", (.48, .04, .05), D(0, -.15, .01), pal["trim"], root, rot=drot, bevel=.01)
-    w, h = .22, .15
-    box("screen_radar_bezel", (w + .035, h + .035, .022), D(0, .015, .03), dark, root, rot=drot, bevel=.006)
-    box("screen_radar_glass", (w, h, .004), D(0, .015, .043), screen, root, rot=drot, bevel=0)
-    q = n.to_track_quat('-Y', 'Z')   # Godot +Z (Blender -Y) faces the pilot, text up = up the slope
-    empty("screen_radar", D(0, .015, .047), root, rot=tuple(q.to_euler()), props={"screen": "radar", "w": w, "h": h})
+    box("lamp_master_caution", (.09, .03, .02), D(-.1, -.07, .032), lamp["#FFB347"], root, rot=drot, bevel=.003)
+    box("lamp_warning", (.09, .03, .02), D(.1, -.07, .032), lamp["#FF4B3A"], root, rot=drot, bevel=.003)
+    box("keypad_plate", (.13, .1, .01), D(0, .03, .03), dark, root, rot=drot, bevel=.003)
+    multi_box("keypad_keys", [((.024, .02, .012), D(-.04 + c * .04, .0 + r * .028, .037), drot) for r in range(3) for c in range(3)],
+              metal, root)
     rows = {c: [] for c in lamp}
     for i in range(9):
         c = rnd.choice(list(lamp))
@@ -511,16 +509,22 @@ def cockpit_interior(pal):
         multi_box(f"dash_lamps_{c[1:]}", parts, lamp[c], root)
     multi_cyl("dash_toggles", [(.007, .035, D(-.2 + i * .04, .125, .03), (SL - .5, 0, 0)) for i in range(11)], metal, root,
               segs=6)
-    # side MFDs flanking the window, angled at the pilot (systems left, weapons right)
-    for name, x in (("screen_status", .36), ("screen_weapons", -.36)):
-        pos = Vector((x * 1.03, -.34, -.075))
+
+    # overhead screen bank above the window, angled down at the pilot (~24-34 deg up in the 75 deg view):
+    # systems (left), nav / target (centre), weapons + boost (right)
+    bank = Vector((0, -.43, .205))
+    bn = (Vector((0, 0, 0)) - bank).normalized()
+    bq = bn.to_track_quat('-Y', 'Z')
+    box("screen_bank_housing", (.9, .07, .17), tuple(bank - bn * .03), dark, root, rot=tuple(bq.to_euler()), bevel=.012)
+    box("screen_bank_trim", (.92, .075, .02), tuple(bank - bn * .03 + Vector((0, 0, -.09))), pal["trim"], root,
+        rot=tuple(bq.to_euler()), bevel=.005)
+    multi_box("screen_bank_hangers", [((.03, .03, .2), (x, -.47, .37)) for x in (-.36, 0, .36)], metal, root)
+    for name, x, w, h in (("screen_status", .3, .17, .11), ("screen_radar", 0, .23, .12), ("screen_weapons", -.3, .17, .11)):
+        pos = Vector((x, bank.y + abs(x) * .18, bank.z))   # slight curve around the pilot
         nrm = (Vector((0, 0, 0)) - pos).normalized()
-        q = nrm.to_track_quat('-Y', 'Z')
-        r = tuple(q.to_euler())
-        w, h = .13, .1
-        box(name + "_bezel", (w + .035, .022, h + .035), tuple(pos), dark, root, rot=r, bevel=.006)
+        r = tuple(nrm.to_track_quat('-Y', 'Z').to_euler())
+        box(name + "_bezel", (w + .03, .022, h + .03), tuple(pos), dark, root, rot=r, bevel=.006)
         box(name + "_glass", (w, .004, h), tuple(pos + nrm * .012), screen, root, rot=r, bevel=0)
-        box(name + "_mount", (.05, .08, .05), tuple(pos - nrm * .05), metal, root, rot=r, bevel=.008)
         empty(name, tuple(pos + nrm * .016), root, rot=r, props={"screen": name[7:], "w": w, "h": h})
 
     # --- side consoles with twin joysticks; the pilot's gloved hands grip them.
