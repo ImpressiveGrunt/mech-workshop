@@ -77,6 +77,9 @@ for tier in TIERS:
             rot=(0, 0, r))
     render_preview(f"mech_{tier}_cockpit_view", tuple(eye), tuple(eye + Vector((0, -10, -.25))),
                    lens=20.25 / (2 * math.tan(math.radians(37.5))), sun=0)   # = Godot fov 75 (vertical)
+    # looking down (aim pitch about -30 deg): gloved hands on the sticks and the pilot's arms
+    render_preview(f"mech_{tier}_cockpit_hands", tuple(eye), tuple(eye + Vector((0, -10, -5.8))),
+                   lens=20.25 / (2 * math.tan(math.radians(37.5))), sun=0)
     render_preview(f"mech_{tier}_cockpit_detail", tuple(eye + Vector((.08, .1, .02))), tuple(eye + Vector((-.15, -1, -.35))),
                    lens=16, sun=0)
 
