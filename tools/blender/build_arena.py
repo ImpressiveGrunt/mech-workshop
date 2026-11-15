@@ -473,6 +473,6 @@ mp.assemble(mp.palette("mk1"), loc=polar(30, GATES["A"]), rotz=PI, name="preview
 mp.assemble(mp.palette("scrap"), loc=polar(30, GATES["B"]), weapon_L="missile_pod", name="preview_mech_B")
 render_preview("arena_overview", (-44.0, -42.0, 30.0), (0, -2, 0), lens=20, sun=.15, sun_color="#9FB4FF",
                sun_rot=(.9, 0, .8), world="#0E1626", world_strength=.35, samples=96)
-render_preview("arena_ground", (5.0, -40.0, 6.8), (0, 0, 3.0), lens=22, sun=0, world="#0E1626", world_strength=.35,
+render_preview("arena_ground", (4.5, -36.0, 6.4), (0, 0, 3.0), lens=22, sun=0, world="#0E1626", world_strength=.35,
                samples=96)
 save_blend(os.path.join(SOURCE, "environments", "arena.blend"))
