@@ -34,7 +34,6 @@ func _ready() -> void:
     var root: Node3D
     if ResourceLoader.exists(ENV_PATH):
         root = LevelUtils.instance_environment(ENV_PATH, self)
-        _tune_lights(root)
     else:
         root = _build_blockout()
     dock = LevelUtils.find_marker(root, "mech_dock")
@@ -138,22 +137,6 @@ func _update_hover(mouse: Vector2) -> void:
         var id := str(GameState.loadout.get(slot, ""))
         _tooltip.text = "%s: %s\nClick to upgrade" % [GameState.SLOT_NAMES[slot], PartDB.display_name(id)]
         _tooltip.position = mouse + Vector2(18, 14)
-
-
-func _tune_lights(root: Node) -> void:
-    # Blender lights carry engine-friendly values in extras {godot_energy, godot_range}.
-    for n in Mech._descendants(root):
-        if not (n is Light3D):
-            continue
-        var extras = n.get_meta("extras", {})
-        var e: Dictionary = extras if extras is Dictionary else {}
-        var light := n as Light3D
-        light.light_energy = float(e.get("godot_energy", 1.0))
-        if light is OmniLight3D:
-            (light as OmniLight3D).omni_range = float(e.get("godot_range", 10.0))
-        elif light is SpotLight3D:
-            (light as SpotLight3D).spot_range = float(e.get("godot_range", 25.0))
-            light.shadow_enabled = true
 
 
 # ------------------------------------------------------------- state

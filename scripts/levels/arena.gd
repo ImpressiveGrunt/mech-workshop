@@ -1,6 +1,8 @@
 extends Node3D
 ## Arena match: player vs one AI mech. Destroy the enemy torso to win.
 ## Damage you take is carried back to the workshop for repair.
+## The Blender arena: night colosseum with crowd, floodlights, symmetric cover,
+## destructible crates and explosive barrels.
 
 const ENV_PATH := "res://assets/models/environments/arena.glb"
 const WIN_REWARD := 400
@@ -13,11 +15,13 @@ var _over := false
 
 
 func _ready() -> void:
-    LevelUtils.add_lighting(self, Color(0.3, 0.42, 0.65), Color(0.25, 0.23, 0.2), 1.2)
     var root: Node3D
     if ResourceLoader.exists(ENV_PATH):
+        # Night bout under floodlights (the Blender arena brings its own lights).
+        LevelUtils.add_lighting(self, Color(0.05, 0.08, 0.15), Color(0.04, 0.04, 0.05), 0.25)
         root = LevelUtils.instance_environment(ENV_PATH, self)
     else:
+        LevelUtils.add_lighting(self, Color(0.3, 0.42, 0.65), Color(0.25, 0.23, 0.2), 1.2)
         root = _build_blockout()
     var spawn_a := LevelUtils.find_marker(root, "spawn_A")
     var spawn_b := LevelUtils.find_marker(root, "spawn_B")

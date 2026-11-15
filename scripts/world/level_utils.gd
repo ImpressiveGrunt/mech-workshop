@@ -71,17 +71,24 @@ static func instance_environment(path: String, parent: Node) -> Node3D:
     var root := packed.instantiate() as Node3D
     parent.add_child(root)
     for n in Mech._descendants(root):
+        if n is Light3D:
+            tune_light(n as Light3D)
+            continue
         if not (n is MeshInstance3D):
             continue
-        var extras = n.get_meta("extras", {})
-        var kind := str(extras.get("collision", "")) if extras is Dictionary else ""
-        match kind:
+        var mi := n as MeshInstance3D
+        var extras := extras_of(mi)
+        if String(mi.name).contains("_collider"):
+            mi.visible = false  # physics proxy (e.g. wrecks built from mech parts)
+        if extras.get("destructible", false):
+            Destructible.wrap(mi, extras)
+            continue
+        match str(extras.get("collision", "")):
             "mesh":
-                n.create_trimesh_collision()
+                mi.create_trimesh_collision()
             "convex":
-                n.create_convex_collision()
+                mi.create_convex_collision()
             "box":
-                var mi := n as MeshInstance3D
                 var aabb := mi.get_aabb()
                 var body := StaticBody3D.new()
                 var shape := CollisionShape3D.new()
@@ -92,6 +99,22 @@ static func instance_environment(path: String, parent: Node) -> Node3D:
                 body.add_child(shape)
                 mi.add_child(body)
     return root
+
+
+static func extras_of(n: Node) -> Dictionary:
+    var e = n.get_meta("extras", {})
+    return e if e is Dictionary else {}
+
+
+## Blender lights carry engine-friendly values in extras {godot_energy, godot_range}.
+static func tune_light(light: Light3D) -> void:
+    var e := extras_of(light)
+    light.light_energy = float(e.get("godot_energy", 1.0))
+    if light is OmniLight3D:
+        (light as OmniLight3D).omni_range = float(e.get("godot_range", 10.0))
+    elif light is SpotLight3D:
+        (light as SpotLight3D).spot_range = float(e.get("godot_range", 25.0))
+        light.shadow_enabled = true
 
 
 static func find_marker(root: Node, marker_name: String) -> Node3D:

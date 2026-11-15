@@ -5,7 +5,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 BLENDER=${BLENDER:-blender}
-for script in build_mech.py build_workshop.py; do   # environments get added one at a time
+for script in build_mech.py build_workshop.py build_arena.py; do   # environments get added one at a time
   echo "== $script"
   "$BLENDER" -b --factory-startup --python "tools/blender/$script" 2>&1 \
     | grep -E "EXPORTED|RENDERED|SAVED|WROTE|Error|Traceback" || true

@@ -269,6 +269,9 @@ def render_preview(name, cam_loc, target, lens=35, sun=3.0, sun_rot=(0.9, 0.2, 0
         sc.view_settings.view_transform = 'AgX'; sc.view_settings.look = 'AgX - Punchy'
     except Exception:
         pass
+    q = float(os.environ.get("PREVIEW_SCALE", "1"))  # e.g. 0.35 for a quick draft render
+    if q < 1:
+        res, sc.cycles.samples = (int(res[0] * q), int(res[1] * q)), max(8, int(samples * q))
     sc.render.resolution_x, sc.render.resolution_y = res
     sc.render.resolution_percentage = 100
     sc.render.image_settings.file_format = 'PNG'
