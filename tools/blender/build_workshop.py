@@ -127,7 +127,7 @@ for nm, a, b in (("n", (-5, 5.5), (5, 5.5)), ("s", (-5, -4.5), (5, -4.5)),
 cyl("turntable_glow", 3.25, .05, (0, 0, .085), M["ring"], segs=48)
 cyl("turntable", 3.1, .12, (0, 0, .12), M["steel"], segs=48, props=SOLID)
 multi_box("turntable_grooves", [((6.0, .06, .02), (0, 0, .185), (0, 0, a * PI / 6)) for a in range(6)], M["grate"])
-text("floor_bay_number", "01", 1.6, (0, -3.6, .07), rot=(0, 0, PI), m=mat("floor_paint_white", "#D8D8D0", 0, .7), extrude=.01)
+text("floor_bay_number", "01", 1.6, (0, -3.6, .065), rot=(PI, 0, 0), m=mat("floor_paint_white", "#D8D8D0", 0, .7), extrude=.01)
 for x in (-5.5, 5.5):
     box(f"lane_{x:+.0f}", (.25, 9, .02), (x, -9.5, .01), mat("hazard_yellow", "#F2C230", 0, .5), bevel=0)
 
