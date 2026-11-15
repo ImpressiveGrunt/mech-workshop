@@ -41,7 +41,7 @@ func _ready() -> void:
     camera.fov = 50.0
     add_child(camera)
     camera.current = true
-    camera.global_transform = shots.get("cam_overview", Transform3D(Basis(), Vector3(2.5, 3.3, 11.5)))
+    camera.global_transform = shots.get("cam_overview", Transform3D(Basis(), Vector3(2.4, 1.7, 11.0)))
 
     _build_ui()
     _rebuild_mech()
@@ -472,19 +472,19 @@ func _build_blockout() -> Node3D:
     root.name = "WorkshopBlockout"
     add_child(root)
     LevelUtils.add_box(root, Vector3(28, 0.3, 24), Vector3(0, -0.15, 2), Color(0.45, 0.44, 0.42))
-    LevelUtils.add_box(root, Vector3(28, 11, 0.3), Vector3(0, 5.5, -10), Color(0.25, 0.3, 0.36))
+    LevelUtils.add_box(root, Vector3(28, 8.5, 0.3), Vector3(0, 4.25, -10), Color(0.25, 0.3, 0.36))
     for x in [-4.7, 4.7]:
-        LevelUtils.add_box(root, Vector3(1.9, 9.4, 3), Vector3(x, 4.7, -0.5), Color(0.88, 0.65, 0.15))
+        LevelUtils.add_box(root, Vector3(1.9, 6.4, 3), Vector3(x, 3.2, -0.5), Color(0.88, 0.65, 0.15))
     var lamp := OmniLight3D.new()
     lamp.position = Vector3(0, 7, 5)
     lamp.omni_range = 18.0
     lamp.light_energy = 2.5
     root.add_child(lamp)
     LevelUtils.add_marker(root, "mech_dock", Vector3(0, 0.18, 0))
-    var cams := {"cam_overview": [Vector3(2.5, 3.3, 11.5), Vector3(2.5, 2.9, 0)],
-                 "cam_upgrade": [Vector3(2.0, 3.7, 7.6), Vector3(1.85, 3.0, 0)],
-                 "cam_repair": [Vector3(5.2, 1.5, 7.4), Vector3(1.5, 2.5, 0)],
-                 "cam_paint": [Vector3(3.0, 2.0, 9.6), Vector3(2.6, 2.7, 0)]}
+    var cams := {"cam_overview": [Vector3(2.4, 1.7, 11.0), Vector3(2.2, 2.9, 0)],
+                 "cam_upgrade": [Vector3(1.9, 1.7, 6.8), Vector3(1.6, 3.3, 0)],
+                 "cam_repair": [Vector3(4.6, 1.2, 6.6), Vector3(1.3, 2.6, 0)],
+                 "cam_paint": [Vector3(2.8, 1.6, 8.8), Vector3(2.4, 2.9, 0)]}
     for marker_name in cams:
         var m := LevelUtils.add_marker(root, marker_name, cams[marker_name][0])
         m.look_at(cams[marker_name][1])

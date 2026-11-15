@@ -3,12 +3,23 @@ extends Node
 ## First-person mech controls. Add as a child of a built Mech.
 ##   W/S throttle, A/D turn legs, mouse twists the torso and pitches the arms,
 ##   LMB right-arm weapon, RMB left-arm weapon, Space boost, C centre torso.
+## The cockpit sells the 15 ft scale: a slow heavy stride bob, a thud on every
+## footfall, a jolt on landing, and shake when hit.
+
+const STEP_LENGTH := 2.6   # metres per footfall for a 4.6 m tall walker
+const BOB_HEIGHT := 0.09
+const SWAY_ROLL := 0.015
 
 @export var mouse_sensitivity := 0.0025
 
 var mech: Mech
 var camera: Camera3D
 var enabled := true
+var _base_pos := Vector3.ZERO
+var _step_phase := 0.0
+var _last_step_sign := 1.0
+var _shake := 0.0
+var _air_time := 0.0
 
 
 func _ready() -> void:
@@ -21,8 +32,38 @@ func _ready() -> void:
     anchor.add_child(camera)
     if anchor == mech:
         camera.position = Vector3(0, 3.6, 0)
+    _base_pos = camera.position
     camera.current = true
     Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+    mech.hit_taken.connect(_on_hit)
+
+
+func _on_hit(_m: Mech, _slot: String, amount: float) -> void:
+    _shake = minf(_shake + amount * 0.004, 0.35)
+
+
+func _process(delta: float) -> void:
+    var speed := Vector2(mech.velocity.x, mech.velocity.z).length()
+    if mech.is_on_floor():
+        if _air_time > 0.35:
+            _shake = maxf(_shake, 0.3)  # landing jolt after a thruster jump
+        _air_time = 0.0
+        if speed > 0.3:
+            _step_phase += speed / STEP_LENGTH * PI * delta
+            var side := signf(sin(_step_phase))
+            if side != _last_step_sign:
+                _last_step_sign = side
+                _shake = maxf(_shake, 0.07)  # footfall thud
+        else:
+            _step_phase = lerpf(_step_phase, round(_step_phase / PI) * PI, delta * 4.0)
+    else:
+        _air_time += delta
+    _shake = move_toward(_shake, 0.0, delta * 0.6)
+    var jitter := Vector2(randf_range(-1, 1), randf_range(-1, 1)) * _shake * 0.15
+    var bob := -absf(sin(_step_phase)) * BOB_HEIGHT
+    camera.position = _base_pos + Vector3(jitter.x, bob + jitter.y, 0)
+    # Godot cameras look down -Z; mech models face +Z, hence the PI yaw.
+    camera.rotation = Vector3(mech.aim_pitch + jitter.y * 0.3, PI, sin(_step_phase) * SWAY_ROLL + jitter.x * 0.3)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -40,8 +81,6 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _physics_process(_delta: float) -> void:
-    # Godot cameras look down -Z; mech models face +Z, hence the PI yaw.
-    camera.rotation = Vector3(mech.aim_pitch, PI, 0)
     if not enabled or mech.is_destroyed:
         mech.throttle = 0.0
         mech.turn = 0.0

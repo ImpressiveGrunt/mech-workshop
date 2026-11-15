@@ -15,6 +15,7 @@ import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from common import *
 import mech_parts as mp
+import props as pr
 
 random.seed(7)
 reset()
@@ -40,7 +41,7 @@ M = dict(
     wood=mat("bench_wood", "#9A7148", 0, .8),
 )
 SOLID = {"collision": "box"}
-W, Y0, Y1, H = 28.0, -14.0, 10.0, 11.0
+W, Y0, Y1, H = 28.0, -14.0, 10.0, 8.5
 
 
 def light(name, loc, energy, color, godot_energy, godot_range, spot_target=None, angle=0.8):
@@ -101,8 +102,8 @@ wall("wall_back", W, (0, Y1), 0)
 wall("wall_front", W, (0, Y0), 0)
 wall("wall_left", Y1 - Y0, (-W / 2, (Y0 + Y1) / 2), PI / 2)
 wall("wall_right", Y1 - Y0, (W / 2, (Y0 + Y1) / 2), PI / 2)
-text("bay_sign", "BAY 01", 1.7, (0, Y1 - .45, 8.4), m=M["accent"], extrude=.08)
-box("bay_sign_plate", (8.2, .1, 2.4), (0, Y1 - .3, 8.4), M["wainscot"], bevel=.03)
+text("bay_sign", "BAY 01", 1.7, (0, Y1 - .45, 6.9), m=M["accent"], extrude=.08)
+box("bay_sign_plate", (8.2, .1, 2.4), (0, Y1 - .3, 6.9), M["wainscot"], bevel=.03)
 
 # roof trusses + light panels
 trusses = []
@@ -131,25 +132,26 @@ text("floor_bay_number", "01", 1.6, (0, -3.6, .07), rot=(0, 0, 0), m=mat("floor_
 for x in (-5.5, 5.5):
     box(f"lane_{x:+.0f}", (.25, 9, .02), (x, -9.5, .01), mat("hazard_yellow", "#F2C230", 0, .5), bevel=0)
 
-# docking towers
+# docking towers: sized to the 4.6 m mech (decks at cockpit height)
+DECK_Z = 3.3
 for s, side in ((1, "L"), (-1, "R")):
     x = 4.7 * s
-    cols = [((.5, .5, 9.4), (x + dx, y, 4.7)) for dx in (-.7, .7) for y in (-.8, 1.8)]
+    cols = [((.45, .45, 6.4), (x + dx, y, 3.2)) for dx in (-.7, .7) for y in (-.8, 1.8)]
     multi_box(f"tower_{side}_columns", cols, M["dock"], props=SOLID, bevel=.03)
     braces = []
-    for z0 in (0.6, 3.6, 6.6):
+    for z0 in (0.4, DECK_Z + .15):
         for dx in (-.7, .7):
-            for a, b in (((x + dx, -.8, z0), (x + dx, 1.8, z0 + 2.8)), ((x + dx, 1.8, z0), (x + dx, -.8, z0 + 2.8))):
-                c, r, L = seg_xf(a, b); braces.append(((.14, .14, L), c, r))
+            for a, b in (((x + dx, -.8, z0), (x + dx, 1.8, z0 + 2.75)), ((x + dx, 1.8, z0), (x + dx, -.8, z0 + 2.75))):
+                c, r, L = seg_xf(a, b); braces.append(((.12, .12, L), c, r))
     multi_box(f"tower_{side}_braces", braces, M["steel"])
-    for z in (3.0, 6.2):
-        box(f"tower_{side}_deck_{z:.0f}", (1.9, 3.0, .15), (x, .5, z), M["grate"], bevel=0, props=SOLID)
-    box(f"tower_{side}_cap", (2.2, 3.3, .5), (x, .5, 9.6), M["steel"])
-    cyl(f"tower_{side}_beacon", .22, .35, (x, -.8, 10.05), M["beacon"], segs=12)
-    light(f"tower_{side}_beacon_light", (x, -1.2, 10.0), 60, "#FF9A2E", .6, 6)
-    # monitor on the front face
-    box(f"tower_{side}_monitor_frame", (1.3, .12, .9), (x, -1.15, 2.2), M["steel"], rot=(-.2, 0, 0))
-    box(f"tower_{side}_monitor", (1.15, .05, .75), (x, -1.22, 2.2), M["screen"], rot=(-.2, 0, 0), bevel=0)
+    box(f"tower_{side}_deck", (1.9, 4.2, .12), (x, -.1, DECK_Z), M["grate"], bevel=0, props=SOLID)
+    railing(f"tower_{side}_rail_outer", (x + .95 * s, -2.2), (x + .95 * s, 2.0), DECK_Z, posts=5)
+    box(f"tower_{side}_cap", (2.0, 3.1, .35), (x, .5, 6.55), M["steel"])
+    cyl(f"tower_{side}_beacon", .16, .26, (x, -.8, 6.85), M["beacon"], segs=12)
+    light(f"tower_{side}_beacon_light", (x, -1.1, 6.8), 40, "#FF9A2E", .6, 6)
+    # eye-level status monitor (a person-sized screen next to a 15 ft machine)
+    box(f"tower_{side}_monitor_frame", (.9, .1, .6), (x, -1.12, 1.55), M["steel"], rot=(-.15, 0, 0))
+    box(f"tower_{side}_monitor", (.78, .05, .48), (x, -1.18, 1.55), M["screen"], rot=(-.15, 0, 0), bevel=0)
     # docking clamp over the pauldron
     box(f"clamp_{side}_beam", (2.6, .7, .6), (2.95 * s, .1, 5.05), M["dock"], bevel=.05)
     cyl(f"clamp_{side}_piston", .14, .7, (2.05 * s, .05, 4.55), M["steel"], segs=10)
@@ -167,25 +169,29 @@ for s, side in ((1, "L"), (-1, "R")):
     cyl(f"repair_arm_{side}_weld", .07, .1, (2.12 * s, -2.68, 2.18), M["weld"], segs=8)
     light(f"repair_arm_{side}_spark", (2.1 * s, -2.8, 2.2), 25, "#9FE8FF", .8, 3)
 
-# top gantry + hoses down to the mech's back
-box("gantry_beam", (10.8, .9, .9), (0, .5, 9.3), M["dock"], bevel=.05, props=SOLID)
-box("gantry_hoist", (1.4, 1.4, .9), (0, .9, 8.5), M["steel"])
-multi_box("gantry_stripe", [((.4, .92, .92), (x, .5, 9.3)) for x in (-4, -2.5, -1, 1, 2.5, 4)],
+# gantry across the tower tops + hoses down to the mech's back
+box("gantry_beam", (10.6, .8, .7), (0, .5, 6.3), M["dock"], bevel=.05, props=SOLID)
+box("gantry_hoist", (1.1, 1.1, .6), (0, .9, 5.65), M["steel"])
+multi_box("gantry_stripe", [((.4, .82, .72), (x, .5, 6.3)) for x in (-4, -2.5, -1, 1, 2.5, 4)],
           mat("hazard_black", "#1B1C1E", 0, .6))
-for i, (a, b, r, m) in enumerate([((-.9, 1.4, 8.8), (-.45, 1.1, 4.6), .09, M["rubber"]),
-                                  ((.9, 1.4, 8.8), (.45, 1.1, 4.6), .09, M["rubber"]),
-                                  ((0, 1.8, 8.1), (0, 1.25, 4.0), .12, M["dock"])]):
+for i, (a, b, r, m) in enumerate([((-.7, 1.3, 5.95), (-.45, 1.1, 4.6), .08, M["rubber"]),
+                                  ((.7, 1.3, 5.95), (.45, 1.1, 4.6), .08, M["rubber"]),
+                                  ((0, 1.3, 5.4), (0, 1.25, 4.0), .1, M["dock"])]):
     cyl_seg(f"hose_{i}", a, b, r, m)
 
-# catwalk behind the mech + stairs
-box("catwalk", (9.0, 1.6, .15), (0, 3.0, 6.2), M["grate"], bevel=0, props=SOLID)
-railing("catwalk_rail_front", (-3.9, 2.25), (3.9, 2.25), 6.2, posts=8)
+# boarding gangway from the right tower deck to the cockpit (pilot walks this)
+box("gangway", (2.5, .9, .1), (-2.5, -1.65, DECK_Z), M["grate"], bevel=0, props=SOLID)
+railing("gangway_rail", (-3.75, -2.1), (-1.25, -2.1), DECK_Z, posts=4)
+hazard_strip("gangway_edge", (-1.3, -2.1, 0), (-1.3, -1.2, 0), .1, seg_len=.15, z=DECK_Z + .06)
+
+# stairs up to the right tower deck
 steps = []
-for i in range(24):
-    steps.append(((.3, 1.3, .08), (-5.9 - i * .26, 3.0, 6.2 - (i + 1) * .258)))
+for i in range(13):
+    steps.append(((.3, 1.0, .07), (-5.8 - i * .27, .6, DECK_Z - (i + 1) * DECK_Z / 13)))
 multi_box("stairs", steps, M["grate"])
-for dy in (-.68, .68):
-    seg(f"stair_stringer_{dy:+.1f}", (-5.7, 3.0 + dy, 6.2), (-12.2, 3.0 + dy, 0), .1, .3, M["dock"])
+for dy in (-.53, .53):
+    seg(f"stair_stringer_{dy:+.1f}", (-5.65, .6 + dy, DECK_Z), (-9.4, .6 + dy, 0), .08, .25, M["dock"])
+railing("stair_rail", (-5.7, 1.13), (-9.3, 1.13), 0, posts=4)
 
 # ------------------------------------------------------------------ props
 use_collection("props")
@@ -231,6 +237,19 @@ for sx in (-1, 1):
 # gas bottles
 multi_cyl("gas_bottles", [(.14, 1.4, (12.8, y, .7)) for y in (2.0, 2.4, 2.8, 3.2)], mat("gas_green", "#3E7A4E", .3, .5), segs=12)
 
+# human scale: crew, forklift, cones, a person-sized door
+pr.human("crew_boarding", (-1.75, -1.65, DECK_Z + .06), PI / 2, pose="tablet", vest="#F2C230", skin=1)
+pr.human("crew_chief", (1.3, -3.1, .18), PI, pose="point", vest="#FF6A1A", hat="#FFFFFF", skin=0)
+pr.human("crew_deck", (4.6, -1.4, DECK_Z + .06), 0, pose="wave", vest="#F2C230", skin=2)
+pr.human("crew_bench", (-8.6, -5.25, 0), PI, pose="stand", vest="#9FE8FF", hat="#2F5D8C", skin=3)
+pr.human("crew_terminal", (6.8, -6.0, 0), PI, pose="tablet", vest="#F2C230", skin=0)
+pr.forklift("forklift", (9.0, 5.2, 0), PI / 2)
+for i, (x, y) in enumerate([(-5.5, -6.0), (-5.5, -8.5), (5.5, -7.2), (6.1, -2.8)]):
+    pr.cone(f"cone_{i}", (x, y, 0))
+box("side_door", (.08, 1.0, 2.1), (W / 2 - .2, 4.0, 1.05), mat("door_blue", "#2F5D8C", .3, .5), bevel=.01)
+box("side_door_frame", (.06, 1.2, 2.25), (W / 2 - .17, 4.0, 1.12), M["steel"], bevel=0)
+box("exit_sign", (.05, .5, .18), (W / 2 - .22, 4.0, 2.45), mat("exit_green", "#2EE66B", 0, .3, emit=5), bevel=0)
+
 # ------------------------------------------------------------------ dock lighting
 light("key_left", (-6.0, -8.0, 8.5), 3500, "#FFF4E0", 8.0, 30, spot_target=(0, 0, 3.0), angle=0.7)
 light("key_right", (6.5, -7.0, 7.5), 2200, "#FFE6C8", 5.0, 30, spot_target=(0, 0, 2.6), angle=0.7)
@@ -242,10 +261,11 @@ light("pad_fill", (0, -4.0, 1.0), 250, "#3CE6FF", 1.0, 8)
 use_collection("markers")
 empty("mech_dock", (0, 0, .18), props={"marker": "mech_dock"})
 SHOTS = {  # name: (camera position, look-at target); mech sits left of frame for the UI panel
-    "cam_overview": ((2.5, -11.5, 3.3), (2.5, 0, 2.9)),
-    "cam_upgrade": ((2.0, -7.6, 3.7), (1.85, 0, 3.0)),
-    "cam_repair": ((5.2, -7.4, 1.5), (1.5, 0, 2.5)),
-    "cam_paint": ((3.0, -9.6, 2.0), (2.6, 0, 2.7)),
+    # eye level (1.7 m) looking up: you stand on the floor next to a 15 ft machine
+    "cam_overview": ((2.4, -11.0, 1.7), (2.2, 0, 2.9)),
+    "cam_upgrade": ((1.9, -6.8, 1.7), (1.6, 0, 3.3)),
+    "cam_repair": ((4.6, -6.6, 1.2), (1.3, 0, 2.6)),
+    "cam_paint": ((2.8, -8.8, 1.6), (2.4, 0, 2.9)),
 }
 for name, (loc, tgt) in SHOTS.items():
     q = (Vector(tgt) - Vector(loc)).to_track_quat('Y', 'Z')  # local +Y -> Godot camera -Z
@@ -258,5 +278,6 @@ use_collection("_preview_mech")
 mp.assemble(mp.palette("mk1"), loc=(0, 0, .18))
 lens = 20.25 / (2 * math.tan(math.radians(25)))  # matches Godot fov 50 (vertical) at 16:9
 render_preview("workshop_overview", *SHOTS["cam_overview"], lens=lens, sun=0, world="#1A2028", world_strength=.3)
-render_preview("workshop_wide", (-9.5, -12.5, 7.5), (0, 1, 3.5), lens=16, sun=0, samples=96)
+render_preview("workshop_upgrade", *SHOTS["cam_upgrade"], lens=lens, sun=0, samples=96)
+render_preview("workshop_wide", (-10.5, -12.5, 5.8), (0, 1, 2.8), lens=16, sun=0, samples=96)
 save_blend(os.path.join(SOURCE, "environments", "workshop.blend"))

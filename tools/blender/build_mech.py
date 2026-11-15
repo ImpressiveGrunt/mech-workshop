@@ -6,6 +6,7 @@ import json, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from common import *
 import mech_parts as mp
+import props as pr
 
 TIERS = ["mk1"]
 PARTS = [
@@ -36,7 +37,8 @@ for tier in TIERS:
     reset()
     mech = mp.assemble(mp.palette(tier))
     export_glb(os.path.join(OUT, f"mech_{tier}_assembled.glb"), hierarchy(mech))
-    render_preview(f"mech_{tier}_front", (6.5, -8.5, 4.2), (0, 0, 2.6), lens=40, ground="#6F7378",
+    pr.human("scale_ref", (2.5, .3, 0), -.5, pose="stand")  # preview only: 1.8 m person for scale
+    render_preview(f"mech_{tier}_front", (6.0, -9.5, 1.7), (.6, 0, 2.4), lens=35, ground="#6F7378",
                    sun_rot=(0.85, 0.15, -0.5))
     render_preview(f"mech_{tier}_back", (-6.0, 7.5, 5.2), (0, 0, 2.9), lens=40, sun=0)
     render_preview(f"mech_{tier}_closeup", (-3.2, -5.2, 3.6), (-1.0, -1.5, 2.9), lens=40, sun=0)

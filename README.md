@@ -1,6 +1,8 @@
 # Mech Workshop
 
-A stylized **first-person mech-building arena fighter**. Mechs are built from
+A stylized **first-person mech-building arena fighter**. Your mech is a 15 ft (4.6 m) walker:
+the workshop camera sits at human eye level, crew members stand around the dock, and the cockpit
+bobs and thuds with every stride. Mechs are built from
 modular parts with real physics and per-part damage: armor plates break off,
 arms get blown away, and losing the torso ends the fight.
 
@@ -78,7 +80,8 @@ tools/blender/build_all.sh               # or SKIP_RENDER=1 for models only
 | Asset | Status |
 |---|---|
 | Starter mech Mk1: legs, torso, two arms, autocannon, ram fist, missile pod, jump thruster | ✅ |
-| Workshop: mech dock bay (clamps, repair arms, turntable, catwalk, props) | ✅ |
+| Workshop: mech dock bay sized to the mech (clamps, repair arms, turntable, boarding gangway, crew, forklift) | ✅ |
+| Human-scale props: workers (4 poses), forklift, traffic cones (`props.py`) | ✅ |
 | Salvage yard environment | blockout only |
 | Arena environment | blockout only |
 
