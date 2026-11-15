@@ -27,7 +27,7 @@ Your mech stands in its dock, seen from the front. Options on the right:
 - **Repairs**: per-part damage bars. Repair a single part or everything. Missing armour plates come back.
 - **Paint**: colour pickers for primary, secondary, stripes and lights, plus presets.
 
-Each option moves the camera to its own shot. Deploy to the **Arena** or the **Salvage Yard** from the bottom of the panel.
+Hold the **< ROTATE / ROTATE >** buttons under the mech (or Q / E) to spin it on the dock turntable and inspect it from any side. Each option moves the camera to its own shot. Deploy to the **Arena** or the **Salvage Yard** from the bottom of the panel.
 
 ## Controls (in the mech)
 

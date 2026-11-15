@@ -7,6 +7,8 @@ extends Node3D
 const ENV_PATH := "res://assets/models/environments/workshop.glb"
 const TABS := {"upgrades": "UPGRADES", "repairs": "REPAIRS", "paint": "PAINT"}
 const SHOTS := {"": "cam_overview", "upgrades": "cam_upgrade", "repairs": "cam_repair", "paint": "cam_paint"}
+const ROTATE_SPEED := deg_to_rad(60.0)  # turntable speed while a rotate button is held
+const TURNTABLE_NODES := ["turntable", "turntable_grooves"]
 
 var display_mech: Mech
 var camera: Camera3D
@@ -21,6 +23,9 @@ var _content: VBoxContainer
 var _status_label: Label
 var _tooltip: Label
 var _tab_buttons: Dictionary = {}
+var _dock_yaw := 0.0
+var _spin := 0.0                       # -1 / 0 / +1 while a rotate control is held
+var _turntable: Dictionary = {}        # node -> rest transform
 
 
 func _ready() -> void:
@@ -33,6 +38,10 @@ func _ready() -> void:
     else:
         root = _build_blockout()
     dock = LevelUtils.find_marker(root, "mech_dock")
+    for node_name in TURNTABLE_NODES:
+        var n := LevelUtils.find_marker(root, node_name)
+        if n:
+            _turntable[n] = n.transform
     for marker_name in SHOTS.values():
         var m := LevelUtils.find_marker(root, marker_name)
         if m:
@@ -58,7 +67,7 @@ func _rebuild_mech() -> void:
         display_mech.queue_free()
     display_mech = Mech.new()
     add_child(display_mech)
-    display_mech.global_transform = dock.global_transform if dock else Transform3D()
+    _apply_dock_yaw()
     display_mech.build(GameState.loadout, GameState.damage, GameState.paint)
     display_mech.set_physics_process(false)  # parked in the dock
     _hover_slot = ""
@@ -75,7 +84,32 @@ func _move_camera(marker_name: String) -> void:
     _cam_tween.tween_property(camera, "global_transform", shots[marker_name], 0.9)
 
 
+func _process(delta: float) -> void:
+    if _spin != 0.0:
+        _dock_yaw = wrapf(_dock_yaw + _spin * ROTATE_SPEED * delta, -PI, PI)
+        _apply_dock_yaw()
+
+
+## Spin the docked mech (and the turntable under it) around the dock marker.
+func _apply_dock_yaw() -> void:
+    var rest := dock.global_transform if dock else Transform3D()
+    if display_mech:
+        display_mech.global_transform = Transform3D(rest.basis.rotated(Vector3.UP, _dock_yaw), rest.origin)
+    for n in _turntable:
+        var t: Transform3D = _turntable[n]
+        n.transform = Transform3D(t.basis.rotated(Vector3.UP, _dock_yaw), t.origin)
+
+
+func _set_spin(direction: float) -> void:
+    _spin = direction
+
+
 func _unhandled_input(event: InputEvent) -> void:
+    if event is InputEventKey and not event.echo:
+        var key := (event as InputEventKey).physical_keycode
+        if key == KEY_Q or key == KEY_E:
+            _spin = (1.0 if key == KEY_Q else -1.0) if event.pressed else 0.0
+            return
     if event is InputEventMouseMotion:
         _update_hover((event as InputEventMouseMotion).position)
     elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
@@ -156,9 +190,32 @@ func _build_ui() -> void:
     _status_label = Label.new()
     hv.add_child(_status_label)
 
+    # rotate-in-dock controls, centred under the mech (hold to spin the turntable)
+    var rotate_bar := HBoxContainer.new()
+    rotate_bar.anchor_left = 0.36
+    rotate_bar.anchor_right = 0.36
+    rotate_bar.anchor_top = 1.0
+    rotate_bar.anchor_bottom = 1.0
+    rotate_bar.offset_left = -150
+    rotate_bar.offset_right = 150
+    rotate_bar.offset_top = -110
+    rotate_bar.offset_bottom = -56
+    rotate_bar.alignment = BoxContainer.ALIGNMENT_CENTER
+    rotate_bar.add_theme_constant_override("separation", 16)
+    ui.add_child(rotate_bar)
+    for pair in [["<   ROTATE", 1.0, "Hold to turn the mech left (Q)"], ["ROTATE   >", -1.0, "Hold to turn the mech right (E)"]]:
+        var b := Button.new()
+        b.text = pair[0]
+        b.tooltip_text = pair[2]
+        b.custom_minimum_size = Vector2(140, 52)
+        b.add_theme_font_size_override("font_size", 18)
+        b.button_down.connect(_set_spin.bind(pair[1]))
+        b.button_up.connect(_set_spin.bind(0.0))
+        rotate_bar.add_child(b)
+
     # bottom-left hint
     var hint := Label.new()
-    hint.text = "Tip: click any part of your mech to upgrade it"
+    hint.text = "Tip: click any part of your mech to upgrade it  ·  Q / E rotates it in the dock"
     hint.add_theme_color_override("font_color", UITheme.MUTED)
     hint.anchor_top = 1.0
     hint.anchor_bottom = 1.0
