@@ -14,6 +14,7 @@ extends CharacterBody3D
 signal destroyed(mech: Mech)
 signal part_destroyed(mech: Mech, slot: String)
 signal hit_taken(mech: Mech, slot: String, amount: float)
+signal footstep(mech: Mech, world_pos: Vector3, strength: float)
 
 const GRAVITY := 24.0
 const LAYER_WORLD := 1
@@ -40,6 +41,9 @@ var shoulders: Array = []
 var slot_meshes: Dictionary = {}  # slot -> visible meshes of that part (for highlighting)
 var _paint_cache: Dictionary = {}
 var _highlight_mat: StandardMaterial3D
+var gait: MechGait
+var current_paint: Dictionary = {}
+var yaw_velocity := 0.0   # rad/s, eased so heavy mechs wind up and wind down their turns
 var is_destroyed := false
 
 # Inputs written by a controller.
@@ -62,6 +66,9 @@ var _impulse := Vector3.ZERO
 
 func build(new_loadout: Dictionary, carried_damage: Dictionary = {}, paint: Dictionary = {}) -> void:
     loadout = new_loadout.duplicate()
+    add_to_group("mechs")
+    floor_snap_length = 0.6
+    floor_max_angle = deg_to_rad(40.0)
     collision_layer = LAYER_MECH
     collision_mask = LAYER_WORLD | LAYER_MECH
     var body_shape := CollisionShape3D.new()
@@ -76,6 +83,13 @@ func build(new_loadout: Dictionary, carried_damage: Dictionary = {}, paint: Dict
     if legs == null:
         return
     torso_pivot = _find(legs, "socket_torso")
+    gait = MechGait.new()
+    add_child(gait)
+    if gait.setup(self, legs):
+        gait.footstep.connect(_on_gait_footstep)
+    else:
+        gait.queue_free()
+        gait = null
     var torso := _spawn("torso", torso_pivot)
     if torso:
         cockpit_anchor = _find(torso, "cockpit_camera")
@@ -116,6 +130,7 @@ func _strip_damaged_armor() -> void:
 
 ## Recolour the mech. paint: {"primary", "secondary", "accent", "glow"} -> "#rrggbb".
 func apply_paint(paint: Dictionary) -> void:
+    current_paint = paint.duplicate()
     _paint_cache.clear()
     for n in _descendants(self):
         if not (n is MeshInstance3D) or n.mesh == null:
@@ -169,12 +184,13 @@ func is_part_alive(slot: String) -> bool:
 # ------------------------------------------------------------- movement
 func _physics_process(delta: float) -> void:
     var legs_ok := is_part_alive("legs")
-    if not is_destroyed:
-        rotate_y(turn * turn_rate * (1.0 if legs_ok else 0.4) * delta)
+    var target_yaw := 0.0 if is_destroyed else turn * turn_rate * (1.0 if legs_ok else 0.4)
+    yaw_velocity = move_toward(yaw_velocity, target_yaw, turn_rate * 2.5 * delta)
+    rotate_y(yaw_velocity * delta)
     var forward := global_basis.z  # models face +Z (Blender -Y)
     var speed := top_speed * (1.0 if legs_ok else 0.25)
     var target := forward * throttle * speed if not is_destroyed else Vector3.ZERO
-    var accel := clampf(250000.0 / mass_kg, 3.0, 20.0)
+    var accel := clampf(180000.0 / mass_kg, 2.5, 14.0)   # ~6.7 m/s^2 for the 27 t starter mech
     var horizontal := Vector3(velocity.x, 0, velocity.z).move_toward(target, accel * delta)
     velocity.x = horizontal.x
     velocity.z = horizontal.z
@@ -217,7 +233,13 @@ func take_hit(slot: String, amount: float, at: Vector3, push: Vector3 = Vector3.
         if part_hp[slot] <= 0.0:
             _destroy_part(slot, push)
     _impulse += push * (8000.0 / mass_kg)
+    if gait:
+        gait.kick(push)
     hit_taken.emit(self, slot, amount)
+
+
+func _on_gait_footstep(_side: String, world_pos: Vector3, strength: float) -> void:
+    footstep.emit(self, world_pos, strength * clampf(mass_kg / 25000.0, 0.5, 2.0))
 
 
 func _nearest_plate(slot: String, at: Vector3) -> Dictionary:

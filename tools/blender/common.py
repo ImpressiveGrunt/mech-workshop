@@ -248,7 +248,7 @@ def render_preview(name, cam_loc, target, lens=35, sun=3.0, sun_rot=(0.9, 0.2, 0
         return
     sc = bpy.context.scene
     use_collection("_preview")
-    cd = bpy.data.cameras.new("PreviewCam"); cd.lens = lens; cd.clip_end = 1000
+    cd = bpy.data.cameras.new("PreviewCam"); cd.lens = lens; cd.clip_end = 1000; cd.clip_start = .01
     rot = (Vector(target) - Vector(cam_loc)).to_track_quat('-Z', 'Y').to_euler()
     sc.camera = _link(bpy.data.objects.new("PreviewCam", cd), cam_loc, tuple(rot), None, None)
     if sun:

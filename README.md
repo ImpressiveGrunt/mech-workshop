@@ -35,6 +35,17 @@ Both mechs start inside their gate tunnels. The blast doors slide open, each mec
 spawn mark (you ride along in your cockpit and can look around), the gates slam shut behind
 them, then 3-2-1, **FIGHT**. Destroy the enemy torso to win.
 
+## Walking and cockpit
+
+- **Procedural gait** (`scripts/mech/mech_gait.gd`): feet plant and stay put; each leg is solved with
+  2-bone IK on the Blender hip/knee/ankle joints (pistons telescope with them). The body crouches, bobs
+  lowest at each footfall, sways over the stance leg, leans into acceleration and turns, and staggers when
+  hit. Turning on the spot makes the mech re-step. Turns wind up and down with inertia.
+- **Cockpit** (`cockpit_interior_mk1.glb`, built in Blender): you look out through layered armoured glass
+  set in a bolted frame. Below it sit caution lamps, three live dashboard screens (systems, speed/heading/target,
+  weapons/boost), switch rows, gauges, a throttle and stick, piped side walls and an overhead panel. The glass
+  cracks at 75 / 50 / 25 % torso integrity.
+
 ## Controls (in the mech)
 
 | Input | Action |

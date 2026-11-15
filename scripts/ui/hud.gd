@@ -23,6 +23,9 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
     if mech == null or not is_instance_valid(mech):
         return
+    if mech.has_meta("diegetic_hud"):
+        _status.text = ""   # the cockpit screens show this instead
+        return
     var lines: Array[String] = []
     for slot in GameState.SLOTS:
         if mech.part_max_hp.has(slot):

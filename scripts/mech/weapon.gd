@@ -32,6 +32,10 @@ func _process(delta: float) -> void:
     _cooldown = maxf(0.0, _cooldown - delta)
 
 
+func ready_fraction() -> float:
+    return clampf(1.0 - _cooldown * fire_rate, 0.0, 1.0)
+
+
 func can_fire() -> bool:
     return _cooldown <= 0.0 and ammo != 0 and not mech.is_destroyed
 

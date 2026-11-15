@@ -69,6 +69,8 @@ func _rebuild_mech() -> void:
     _apply_dock_yaw()
     display_mech.build(GameState.loadout, GameState.damage, GameState.paint)
     display_mech.set_physics_process(false)  # parked in the dock
+    if display_mech.gait:
+        display_mech.gait.freeze()            # legs hold a planted stance
     _hover_slot = ""
     if _tab == "upgrades":
         display_mech.set_highlight(_slot, true)
