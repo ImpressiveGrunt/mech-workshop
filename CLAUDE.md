@@ -16,5 +16,6 @@
   `exit_to_workshop`, and extras `{"collision": "box"|"convex"|"mesh"}`,
   `{"destructible": true, "hp": n, "explosive": bool}`, lights `{godot_energy, godot_range}`,
   arena doors `{gate, side, slide}` (slide along local X),
-  cockpit markers `screen_status/radar/weapons` (Godot +Z faces pilot) and `glass_crack_1..3`.
+  cockpit markers `screen_status/radar/weapons` (Godot +Z faces pilot), `glass_crack_1..3`,
+  `stick_pivot_L/R` (joysticks; pilot hands parented to them).
 - Quick draft renders: `PREVIEW_SCALE=0.4 blender -b ... --python tools/blender/build_X.py`.

@@ -494,42 +494,79 @@ def cockpit_interior(pal):
     def D(lx, ly, h=0.0):
         return tuple(Cd + Rd @ Vector((lx, ly, 0)) + n * h)
     drot = (SL, 0, 0)
-    box("dash_top", (1.16, .3, .05), D(0, 0), panel, root, rot=drot, bevel=.012)
-    box("dash_body", (1.16, .3, .3), (0, -.34, -.38), dark, root, bevel=.02)
-    box("dash_lip", (1.18, .04, .05), D(0, -.15, .01), pal["trim"], root, rot=drot, bevel=.01)
-    for name, (lx, ly, w, h) in {"screen_status": (.36, .02, .21, .13), "screen_radar": (0, .015, .3, .17),
-                                 "screen_weapons": (-.36, .02, .21, .13)}.items():
-        box(name + "_bezel", (w + .035, h + .035, .022), D(lx, ly, .03), dark, root, rot=drot, bevel=.006)
-        box(name + "_glass", (w, h, .004), D(lx, ly, .043), screen, root, rot=drot, bevel=0)
-        q = n.to_track_quat('-Y', 'Z')   # Godot +Z (Blender -Y) faces the pilot, text up = up the slope
-        empty(name, D(lx, ly, .047), root, rot=tuple(q.to_euler()), props={"screen": name[7:], "w": w, "h": h})
+    # centre dashboard: nav / target screen, lamp row, toggles
+    box("dash_top", (.46, .3, .05), D(0, 0), panel, root, rot=drot, bevel=.012)
+    box("dash_body", (.46, .3, .3), (0, -.34, -.38), dark, root, bevel=.02)
+    box("dash_lip", (.48, .04, .05), D(0, -.15, .01), pal["trim"], root, rot=drot, bevel=.01)
+    w, h = .22, .15
+    box("screen_radar_bezel", (w + .035, h + .035, .022), D(0, .015, .03), dark, root, rot=drot, bevel=.006)
+    box("screen_radar_glass", (w, h, .004), D(0, .015, .043), screen, root, rot=drot, bevel=0)
+    q = n.to_track_quat('-Y', 'Z')   # Godot +Z (Blender -Y) faces the pilot, text up = up the slope
+    empty("screen_radar", D(0, .015, .047), root, rot=tuple(q.to_euler()), props={"screen": "radar", "w": w, "h": h})
     rows = {c: [] for c in lamp}
-    for i in range(22):
+    for i in range(9):
         c = rnd.choice(list(lamp))
-        rows[c].append(((.022, .014, .012), D(-.52 + i * .05, -.12, .03), drot))
+        rows[c].append(((.022, .014, .012), D(-.2 + i * .05, -.12, .03), drot))
     for c, parts in rows.items():
         multi_box(f"dash_lamps_{c[1:]}", parts, lamp[c], root)
-    multi_cyl("dash_toggles", [(.007, .035, D(-.5 + i * .045, .125, .03), (SL - .5, 0, 0)) for i in range(23)
-                               if abs(-.5 + i * .045) > .18], metal, root, segs=6)
-    for s_ in (-1, 1):  # round gauges with needles
-        cyl(f"gauge_{s_:+d}", .045, .02, D(.52 * s_, .06, .03), dark, root, rot=drot, segs=16)
-        cyl(f"gauge_face_{s_:+d}", .038, .004, D(.52 * s_, .06, .042), lamp["#FFB347"] if s_ > 0 else lamp["#5FD38A"], root,
-            rot=drot, segs=16)
-        box(f"gauge_needle_{s_:+d}", (.004, .03, .003), D(.52 * s_ + .008, .068, .046), dark, root, rot=(SL, 0, .6 * s_), bevel=0)
+    multi_cyl("dash_toggles", [(.007, .035, D(-.2 + i * .04, .125, .03), (SL - .5, 0, 0)) for i in range(11)], metal, root,
+              segs=6)
+    # side MFDs flanking the window, angled at the pilot (systems left, weapons right)
+    for name, x in (("screen_status", .36), ("screen_weapons", -.36)):
+        pos = Vector((x * 1.03, -.34, -.075))
+        nrm = (Vector((0, 0, 0)) - pos).normalized()
+        q = nrm.to_track_quat('-Y', 'Z')
+        r = tuple(q.to_euler())
+        w, h = .13, .1
+        box(name + "_bezel", (w + .035, .022, h + .035), tuple(pos), dark, root, rot=r, bevel=.006)
+        box(name + "_glass", (w, .004, h), tuple(pos + nrm * .012), screen, root, rot=r, bevel=0)
+        box(name + "_mount", (.05, .08, .05), tuple(pos - nrm * .05), metal, root, rot=r, bevel=.008)
+        empty(name, tuple(pos + nrm * .016), root, rot=r, props={"screen": name[7:], "w": w, "h": h})
 
-    # --- controls: throttle (left) and stick (right)
-    box("throttle_shelf", (.18, .32, .07), (.47, -.12, -.42), panel, root, bevel=.01)
-    multi_box("throttle_track", [((.012, .22, .01), (.47 + dx, -.13, -.38)) for dx in (-.02, .02)], dark, root)
-    seg("throttle_lever", (.47, -.1, -.38), (.47, -.17, -.25), .02, .02, metal, root, bevel=0)
-    box("throttle_knob", (.06, .06, .07), (.47, -.175, -.23), pal["paint"], root, bevel=.012)
-    box("throttle_button", (.02, .015, .015), (.47, -.21, -.215), lamp["#FF4B3A"], root, bevel=0)
-    cyl("stick_base", .06, .05, (-.47, -.12, -.42), dark, root, segs=12)
-    cyl("stick_boot", .045, .08, (-.47, -.12, -.36), mat(f"{t}_rubber_boot", "#141414", 0, .9), root, segs=10, r2=.025)
-    seg("stick_shaft", (-.47, -.12, -.33), (-.47, -.14, -.22), .022, .022, metal, root, bevel=0)
-    box("stick_grip", (.05, .06, .12), (-.47, -.145, -.17), dark, root, rot=(.15, 0, 0), bevel=.012)
-    box("stick_trigger", (.015, .02, .03), (-.47, -.18, -.18), lamp["#FF4B3A"], root, bevel=0)
-    box("stick_thumb", (.018, .018, .01), (-.47, -.14, -.105), lamp["#3CE6FF"], root, bevel=0)
-
+    # --- side consoles with twin joysticks; the pilot's gloved hands grip them.
+    # Stick tops sit in the bottom corners of the first-person view. stick_pivot_L/R are the
+    # pivots the game tilts (left = drive: W/S/A/D, right = aim: mouse); hands are parented to them.
+    glove = mat(f"{t}_pilot_glove", "#5A4636", 0, .65)
+    glove_pad = mat(f"{t}_pilot_glove_pad", "#7A624C", 0, .75)
+    suit = mat(f"{t}_pilot_suit", "#6B7785", 0, .85)
+    rubber = mat(f"{t}_rubber_boot", "#141414", 0, .9)
+    V = Vector
+    for sd in ("L", "R"):
+        s_ = 1 if sd == "L" else -1           # pilot's left is +X
+        P = V((.30 * s_, -.30, -.31))        # bottom corners of the first-person view, clear of the dash
+        box(f"side_console_{sd}", (.2, .4, .12), (.36 * s_, -.25, -.38), panel, root, rot=(-.2, 0, 0), bevel=.015)
+        box(f"side_console_trim_{sd}", (.21, .03, .03), (.36 * s_, -.45, -.34), pal["trim"], root, bevel=.005)
+        cyl(f"side_gauge_{sd}", .035, .015, (.41 * s_, -.15, -.32), dark, root, rot=(-.2, 0, 0), segs=16)
+        cyl(f"side_gauge_face_{sd}", .029, .004, (.41 * s_, -.15, -.312), lamp["#FFB347"] if sd == "L" else lamp["#5FD38A"],
+            root, rot=(-.2, 0, 0), segs=16)
+        multi_box(f"side_console_lamps_{sd}", [((.015, .012, .01), (.42 * s_, -.28 + k * .03, -.325)) for k in range(4)],
+                  lamp["#3CE6FF"], root)
+        cyl(f"stick_base_{sd}", .058, .035, tuple(P + V((0, 0, -.015))), dark, root, segs=14)
+        cyl(f"stick_base_ring_{sd}", .062, .01, tuple(P), metal, root, segs=14)
+        pivot = empty(f"stick_pivot_{sd}", tuple(P), root, props={"joystick": "drive" if sd == "L" else "aim"})
+        cyl(f"stick_boot_{sd}", .042, .06, tuple(P + V((0, 0, .03))), rubber, pivot, segs=10, r2=.022)
+        seg(f"stick_shaft_{sd}", tuple(P + V((0, 0, .05))), tuple(P + V((0, -.01, .075))), .02, .02, metal, pivot, bevel=0)
+        G = P + V((0, -.015, .125))           # grip centre
+        box(f"stick_grip_{sd}", (.048, .058, .12), tuple(G), dark, pivot, rot=(.12, 0, 0), bevel=.014)
+        box(f"stick_head_{sd}", (.052, .05, .025), tuple(G + V((0, .004, .07))), metal, pivot, rot=(.12, 0, 0), bevel=.008)
+        cyl(f"stick_hat_switch_{sd}", .008, .014, tuple(G + V((-.01 * s_, .012, .087))), lamp["#3CE6FF"], pivot, segs=8)
+        box(f"stick_trigger_{sd}", (.016, .018, .03), tuple(G + V((0, -.038, .035))), lamp["#FF4B3A"], pivot, bevel=.003)
+        # gloved hand: palm and back of hand on the outer side, fingers wrapped across the front, thumb on the hat
+        box(f"hand_{sd}_palm", (.04, .085, .1), tuple(G + V((.042 * s_, .008, -.005))), glove, pivot, rot=(.12, 0, 0), bevel=.012)
+        box(f"hand_{sd}_back", (.025, .075, .085), tuple(G + V((.064 * s_, .012, 0))), glove_pad, pivot, rot=(.12, 0, 0), bevel=.01)
+        box(f"hand_{sd}_knuckles", (.032, .026, .09), tuple(G + V((.04 * s_, -.044, .002))), glove, pivot, rot=(.12, 0, 0), bevel=.008)
+        for k, z in enumerate((.033, .01, -.013, -.035)):
+            reach = .056 if k else .05           # index finger rides the trigger
+            box(f"hand_{sd}_finger_{k}_a", (reach, .023, .02), tuple(G + V((.012 * s_, -.046, z))), glove, pivot, bevel=.007)
+            box(f"hand_{sd}_finger_{k}_b", (.02, .036, .019), tuple(G + V((-.02 * s_, -.026, z))), glove, pivot, bevel=.007)
+        box(f"hand_{sd}_thumb_a", (.024, .022, .04), tuple(G + V((.038 * s_, .016, .055))), glove, pivot, rot=(0, -.5 * s_, 0), bevel=.008)
+        box(f"hand_{sd}_thumb_b", (.022, .02, .03), tuple(G + V((.012 * s_, .014, .082))), glove, pivot, rot=(0, -1.1 * s_, 0), bevel=.007)
+        box(f"hand_{sd}_cuff", (.075, .075, .055), tuple(G + V((.05 * s_, .032, -.075))), glove_pad, pivot, bevel=.012)
+        # flight-suit sleeve running back out of view, with an orange shoulder-flash stripe
+        seg(f"arm_{sd}_sleeve", tuple(G + V((.055 * s_, .045, -.095))), tuple(G + V((.13 * s_, .33, -.34))), .09, .085, suit, pivot,
+            bevel=.02, taper=(1.15, 1.15))
+        seg(f"arm_{sd}_sleeve_band", tuple(G + V((.07 * s_, .1, -.15))), tuple(G + V((.075 * s_, .115, -.162))), .096, .09,
+            pal["paint"], pivot, bevel=.01)
     # --- side walls: pipes, cables, rivets, fan, extinguisher, grab handle
     for s_ in (-1, 1):
         x = .62 * s_
@@ -554,7 +591,7 @@ def cockpit_interior(pal):
     multi_box("overhead_switches", [((.018, .012, .02), (-.2 + i * .04, -.16, .41)) for i in range(11)], metal, root)
     multi_box("overhead_lamps", [((.02, .01, .012), (-.2 + i * .04, -.22, .415)) for i in range(11)], lamp["#5FD38A"], root)
     cyl("dome_light", .045, .03, (0, .05, .44), lamp["#FF4B3A"], root, segs=12)
-    lt = point_light("cockpit_light", (0, -.05, .32), 12, "#FFB347", radius=.05, parent=root)
+    lt = point_light("cockpit_light", (0, -.05, .32), 20, "#FFB347", radius=.05, parent=root)
     lt["godot_energy"] = 0.35
     lt["godot_range"] = 1.5
     return root

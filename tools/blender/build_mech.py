@@ -60,9 +60,9 @@ for tier in TIERS:
             o.hide_render = True   # cracks only appear in game as the torso takes damage
     # preview only: sample readouts on the dashboard screens (the game draws live Label3D text there)
     bpy.context.view_layer.update()
-    readouts = {"screen_status": ("SYSTEMS\nTORSO [######] 100%\nLEGS  [#####-]  84%\nARM L [######] 100%\nARM R [####--]  71%", .0105),
-                "screen_radar": ("SPD  21 km/h   HDG 004\n\nTARGET  26 m   [ ]  +2", .013),
-                "screen_weapons": ("WEAPONS\nR AUTOCANNON 112\n   READY\nL RAM        INF\nBOOST [######]", .0105)}
+    readouts = {"screen_status": ("SYSTEMS\nTORSO [######] 100%\nLEGS  [#####-]  84%\nARM L [######] 100%\nARM R [####--]  71%", .0062),
+                "screen_radar": ("SPD  21 km/h   HDG 004\n\nTARGET  26 m   [ ]  +2", .0095),
+                "screen_weapons": ("WEAPONS\nR AUTOCANNON 112\n   READY\nL RAM        INF\nBOOST [######]", .0062)}
     for o in hierarchy(cockpit):
         key = o.name.split(".")[0]
         if key in readouts:

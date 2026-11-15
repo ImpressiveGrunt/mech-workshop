@@ -42,9 +42,12 @@ them, then 3-2-1, **FIGHT**. Destroy the enemy torso to win.
   lowest at each footfall, sways over the stance leg, leans into acceleration and turns, and staggers when
   hit. Turning on the spot makes the mech re-step. Turns wind up and down with inertia.
 - **Cockpit** (`cockpit_interior_mk1.glb`, built in Blender): you look out through layered armoured glass
-  set in a bolted frame. Below it sit caution lamps, three live dashboard screens (systems, speed/heading/target,
-  weapons/boost), switch rows, gauges, a throttle and stick, piped side walls and an overhead panel. The glass
-  cracks at 75 / 50 / 25 % torso integrity.
+  set in a bolted frame, with caution lamps above. Systems and weapons/boost screens flank the window, and
+  a centre dashboard carries the speed/heading/target screen, lamp row and toggles. Two joysticks on side
+  consoles sit in the bottom corners of the view, gripped by the pilot's gloved hands (thumb on the hat
+  switch, finger on the trigger). The left stick tilts with W/S/A/D and the right with your aim, and the
+  hands move with them. Around you: piped side walls and an overhead panel. The glass cracks at
+  75 / 50 / 25 % torso integrity.
 
 ## Controls (in the mech)
 

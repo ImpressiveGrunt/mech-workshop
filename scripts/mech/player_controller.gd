@@ -27,6 +27,10 @@ var _air_time := 0.0
 var _screens: Dictionary = {}   # "status" / "radar" / "weapons" -> Label3D
 var _cracks: Array = []
 var _screen_timer := 0.0
+var _stick_drive: Node3D        # left joystick: tilts with W/S (pitch) and A/D (roll)
+var _stick_aim: Node3D          # right joystick: tilts with torso twist / aim pitch rate (mouse)
+var _aim_rate := Vector2.ZERO   # smoothed twist / pitch rate, rad/s
+var _last_aim := Vector2.ZERO
 
 
 func _ready() -> void:
@@ -68,6 +72,9 @@ func _setup_cockpit() -> void:
         var marker := cockpit.find_child("screen_" + key, true, false) as Node3D
         if marker:
             _screens[key] = _make_screen_label(marker, key == "radar")
+    _stick_drive = cockpit.find_child("stick_pivot_L", true, false) as Node3D
+    _stick_aim = cockpit.find_child("stick_pivot_R", true, false) as Node3D
+    _last_aim = Vector2(mech.torso_twist, mech.aim_pitch)
     for k in [1, 2, 3]:
         var c := cockpit.find_child("glass_crack_%d" % k, true, false) as Node3D
         if c:
@@ -120,10 +127,29 @@ func _process(delta: float) -> void:
     camera.position = _base_pos + Vector3(jitter.x, jitter.y, 0)   # the gait moves the cockpit itself
     # Godot cameras look down -Z; mech models face +Z, hence the PI yaw.
     camera.rotation = Vector3(mech.aim_pitch + jitter.y * 0.3, PI, jitter.x * 0.3)
+    _animate_sticks(delta)
     _screen_timer -= delta
     if cockpit and _screen_timer <= 0.0:
         _screen_timer = 1.0 / SCREEN_HZ
         _update_screens()
+
+
+## The pilot's hands ride the sticks (they are parented to the pivots in Blender).
+## Godot pivot space: +X = mech left, +Z = forward; tilting the stick top forward is +rotation.x,
+## toward the left is -rotation.z.
+func _animate_sticks(delta: float) -> void:
+    const MAX_TILT := 0.32
+    var aim := Vector2(mech.torso_twist, mech.aim_pitch)
+    if delta > 0.0:
+        _aim_rate = _aim_rate.lerp((aim - _last_aim) / delta, minf(1.0, delta * 12.0))
+    _last_aim = aim
+    if _stick_drive:
+        var target := Vector3(mech.throttle * MAX_TILT, 0.0, -mech.turn * MAX_TILT)
+        _stick_drive.rotation = _stick_drive.rotation.lerp(target, minf(1.0, delta * 10.0))
+    if _stick_aim:
+        var target := Vector3(clampf(-_aim_rate.y * 0.12, -MAX_TILT, MAX_TILT), 0.0,
+            clampf(-_aim_rate.x * 0.12, -MAX_TILT, MAX_TILT))
+        _stick_aim.rotation = _stick_aim.rotation.lerp(target, minf(1.0, delta * 14.0))
 
 
 func _update_screens() -> void:
