@@ -17,5 +17,6 @@
   `{"destructible": true, "hp": n, "explosive": bool}`, lights `{godot_energy, godot_range}`,
   arena doors `{gate, side, slide}` (slide along local X),
   cockpit markers `screen_status/radar/weapons` (Godot +Z faces pilot), `glass_crack_1..3`,
-  `stick_pivot_L/R` (joysticks; pilot hands parented to them).
+  `stick_pivot_L/R` (joysticks; pilot hands + forearms parented to them),
+  `arm_shoulder_L/R` (upper arm along local +Y; game aims it at) `arm_elbow_L/R`.
 - Quick draft renders: `PREVIEW_SCALE=0.4 blender -b ... --python tools/blender/build_X.py`.

@@ -533,6 +533,7 @@ def cockpit_interior(pal):
     glove = mat(f"{t}_pilot_glove", "#5A4636", 0, .65)
     glove_pad = mat(f"{t}_pilot_glove_pad", "#7A624C", 0, .75)
     suit = mat(f"{t}_pilot_suit", "#6B7785", 0, .85)
+    suit_dark = mat(f"{t}_pilot_suit_dark", "#4A5360", 0, .9)
     rubber = mat(f"{t}_rubber_boot", "#141414", 0, .9)
     V = Vector
     for sd in ("L", "R"):
@@ -566,28 +567,24 @@ def cockpit_interior(pal):
         box(f"hand_{sd}_thumb_a", (.024, .022, .04), tuple(G + V((.038 * s_, .016, .055))), glove, pivot, rot=(0, -.5 * s_, 0), bevel=.008)
         box(f"hand_{sd}_thumb_b", (.022, .02, .03), tuple(G + V((.012 * s_, .014, .082))), glove, pivot, rot=(0, -1.1 * s_, 0), bevel=.007)
         box(f"hand_{sd}_cuff", (.075, .075, .055), tuple(G + V((.05 * s_, .032, -.075))), glove_pad, pivot, bevel=.012)
-        # flight-suit sleeve running back out of view, with an orange shoulder-flash stripe
-        seg(f"arm_{sd}_sleeve", tuple(G + V((.055 * s_, .045, -.095))), tuple(G + V((.13 * s_, .33, -.34))), .09, .085, suit, pivot,
-            bevel=.02, taper=(1.15, 1.15))
-        seg(f"arm_{sd}_sleeve_band", tuple(G + V((.07 * s_, .1, -.15))), tuple(G + V((.075 * s_, .115, -.162))), .096, .09,
-            pal["paint"], pivot, bevel=.01)
-    # --- side walls: pipes, cables, rivets, fan, extinguisher, grab handle
-    for s_ in (-1, 1):
-        x = .62 * s_
-        box(f"wall_{s_:+d}", (.04, .8, .95), (x, -.08, 0), panel, root, rot=(0, -.12 * s_, 0), bevel=.01)
-        multi_cyl(f"wall_pipes_{s_:+d}", [(.018, .8, (x - .045 * s_, -.08, z), (PI / 2, 0, 0)) for z in (.3, .25)], copper,
-                  root, segs=8)
-        cable(f"wall_cables_{s_:+d}", [(x - .05 * s_, .25, -.15), (x - .06 * s_, -.05, -.2), (x - .05 * s_, -.4, -.12)], pal,
-              root, r=.012)
-        bolts(f"wall_rivets_{s_:+d}", [(x - .025 * s_, y, z) for y in (.2, -.05, -.3) for z in (-.35, .4)], pal, root,
-              axis=X_AXIS, r=.01)
-        box(f"wall_label_plate_{s_:+d}", (.01, .12, .05), (x - .03 * s_, -.25, .12), pal["decal"], root, bevel=0)
-    cyl("wall_fan", .07, .03, (.585, -.2, -.05), dark, root, rot=X_AXIS, segs=16)
-    multi_box("wall_fan_grille", [((.01, .13, .012), (.57, -.2, -.05 + dz)) for dz in (-.04, -.02, 0, .02, .04)], metal, root)
-    cyl("extinguisher", .04, .26, (-.55, .05, -.18), red, root, segs=12)
-    cyl("extinguisher_head", .025, .05, (-.55, .05, -.03), metal, root, segs=8)
-    multi_box("extinguisher_bracket", [((.02, .1, .02), (-.585, .05, z)) for z in (-.26, -.1)], metal, root)
-    seg("grab_handle", (.56, .1, .32), (.56, -.25, .36), .025, .025, metal, root, bevel=0)
+        # pilot's arm: forearm rides the stick pivot; the upper arm hangs from a fixed shoulder and the game
+        # re-aims it at the elbow every frame (arm_shoulder_* looks at arm_elbow_*), so the arm bends with the stick
+        W = G + V((.05 * s_, .045, -.095))     # wrist (inside the glove cuff)
+        E = V((.36 * s_, -.03, -.44))          # elbow, low and outboard beside the seat
+        S = V((.22 * s_, .1, -.2))             # shoulder
+        seg(f"arm_{sd}_forearm", tuple(W), tuple(E), .085, .08, suit, pivot, bevel=.02, taper=(1.25, 1.2))
+        seg(f"arm_{sd}_forearm_band", tuple(W.lerp(E, .3)), tuple(W.lerp(E, .38)), .1, .095, pal["paint"], pivot, bevel=.01)
+        seg(f"arm_{sd}_cuff_seam", tuple(W.lerp(E, .04)), tuple(W.lerp(E, .1)), .094, .088, suit_dark, pivot, bevel=.01)
+        cyl(f"arm_{sd}_elbow_pad", .062, .1, tuple(E), suit_dark, pivot, rot=X_AXIS, segs=12)
+        empty(f"arm_elbow_{sd}", tuple(E), pivot, props={"arm": "elbow"})
+        q = (E - S).to_track_quat('Y', 'Z')    # local +Y (= Godot -Z) points shoulder -> elbow
+        shoulder = empty(f"arm_shoulder_{sd}", tuple(S), root, rot=tuple(q.to_euler()), props={"arm": "shoulder"})
+        seg(f"arm_{sd}_upper", tuple(S), tuple(E), .1, .095, suit, shoulder, bevel=.025, taper=(.85, .85))
+        seg(f"arm_{sd}_shoulder_flash", tuple(S.lerp(E, .12)), tuple(S.lerp(E, .3)), .108, .102, pal["paint"], shoulder,
+            bevel=.012)
+        cyl(f"arm_{sd}_shoulder", .075, .12, tuple(S), suit, shoulder, rot=X_AXIS, segs=12)
+        box(f"arm_{sd}_patch", (.012, .05, .04), tuple(S.lerp(E, .2) + V((.052 * s_, 0, 0))), pal["decal"], shoulder,
+            rot=tuple(q.to_euler()), bevel=0)
 
     # --- ceiling: overhead panel, dome light
     box("ceiling", (1.3, .8, .04), (0, -.1, .46), dark, root, bevel=0)

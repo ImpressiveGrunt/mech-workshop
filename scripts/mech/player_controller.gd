@@ -29,6 +29,7 @@ var _cracks: Array = []
 var _screen_timer := 0.0
 var _stick_drive: Node3D        # left joystick: tilts with W/S (pitch) and A/D (roll)
 var _stick_aim: Node3D          # right joystick: tilts with torso twist / aim pitch rate (mouse)
+var _arms: Array = []           # [{shoulder, elbow}]: upper arms re-aimed at the elbows each frame
 var _aim_rate := Vector2.ZERO   # smoothed twist / pitch rate, rad/s
 var _last_aim := Vector2.ZERO
 
@@ -75,6 +76,11 @@ func _setup_cockpit() -> void:
     _stick_drive = cockpit.find_child("stick_pivot_L", true, false) as Node3D
     _stick_aim = cockpit.find_child("stick_pivot_R", true, false) as Node3D
     _last_aim = Vector2(mech.torso_twist, mech.aim_pitch)
+    for sd in ["L", "R"]:
+        var shoulder := cockpit.find_child("arm_shoulder_" + sd, true, false) as Node3D
+        var elbow := cockpit.find_child("arm_elbow_" + sd, true, false) as Node3D
+        if shoulder and elbow:
+            _arms.append({"shoulder": shoulder, "elbow": elbow})
     for k in [1, 2, 3]:
         var c := cockpit.find_child("glass_crack_%d" % k, true, false) as Node3D
         if c:
@@ -150,6 +156,13 @@ func _animate_sticks(delta: float) -> void:
         var target := Vector3(clampf(-_aim_rate.y * 0.12, -MAX_TILT, MAX_TILT), 0.0,
             clampf(-_aim_rate.x * 0.12, -MAX_TILT, MAX_TILT))
         _stick_aim.rotation = _stick_aim.rotation.lerp(target, minf(1.0, delta * 14.0))
+    # forearms ride the sticks; swing each upper arm from its shoulder so it stays joined at the elbow
+    for arm in _arms:
+        var shoulder: Node3D = arm["shoulder"]
+        var elbow: Node3D = arm["elbow"]
+        var up := cockpit.global_basis.y
+        if shoulder.global_position.distance_to(elbow.global_position) > 0.01:
+            shoulder.look_at(elbow.global_position, up)   # Blender modelled the upper arm along local +Y (= Godot -Z)
 
 
 func _update_screens() -> void:
