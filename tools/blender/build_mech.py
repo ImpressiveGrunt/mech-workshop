@@ -58,6 +58,19 @@ for tier in TIERS:
     for o in hierarchy(cockpit):
         if o.name.startswith("glass_crack_"):
             o.hide_render = True   # cracks only appear in game as the torso takes damage
+    # preview only: sample readouts on the dashboard screens (the game draws live Label3D text there)
+    bpy.context.view_layer.update()
+    readouts = {"screen_status": ("SYSTEMS\nTORSO [######] 100%\nLEGS  [#####-]  84%\nARM L [######] 100%\nARM R [####--]  71%", .0105),
+                "screen_radar": ("SPD  21 km/h   HDG 004\n\nTARGET  26 m   [ ]  +2", .013),
+                "screen_weapons": ("WEAPONS\nR AUTOCANNON 112\n   READY\nL RAM        INF\nBOOST [######]", .0105)}
+    for o in hierarchy(cockpit):
+        key = o.name.split(".")[0]
+        if key in readouts:
+            body, size = readouts[key]
+            tob = text("preview_" + key, body, size, (0, 0, 0), rot=(0, 0, 0), m=mat("screen_text_preview", "#73FFBF", 0, .3, emit=4),
+                       extrude=0)
+            tob.data.materials.clear(); tob.data.materials.append(mat("screen_text_preview", "#73FFBF", 0, .3, emit=4))
+            tob.matrix_world = o.matrix_world @ Matrix.Translation((0, -.002, 0)) @ Euler((PI / 2, 0, 0)).to_matrix().to_4x4()
     enemy = mp.assemble(mp.palette("scrap"), weapon_L="missile_pod", loc=(-3.0, -26.0, 0), rotz=PI + .25, name="preview_enemy")
     for i, (x, y, r) in enumerate([(7, -18, .3), (-9, -34, -.5), (4, -40, .1)]):
         box(f"preview_block_{i}", (6.0, 2.4, 2.6), (x, y, 1.3), mat(f"preview_block_{i}", ["#2F5D8C", "#B33A2E", "#3E7A4E"][i], .3, .6),

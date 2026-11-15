@@ -432,10 +432,10 @@ def cockpit_interior(pal):
     panel = mat(f"{t}_cockpit_panel", "#3A4048", .4, .55)
     dark = mat(f"{t}_cockpit_dark", "#1A1D21", .3, .7)
     metal = mat(f"{t}_cockpit_metal", "#5A616B", .8, .35)
-    glass_in = mat(f"{t}_armor_glass_inner", "#9FD8FF", .1, .05, alpha=.10)
-    glass_out = mat(f"{t}_armor_glass_outer", "#7FC4E8", .1, .05, alpha=.08)
+    glass_in = mat(f"{t}_armor_glass_inner", "#9FD8FF", .1, .22, alpha=.10)
+    glass_out = mat(f"{t}_armor_glass_outer", "#7FC4E8", .1, .22, alpha=.08)
     glass_edge = mat(f"{t}_armor_glass_edge", "#3CE6C8", 0, .1, emit=.12, alpha=.3)
-    scratch = mat(f"{t}_glass_scratch", "#FFFFFF", 0, .3, alpha=.18)
+    scratch = mat(f"{t}_glass_scratch", "#DDE8F0", 0, .6, alpha=.07)
     crack = mat(f"{t}_glass_crack", "#E8F6FF", 0, .2, emit=.4, alpha=.55)
     screen = mat(f"{t}_cockpit_screen", "#0C2A2A", 0, .3, emit=1.2)
     lamp = {c: mat(f"{t}_lamp_{c[1:]}", c, 0, .3, emit=5) for c in ("#FFB347", "#5FD38A", "#FF4B3A", "#3CE6FF")}
@@ -468,7 +468,7 @@ def cockpit_interior(pal):
               + [((.006, .05, .28), F(x, 0), rot) for x in (-.368, .368)], glass_edge, root)
     rnd = random.Random(7)
     multi_box("glass_scratches", [((rnd.uniform(.05, .2), .002, .003), F(rnd.uniform(-.3, .3), rnd.uniform(-.11, .11), .033),
-                                   (TILT, 0, rnd.uniform(-.5, .5))) for _ in range(14)], scratch, root)
+                                   (TILT, 0, rnd.uniform(-.5, .5))) for _ in range(8)], scratch, root)
     for k, (cx, cz) in enumerate([(.22, .06), (-.25, -.05), (.02, .1)], start=1):
         rays = []
         for j in range(7):
