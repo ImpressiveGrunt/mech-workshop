@@ -54,6 +54,7 @@
     },
     "torso_mk1": {
       "cockpit_height": 1.12,
+      "cockpit_interior": "res://assets/models/mech/cockpit_interior_mk1.glb",
       "cooling": 12,
       "hp": 600,
       "mass_kg": 7000,
