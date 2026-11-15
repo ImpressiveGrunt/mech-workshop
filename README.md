@@ -84,6 +84,8 @@ tools/blender/build_all.sh               # or SKIP_RENDER=1 for models only
 
 ![Workshop dock](docs/previews/workshop_overview.png)
 ![Mech Mk1](docs/previews/mech_mk1_front.png)
+![Mech Mk1 back](docs/previews/mech_mk1_back.png)
+![Mech Mk1 close-up](docs/previews/mech_mk1_closeup.png)
 ![Cockpit view](docs/previews/mech_mk1_cockpit_view.png)
 
 ### Part conventions
@@ -93,4 +95,5 @@ tools/blender/build_all.sh               # or SKIP_RENDER=1 for models only
 - `joint_*` empties are pivots the game rotates (torso twist, arm pitch).
 - `armor_*` meshes are detachable plates; `weak_point_reactor` takes 2.5× damage.
 - `*_collider` boxes become per-part hitboxes.
+- Hydraulic pistons are split into a sleeve on the parent joint and a rod on the child joint, so they telescope when the game bends a joint.
 - Root extras hold the stats (hp, mass, price, damage, ...), which are exported to `data/parts.json`.

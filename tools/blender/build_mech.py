@@ -38,6 +38,8 @@ for tier in TIERS:
     export_glb(os.path.join(OUT, f"mech_{tier}_assembled.glb"), hierarchy(mech))
     render_preview(f"mech_{tier}_front", (6.5, -8.5, 4.2), (0, 0, 2.6), lens=40, ground="#6F7378",
                    sun_rot=(0.85, 0.15, -0.5))
+    render_preview(f"mech_{tier}_back", (-6.0, 7.5, 5.2), (0, 0, 2.9), lens=40, sun=0)
+    render_preview(f"mech_{tier}_closeup", (-3.2, -5.2, 3.6), (-1.0, -1.5, 2.9), lens=40, sun=0)
     render_preview(f"mech_{tier}_cockpit_view", (0, -1.2, 3.62), (0, -8, 2.3), lens=16, sun=0)  # reuses sun + ground
     save_blend(os.path.join(SOURCE, "mech", f"mech_{tier}.blend"))
 
