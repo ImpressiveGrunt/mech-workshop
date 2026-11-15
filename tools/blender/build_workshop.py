@@ -239,7 +239,7 @@ multi_cyl("gas_bottles", [(.14, 1.4, (12.8, y, .7)) for y in (2.0, 2.4, 2.8, 3.2
 
 # human scale: crew, forklift, cones, a person-sized door
 pr.human("crew_boarding", (-1.75, -1.65, DECK_Z + .06), PI / 2, pose="tablet", vest="#F2C230", skin=1)
-pr.human("crew_chief", (1.3, -3.1, .18), PI, pose="point", vest="#FF6A1A", hat="#FFFFFF", skin=0)
+pr.human("crew_chief", (-1.9, -2.7, .18), PI - .6, pose="point", vest="#FF6A1A", hat="#FFFFFF", skin=0)
 pr.human("crew_deck", (4.6, -1.4, DECK_Z + .06), 0, pose="wave", vest="#F2C230", skin=2)
 pr.human("crew_bench", (-8.6, -5.25, 0), PI, pose="stand", vest="#9FE8FF", hat="#2F5D8C", skin=3)
 pr.human("crew_terminal", (6.8, -6.0, 0), PI, pose="tablet", vest="#F2C230", skin=0)
