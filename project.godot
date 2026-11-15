@@ -1,0 +1,27 @@
+; Engine configuration file. Godot 4.3+
+
+config_version=5
+
+[application]
+
+config/name="Mech Workshop"
+config/description="Stylized first-person mech-building arena fighter."
+run/main_scene="res://scenes/main.tscn"
+config/features=PackedStringArray("4.3", "Forward Plus")
+
+[autoload]
+
+PartDB="*res://scripts/autoload/part_db.gd"
+GameState="*res://scripts/autoload/game_state.gd"
+
+[display]
+
+window/size/viewport_width=1600
+window/size/viewport_height=900
+
+[layer_names]
+
+3d_physics/layer_1="world"
+3d_physics/layer_2="mech_body"
+3d_physics/layer_3="hitbox"
+3d_physics/layer_4="debris"

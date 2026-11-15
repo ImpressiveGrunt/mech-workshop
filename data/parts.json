@@ -1,0 +1,113 @@
+{
+  "generated_by": "tools/blender/build_mech.py",
+  "parts": {
+    "arm_L_mk1": {
+      "aim_speed": 120,
+      "hp": 260,
+      "mass_kg": 2600,
+      "name": "Left Arm MK1",
+      "part_id": "arm_L",
+      "price": 700,
+      "recoil_control": 0.6,
+      "scene": "res://assets/models/mech/parts/arm_L_mk1.glb",
+      "slot": "arm_L",
+      "tier": "mk1"
+    },
+    "arm_R_mk1": {
+      "aim_speed": 120,
+      "hp": 260,
+      "mass_kg": 2600,
+      "name": "Right Arm MK1",
+      "part_id": "arm_R",
+      "price": 700,
+      "recoil_control": 0.6,
+      "scene": "res://assets/models/mech/parts/arm_R_mk1.glb",
+      "slot": "arm_R",
+      "tier": "mk1"
+    },
+    "back_thruster_mk1": {
+      "boost_force": 900000,
+      "fuel": 100,
+      "hp": 180,
+      "mass_kg": 1500,
+      "name": "Jump Thruster MK1",
+      "part_id": "back_thruster",
+      "price": 1000,
+      "recharge": 15,
+      "scene": "res://assets/models/mech/parts/back_thruster_mk1.glb",
+      "slot": "back",
+      "tier": "mk1"
+    },
+    "legs_biped_mk1": {
+      "hp": 420,
+      "jump": 0.0,
+      "load_capacity": 22000,
+      "mass_kg": 9000,
+      "name": "Strider Legs MK1",
+      "part_id": "legs_biped",
+      "price": 1200,
+      "scene": "res://assets/models/mech/parts/legs_biped_mk1.glb",
+      "slot": "legs",
+      "speed": 8.0,
+      "tier": "mk1",
+      "turn_rate": 90
+    },
+    "torso_mk1": {
+      "cockpit_height": 1.12,
+      "cooling": 12,
+      "hp": 600,
+      "mass_kg": 7000,
+      "name": "Bulwark Torso MK1",
+      "part_id": "torso_mk",
+      "power": 100,
+      "price": 1500,
+      "scene": "res://assets/models/mech/parts/torso_mk1.glb",
+      "slot": "torso",
+      "tier": "mk1"
+    },
+    "weapon_autocannon_mk1": {
+      "ammo": 120,
+      "damage": 35,
+      "fire_rate": 6.0,
+      "hp": 150,
+      "mass_kg": 1800,
+      "name": "Autocannon MK1",
+      "part_id": "weapon_autocannon",
+      "price": 900,
+      "range": 120,
+      "scene": "res://assets/models/mech/parts/weapon_autocannon_mk1.glb",
+      "slot": "weapon",
+      "tier": "mk1",
+      "weapon_type": "ballistic"
+    },
+    "weapon_missile_pod_mk1": {
+      "ammo": 18,
+      "damage": 60,
+      "fire_rate": 1.5,
+      "hp": 140,
+      "mass_kg": 2000,
+      "name": "Missile Pod MK1",
+      "part_id": "weapon_missile_pod",
+      "price": 1400,
+      "range": 200,
+      "scene": "res://assets/models/mech/parts/weapon_missile_pod_mk1.glb",
+      "slot": "weapon",
+      "tier": "mk1",
+      "weapon_type": "explosive"
+    },
+    "weapon_ram_fist_mk1": {
+      "damage": 80,
+      "fire_rate": 1.0,
+      "hp": 260,
+      "mass_kg": 2200,
+      "name": "Ram Fist MK1",
+      "part_id": "weapon_ram_fist",
+      "price": 750,
+      "range": 4,
+      "scene": "res://assets/models/mech/parts/weapon_ram_fist_mk1.glb",
+      "slot": "weapon",
+      "tier": "mk1",
+      "weapon_type": "melee"
+    }
+  }
+}

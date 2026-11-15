@@ -1,0 +1,106 @@
+class_name LevelUtils
+extends Object
+## Helpers shared by the level scripts: lighting, blockout geometry, and loading
+## Blender-built environments (which tag collision + markers via glTF extras).
+
+
+static func add_lighting(parent: Node, sky_top: Color, ground: Color, sun_energy: float = 1.2) -> void:
+    var mat := ProceduralSkyMaterial.new()
+    mat.sky_top_color = sky_top
+    mat.sky_horizon_color = sky_top.lerp(Color.WHITE, 0.4)
+    mat.ground_bottom_color = ground
+    mat.ground_horizon_color = ground.lerp(Color.WHITE, 0.3)
+    var sky := Sky.new()
+    sky.sky_material = mat
+    var env := Environment.new()
+    env.background_mode = Environment.BG_SKY
+    env.sky = sky
+    env.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
+    env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+    env.ssao_enabled = true
+    env.glow_enabled = true
+    var world := WorldEnvironment.new()
+    world.environment = env
+    parent.add_child(world)
+    var sun := DirectionalLight3D.new()
+    sun.light_energy = sun_energy
+    sun.shadow_enabled = true
+    sun.rotation_degrees = Vector3(-50, 35, 0)
+    parent.add_child(sun)
+
+
+static func add_box(parent: Node, size: Vector3, pos: Vector3, color: Color, rot_y: float = 0.0,
+        solid: bool = true) -> Node3D:
+    var mesh := BoxMesh.new()
+    mesh.size = size
+    var m := StandardMaterial3D.new()
+    m.albedo_color = color
+    m.roughness = 0.85
+    mesh.material = m
+    var mi := MeshInstance3D.new()
+    mi.mesh = mesh
+    var root: Node3D = mi
+    if solid:
+        var body := StaticBody3D.new()
+        body.collision_layer = Mech.LAYER_WORLD
+        body.collision_mask = 0
+        var shape := CollisionShape3D.new()
+        var box := BoxShape3D.new()
+        box.size = size
+        shape.shape = box
+        body.add_child(shape)
+        body.add_child(mi)
+        root = body
+    root.position = pos
+    root.rotation.y = rot_y
+    parent.add_child(root)
+    return root
+
+
+static func add_marker(parent: Node, marker_name: String, pos: Vector3, rot_y: float = 0.0) -> Node3D:
+    var n := Node3D.new()
+    n.name = marker_name
+    n.position = pos
+    n.rotation.y = rot_y
+    parent.add_child(n)
+    return n
+
+
+static func instance_environment(path: String, parent: Node) -> Node3D:
+    var packed: PackedScene = load(path)
+    var root := packed.instantiate() as Node3D
+    parent.add_child(root)
+    for n in Mech._descendants(root):
+        if not (n is MeshInstance3D):
+            continue
+        var extras = n.get_meta("extras", {})
+        var kind := str(extras.get("collision", "")) if extras is Dictionary else ""
+        match kind:
+            "mesh":
+                n.create_trimesh_collision()
+            "convex":
+                n.create_convex_collision()
+            "box":
+                var mi := n as MeshInstance3D
+                var aabb := mi.get_aabb()
+                var body := StaticBody3D.new()
+                var shape := CollisionShape3D.new()
+                var box := BoxShape3D.new()
+                box.size = aabb.size
+                shape.shape = box
+                shape.position = aabb.get_center()
+                body.add_child(shape)
+                mi.add_child(body)
+    return root
+
+
+static func find_marker(root: Node, marker_name: String) -> Node3D:
+    return root.find_child(marker_name, true, false) as Node3D
+
+
+static func find_markers(root: Node, prefix: String) -> Array:
+    var out := []
+    for n in Mech._descendants(root):
+        if n is Node3D and String(n.name).begins_with(prefix):
+            out.append(n)
+    return out
