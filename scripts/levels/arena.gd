@@ -7,11 +7,20 @@ extends Node3D
 const ENV_PATH := "res://assets/models/environments/arena.glb"
 const WIN_REWARD := 400
 const LOSS_REWARD := 75
+const GATE_TIME := 2.2         # seconds for the blast doors to slide
+const WALK_TIMEOUT := 14.0     # safety net for the walk-out
+
+## Match intro: both mechs start inside their gate tunnels, the blast doors
+## slide open, the mechs walk out to their spawn marks (you watch from your own
+## cockpit and can look around), the gates slam shut behind them, 3-2-1, FIGHT.
 
 var player: Mech
 var enemy: Mech
 var hud: Hud
+var player_ctrl: PlayerController
+var enemy_ai: AIController
 var _over := false
+var _doors: Array = []          # [{node, closed, open}]
 
 
 func _ready() -> void:
@@ -25,20 +34,100 @@ func _ready() -> void:
         root = _build_blockout()
     var spawn_a := LevelUtils.find_marker(root, "spawn_A")
     var spawn_b := LevelUtils.find_marker(root, "spawn_B")
+    var start_a := LevelUtils.find_marker(root, "gate_A_start")
+    var start_b := LevelUtils.find_marker(root, "gate_B_start")
+    _collect_doors(root)
+    var intro := start_a != null and start_b != null and not _doors.is_empty()
 
-    player = _spawn_mech(GameState.loadout, GameState.damage, spawn_a, GameState.paint)
-    player.add_child(PlayerController.new())
-    enemy = _spawn_mech(_enemy_loadout(), {}, spawn_b, GameState.PAINT_PRESETS.values().pick_random())
-    var ai := AIController.new()
-    ai.target = player
-    enemy.add_child(ai)
+    player = _spawn_mech(GameState.loadout, GameState.damage, start_a if intro else spawn_a, GameState.paint)
+    player_ctrl = PlayerController.new()
+    player.add_child(player_ctrl)
+    enemy = _spawn_mech(_enemy_loadout(), {}, start_b if intro else spawn_b, GameState.PAINT_PRESETS.values().pick_random())
+    enemy_ai = AIController.new()
+    enemy_ai.target = player
+    enemy.add_child(enemy_ai)
     player.destroyed.connect(_on_mech_destroyed)
     enemy.destroyed.connect(_on_mech_destroyed)
 
     hud = Hud.new()
     add_child(hud)
     hud.mech = player
+    if intro:
+        _run_intro({player: spawn_a.global_position, enemy: spawn_b.global_position})
+    else:
+        _start_fight()
+
+
+# ------------------------------------------------------------- match intro
+func _run_intro(walk_to: Dictionary) -> void:
+    player_ctrl.enabled = false
+    enemy_ai.enabled = false
+    hud.show_message("GATES OPENING", GATE_TIME + 0.5)
+    player_ctrl.add_shake(0.12)
+    await _move_gates(true)
+
+    hud.show_message("ENTER THE ARENA", 3.0)
+    var t := 0.0
+    var walking := true
+    while walking and t < WALK_TIMEOUT:
+        await get_tree().physics_frame
+        t += get_physics_process_delta_time()
+        walking = false
+        for m in walk_to:
+            if is_instance_valid(m) and _walk_toward(m, walk_to[m]):
+                walking = true
+    for m in walk_to:
+        if is_instance_valid(m):
+            m.throttle = 0.0
+            m.turn = 0.0
+
+    hud.show_message("GATES SEALED", GATE_TIME)
+    await _move_gates(false)
+    player_ctrl.add_shake(0.3)  # the doors slam shut behind you
+    for n in ["3", "2", "1"]:
+        hud.show_message(n, 0.9)
+        await get_tree().create_timer(0.8).timeout
+    _start_fight()
+
+
+func _start_fight() -> void:
+    player_ctrl.enabled = true
+    enemy_ai.enabled = true
     hud.show_message("FIGHT!", 2.0)
+
+
+## Autopilot step: steer and throttle towards a point; false once arrived.
+func _walk_toward(m: Mech, target: Vector3) -> bool:
+    var to := target - m.global_position
+    to.y = 0.0
+    if to.length() < 1.2:
+        m.throttle = 0.0
+        m.turn = 0.0
+        return false
+    var fwd := m.global_basis.z
+    fwd.y = 0.0
+    m.turn = clampf(fwd.signed_angle_to(to, Vector3.UP) * 2.0, -1.0, 1.0)
+    m.throttle = clampf(to.length() / 4.0, 0.3, 1.0)
+    return true
+
+
+## Blender tags each blast door with extras {gate, side, slide}; doors slide along local X.
+func _collect_doors(root: Node) -> void:
+    for n in Mech._descendants(root):
+        var e := LevelUtils.extras_of(n)
+        if e.has("gate") and n is Node3D:
+            var closed: Transform3D = n.transform
+            var offset := Vector3(float(e.get("side", 1)) * float(e.get("slide", 5.9)), 0, 0)
+            _doors.append({"node": n, "closed": closed, "open": closed.translated_local(offset)})
+
+
+func _move_gates(open: bool) -> void:
+    if _doors.is_empty():
+        return
+    var tw := create_tween().set_parallel(true).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+    for d in _doors:
+        tw.tween_property(d["node"], "transform", d["open"] if open else d["closed"], GATE_TIME)
+    await tw.finished
 
 
 func _spawn_mech(loadout: Dictionary, damage: Dictionary, marker: Node3D, paint: Dictionary) -> Mech:

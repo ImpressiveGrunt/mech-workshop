@@ -8,6 +8,7 @@ extends Node
 
 var mech: Mech
 var target: Mech
+var enabled := true  # false while the match intro drives the mech
 var _strafe := 1.0
 var _strafe_timer := 0.0
 
@@ -17,6 +18,8 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+    if not enabled:
+        return
     if mech.is_destroyed or target == null or not is_instance_valid(target) or target.is_destroyed:
         mech.throttle = 0.0
         mech.turn = 0.0

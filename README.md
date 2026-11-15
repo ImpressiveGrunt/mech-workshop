@@ -29,6 +29,12 @@ Your mech stands in its dock, seen from the front. Options on the right:
 
 Hold the **< ROTATE / ROTATE >** buttons under the mech (or Q / E) to spin it on the dock turntable and inspect it from any side. Each option moves the camera to its own shot. Deploy to the **Arena** or the **Salvage Yard** from the bottom of the panel.
 
+## Arena match flow
+
+Both mechs start inside their gate tunnels. The blast doors slide open, each mech walks out to its
+spawn mark (you ride along in your cockpit and can look around), the gates slam shut behind
+them, then 3-2-1, **FIGHT**. Destroy the enemy torso to win.
+
 ## Controls (in the mech)
 
 | Input | Action |

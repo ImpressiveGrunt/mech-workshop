@@ -12,7 +12,8 @@
 - Engine: Godot 4.3+, GDScript, 4-space indentation.
 - Naming contract between Blender and game code (see `tools/blender/common.py`):
   `socket_*`, `joint_*`, `armor_*`, `weak_point*`, `*_collider`, `cockpit_camera`,
-  environment markers `spawn_A/B`, `mech_spawn`, `salvage_spot_*`, `sell_point`,
+  environment markers `spawn_A/B`, `gate_A/B_start`, `mech_spawn`, `salvage_spot_*`, `sell_point`,
   `exit_to_workshop`, and extras `{"collision": "box"|"convex"|"mesh"}`,
-  `{"destructible": true, "hp": n, "explosive": bool}`, lights `{godot_energy, godot_range}`.
+  `{"destructible": true, "hp": n, "explosive": bool}`, lights `{godot_energy, godot_range}`,
+  arena doors `{gate, side, slide}` (slide along local X).
 - Quick draft renders: `PREVIEW_SCALE=0.4 blender -b ... --python tools/blender/build_X.py`.

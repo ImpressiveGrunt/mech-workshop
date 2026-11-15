@@ -194,6 +194,7 @@ for k, name in enumerate(["SCRAP & SONS", "VOLTWORKS", "HAMMER CO", "IRONLINE", 
 
 # ================================================================== gates + tunnels
 use_collection("gates")
+DOORS = []   # (door object, gate angle, side) for the open-gate preview
 for g, a in GATES.items():
     rot = (0, 0, a + PI / 2)
     inward = a + PI
@@ -208,23 +209,27 @@ for g, a in GATES.items():
     box(f"gate_{g}_header", (12.8, 2.6, 3.0), polar(R + 1.6, a, WALL_H + 2.0), M["wall_dark"], rot=rot, props=SOLID)
     text(f"gate_{g}_letter", g, 2.4, polar(R + .25, a, WALL_H + 2.0), rot=(PI / 2, 0, a - PI / 2),
          m=M["glow_blue"] if g == "A" else M["glow_red"], extrude=.1)
-    for side in (-1, 1):  # blast doors (closed), chevrons, pistons
+    for side in (-1, 1):  # sliding blast doors (built closed; the game slides them along local X by side * 5.9 m)
         dc = lw(polar(R + 1.9, a), a + PI / 2, side * 3.0, 0, 4.0)
-        box(f"gate_{g}_door_{side:+d}", (5.9, .7, 8.0), dc, M["orange"], rot=rot, bevel=.05, props=SOLID)
+        door = box(f"gate_{g}_door_{side:+d}", (5.9, .7, 8.0), dc, M["orange"], rot=rot, bevel=.05,
+                   props={"collision": "box", "gate": g, "side": side, "slide": 5.9})
+        DOORS.append((door, a, side))
         chev = []
         for k in range(3):
             z = 2.2 + k * 1.9
             chev.append(((.5, .75, 2.2), lw(polar(R + 1.85, a), a + PI / 2, side * 3.0 - side * .7, 0, z), (0, 0, 0)))
         for c in chev:
-            box(f"gate_{g}_chevron_{side:+d}_{c[1][2]:.0f}", (2.6, .74, .45), c[1], M["black"],
+            box(f"gate_{g}_chevron_{side:+d}_{c[1][2]:.0f}", (2.6, .74, .45), c[1], M["black"], door,
                 rot=(0, side * .7, a + PI / 2), bevel=0)
         piston_a = lw(polar(R + 1.5, a), a + PI / 2, side * 5.6, 0, 6.6)
         piston_b = lw(polar(R + 1.5, a), a + PI / 2, side * 1.6, 0, 7.4)
         c, r, L = seg_xf(piston_a, piston_b)
-        cyl(f"gate_{g}_piston_{side:+d}", .14, L, c, M["steel"], rot=r, segs=10)
+        cyl(f"gate_{g}_piston_{side:+d}", .14, L, c, M["steel"], door, rot=r, segs=10)
     # tunnel behind the gate, under the stands
     tc = polar(R + 10, a, 0)
-    box(f"tunnel_{g}_floor", (13, 16, .3), (tc[0], tc[1], -.1), M["concrete_dark"], rot=rot, bevel=0)
+    box(f"tunnel_{g}_floor", (13, 18, .3), polar(R + 9, a, -.1), M["concrete_dark"], rot=rot, bevel=0, props=SOLID)
+    multi_box(f"tunnel_{g}_guide", [((.3, 14, .02), lw(polar(R + 9, a), a + PI / 2, dx, 0, .06)) for dx in (-3.5, 3.5)],
+              M["line_y"])
     for side in (-1, 1):
         box(f"tunnel_{g}_wall_{side:+d}", (1.0, 16, 9.5), lw(tc, a + PI / 2, side * 6.8, 0, 4.75), M["concrete_dark"],
             rot=rot, bevel=0, props=SOLID)
@@ -515,6 +520,9 @@ use_collection("markers")
 empty("arena_center", (0, 0, 0), props={"marker": "arena_center"})
 empty("spawn_A", polar(SPAWN_R, GATES["A"]), rot=(0, 0, PI), props={"marker": "spawn", "team": "A"})   # faces +Y
 empty("spawn_B", polar(SPAWN_R, GATES["B"]), rot=(0, 0, 0), props={"marker": "spawn", "team": "B"})    # faces -Y
+# match intro: mechs start inside the tunnels, gates open, they walk out to their spawns
+empty("gate_A_start", polar(R + 12, GATES["A"]), rot=(0, 0, PI), props={"marker": "gate_start", "team": "A"})
+empty("gate_B_start", polar(R + 12, GATES["B"]), rot=(0, 0, 0), props={"marker": "gate_start", "team": "B"})
 
 export_glb(os.path.join(MODELS, "environments", "arena.glb"))
 
@@ -526,4 +534,11 @@ render_preview("arena_overview", (38.0, -78.0, 60.0), (0, -2, 0), lens=19, sun=.
                sun_rot=(.9, 0, .8), world="#0E1626", world_strength=.35, samples=96)
 render_preview("arena_ground", (4.5, -SPAWN_R - 6.0, 6.4), (0, 0, 3.0), lens=22, sun=0, world="#0E1626", world_strength=.35,
                samples=96)
+# intro moment: gate A open, your mech striding out of the tunnel
+for door, a, side in DOORS:
+    if abs(a - GATES["A"]) < 1e-6:
+        door.location += Vector((math.cos(a + PI / 2), math.sin(a + PI / 2), 0)) * side * 5.9
+bpy.data.objects["preview_mech_A"].location = polar(R + 1.5, GATES["A"])
+render_preview("arena_gate_intro", (9.0, -R + 16.0, 3.2), (0, -R - 2.0, 3.6), lens=24, sun=0, world="#0E1626",
+               world_strength=.35, samples=96)
 save_blend(os.path.join(SOURCE, "environments", "arena.blend"))

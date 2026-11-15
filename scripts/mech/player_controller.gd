@@ -14,7 +14,7 @@ const SWAY_ROLL := 0.015
 
 var mech: Mech
 var camera: Camera3D
-var enabled := true
+var enabled := true  # false = movement/weapons locked (e.g. match intro); looking around still works
 var _base_pos := Vector3.ZERO
 var _step_phase := 0.0
 var _last_step_sign := 1.0
@@ -39,7 +39,11 @@ func _ready() -> void:
 
 
 func _on_hit(_m: Mech, _slot: String, amount: float) -> void:
-    _shake = minf(_shake + amount * 0.004, 0.35)
+    add_shake(amount * 0.004)
+
+
+func add_shake(amount: float) -> void:
+    _shake = minf(_shake + amount, 0.35)
 
 
 func _process(delta: float) -> void:
@@ -72,7 +76,7 @@ func _unhandled_input(event: InputEvent) -> void:
         Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if captured else Input.MOUSE_MODE_CAPTURED
     elif event is InputEventMouseButton and event.pressed and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
         Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-    elif event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and enabled:
+    elif event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and not mech.is_destroyed:
         var motion := event as InputEventMouseMotion
         mech.torso_twist = clampf(mech.torso_twist - motion.relative.x * mouse_sensitivity,
                                   -Mech.TWIST_LIMIT, Mech.TWIST_LIMIT)
@@ -81,11 +85,13 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _physics_process(_delta: float) -> void:
-    if not enabled or mech.is_destroyed:
+    if mech.is_destroyed:
         mech.throttle = 0.0
         mech.turn = 0.0
         mech.boosting = false
         return
+    if not enabled:
+        return  # someone else (the intro autopilot) is driving
     mech.throttle = Input.get_axis("move_back", "move_forward")
     mech.turn = Input.get_axis("turn_right", "turn_left")
     mech.boosting = Input.is_action_pressed("boost")
