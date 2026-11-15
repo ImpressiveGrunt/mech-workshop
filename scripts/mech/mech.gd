@@ -24,6 +24,7 @@ const TWIST_LIMIT := deg_to_rad(110.0)
 const PITCH_LIMIT := deg_to_rad(35.0)
 const WEAK_POINT_RADIUS := 0.7
 const PLATE_RADIUS := 1.5
+const PAINT_SUFFIXES := {"_paint": "primary", "_trim": "secondary", "_hazard": "accent", "_glow": "glow"}
 
 var loadout: Dictionary = {}
 var part_nodes: Dictionary = {}   # slot -> Node3D
@@ -36,6 +37,9 @@ var hitbox_rids: Array[RID] = []
 var torso_pivot: Node3D
 var cockpit_anchor: Node3D
 var shoulders: Array = []
+var slot_meshes: Dictionary = {}  # slot -> visible meshes of that part (for highlighting)
+var _paint_cache: Dictionary = {}
+var _highlight_mat: StandardMaterial3D
 var is_destroyed := false
 
 # Inputs written by a controller.
@@ -56,7 +60,7 @@ var fuel_recharge := 0.0
 var _impulse := Vector3.ZERO
 
 
-func build(new_loadout: Dictionary, carried_damage: Dictionary = {}) -> void:
+func build(new_loadout: Dictionary, carried_damage: Dictionary = {}, paint: Dictionary = {}) -> void:
     loadout = new_loadout.duplicate()
     collision_layer = LAYER_MECH
     collision_mask = LAYER_WORLD | LAYER_MECH
@@ -94,6 +98,61 @@ func build(new_loadout: Dictionary, carried_damage: Dictionary = {}) -> void:
     for slot in carried_damage:
         if part_hp.has(slot):
             part_hp[slot] = maxf(1.0, part_hp[slot] - float(carried_damage[slot]))
+    _strip_damaged_armor()
+    if not paint.is_empty():
+        apply_paint(paint)
+
+
+## Carried damage shows: a part at 60% HP is missing ~40% of its armor plates.
+func _strip_damaged_armor() -> void:
+    for slot in part_max_hp:
+        var lost: float = 1.0 - part_hp[slot] / part_max_hp[slot]
+        var slot_plates := plates.filter(func(p): return p["slot"] == slot)
+        for k in int(round(lost * slot_plates.size())):
+            var p: Dictionary = slot_plates[k]
+            p["node"].visible = false
+            plates.erase(p)
+
+
+## Recolour the mech. paint: {"primary", "secondary", "accent", "glow"} -> "#rrggbb".
+func apply_paint(paint: Dictionary) -> void:
+    _paint_cache.clear()
+    for n in _descendants(self):
+        if not (n is MeshInstance3D) or n.mesh == null:
+            continue
+        var mi := n as MeshInstance3D
+        for i in mi.mesh.get_surface_count():
+            var base := mi.mesh.surface_get_material(i) as BaseMaterial3D
+            if base == null:
+                continue
+            var channel := ""
+            for suffix in PAINT_SUFFIXES:
+                if base.resource_name.ends_with(suffix):
+                    channel = PAINT_SUFFIXES[suffix]
+            if channel == "" or not paint.has(channel):
+                mi.set_surface_override_material(i, null)
+                continue
+            if not _paint_cache.has(base):
+                var m := base.duplicate() as BaseMaterial3D
+                var c := Color(str(paint[channel]))
+                m.albedo_color = c
+                if channel == "glow":
+                    m.emission_enabled = true
+                    m.emission = c
+                _paint_cache[base] = m
+            mi.set_surface_override_material(i, _paint_cache[base])
+
+
+func set_highlight(slot: String, on: bool) -> void:
+    if _highlight_mat == null:
+        _highlight_mat = StandardMaterial3D.new()
+        _highlight_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+        _highlight_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+        _highlight_mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+        _highlight_mat.albedo_color = Color(1.0, 0.55, 0.2, 0.35)
+    for mi in slot_meshes.get(slot, []):
+        if is_instance_valid(mi):
+            mi.material_overlay = _highlight_mat if on else null
 
 
 func damage_report() -> Dictionary:
@@ -249,8 +308,11 @@ func _spawn(slot: String, parent: Node3D) -> Node3D:
 
 
 func _prepare_part(root: Node, slot: String) -> void:
+    slot_meshes[slot] = []
     for n in _descendants(root):
         var nm := String(n.name)
+        if n is MeshInstance3D and not nm.ends_with("_collider"):
+            slot_meshes[slot].append(n)
         if n is MeshInstance3D and nm.ends_with("_collider"):
             _make_hitbox(n as MeshInstance3D, slot)
         elif n is MeshInstance3D and nm.begins_with("armor_"):

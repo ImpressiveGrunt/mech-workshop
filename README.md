@@ -17,6 +17,16 @@ arms get blown away, and losing the torso ends the fight.
    (damage carries back)      + scrap, sell scrap at the scale
 ```
 
+## Workshop
+
+Your mech stands in its dock, seen from the front. Options on the right:
+
+- **Upgrades**: pick a slot (or just click that part of the mech), then equip stored parts or buy new ones.
+- **Repairs**: per-part damage bars. Repair a single part or everything. Missing armour plates come back.
+- **Paint**: colour pickers for primary, secondary, stripes and lights, plus presets.
+
+Each option moves the camera to its own shot. Deploy to the **Arena** or the **Salvage Yard** from the bottom of the panel.
+
 ## Controls (in the mech)
 
 | Input | Action |
@@ -68,10 +78,11 @@ tools/blender/build_all.sh               # or SKIP_RENDER=1 for models only
 | Asset | Status |
 |---|---|
 | Starter mech Mk1: legs, torso, two arms, autocannon, ram fist, missile pod, jump thruster | ✅ |
-| Workshop environment | blockout only (in Godot) |
+| Workshop: mech dock bay (clamps, repair arms, turntable, catwalk, props) | ✅ |
 | Salvage yard environment | blockout only |
 | Arena environment | blockout only |
 
+![Workshop dock](docs/previews/workshop_overview.png)
 ![Mech Mk1](docs/previews/mech_mk1_front.png)
 ![Cockpit view](docs/previews/mech_mk1_cockpit_view.png)
 

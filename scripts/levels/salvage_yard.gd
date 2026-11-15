@@ -32,7 +32,7 @@ func _ready() -> void:
     add_child(player)
     player.global_transform = spawn.global_transform
     player.position.y += 0.3
-    player.build(GameState.loadout, GameState.damage)
+    player.build(GameState.loadout, GameState.damage, GameState.paint)
     player.add_child(PlayerController.new())
     hud = Hud.new()
     add_child(hud)

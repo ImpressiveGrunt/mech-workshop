@@ -22,9 +22,9 @@ func _ready() -> void:
     var spawn_a := LevelUtils.find_marker(root, "spawn_A")
     var spawn_b := LevelUtils.find_marker(root, "spawn_B")
 
-    player = _spawn_mech(GameState.loadout, GameState.damage, spawn_a)
+    player = _spawn_mech(GameState.loadout, GameState.damage, spawn_a, GameState.paint)
     player.add_child(PlayerController.new())
-    enemy = _spawn_mech(_enemy_loadout(), {}, spawn_b)
+    enemy = _spawn_mech(_enemy_loadout(), {}, spawn_b, GameState.PAINT_PRESETS.values().pick_random())
     var ai := AIController.new()
     ai.target = player
     enemy.add_child(ai)
@@ -37,12 +37,12 @@ func _ready() -> void:
     hud.show_message("FIGHT!", 2.0)
 
 
-func _spawn_mech(loadout: Dictionary, damage: Dictionary, marker: Node3D) -> Mech:
+func _spawn_mech(loadout: Dictionary, damage: Dictionary, marker: Node3D, paint: Dictionary) -> Mech:
     var m := Mech.new()
     add_child(m)
     m.global_transform = marker.global_transform
     m.position.y += 0.3
-    m.build(loadout, damage)
+    m.build(loadout, damage, paint)
     return m
 
 

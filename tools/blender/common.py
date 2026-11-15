@@ -264,6 +264,7 @@ def render_preview(name, cam_loc, target, lens=35, sun=3.0, sun_rot=(0.9, 0.2, 0
     sc.cycles.samples = samples; sc.cycles.max_bounces = 6
     sc.cycles.use_denoising = False  # distro Blender ships without OpenImageDenoise
     sc.cycles.use_adaptive_sampling = True
+    sc.cycles.sample_clamp_indirect = 2.0  # kill fireflies
     try:
         sc.view_settings.view_transform = 'AgX'; sc.view_settings.look = 'AgX - Punchy'
     except Exception:

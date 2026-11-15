@@ -8,6 +8,7 @@ extends Node
 signal money_changed(money: int)
 signal scrap_changed(scrap_kg: int)
 signal loadout_changed
+signal paint_changed
 
 const SAVE_PATH := "user://save.json"
 const SCENES := {
@@ -25,6 +26,21 @@ const STARTING_LOADOUT := {
     "weapon_R": "weapon_autocannon_mk1",
     "back": "back_thruster_mk1",
 }
+const SLOT_NAMES := {
+    "legs": "Legs", "torso": "Torso", "arm_L": "Left Arm", "arm_R": "Right Arm",
+    "weapon_L": "Left Weapon", "weapon_R": "Right Weapon", "back": "Backpack",
+}
+# Paint channels map to Blender material suffixes: _paint, _trim, _hazard, _glow.
+const PAINT_CHANNELS := {"primary": "Primary", "secondary": "Secondary", "accent": "Stripes", "glow": "Lights"}
+const DEFAULT_PAINT := {"primary": "#e8772e", "secondary": "#2b2f36", "accent": "#f2c230", "glow": "#ffb347"}
+const PAINT_PRESETS := {
+    "Foundry": DEFAULT_PAINT,
+    "Arctic": {"primary": "#dfe6ea", "secondary": "#3a4a5a", "accent": "#3ce6ff", "glow": "#3ce6ff"},
+    "Jungle": {"primary": "#4f6b3a", "secondary": "#2a2e24", "accent": "#d9c45a", "glow": "#9cff6b"},
+    "Crimson": {"primary": "#a8262b", "secondary": "#1e1e22", "accent": "#e6e6e6", "glow": "#ff4b3a"},
+    "Hornet": {"primary": "#f2c230", "secondary": "#1b1c1e", "accent": "#1b1c1e", "glow": "#ff9a2e"},
+    "Ghost": {"primary": "#2c3036", "secondary": "#14161a", "accent": "#7d8590", "glow": "#b06bff"},
+}
 const STARTING_MONEY := 500
 const REPAIR_COST_PER_HP := 2
 const SCRAP_PRICE_PER_KG := 3
@@ -35,6 +51,7 @@ var scrap_kg: int = 0
 var inventory: Array[String] = []
 var loadout: Dictionary = {}
 var damage: Dictionary = {}  # slot -> hp lost, carried between matches
+var paint: Dictionary = {}   # channel -> "#rrggbb"
 var matches_played: int = 0
 var matches_won: int = 0
 
@@ -51,6 +68,7 @@ func new_game() -> void:
     inventory.clear()
     loadout = STARTING_LOADOUT.duplicate()
     damage.clear()
+    paint = DEFAULT_PAINT.duplicate()
     matches_played = 0
     matches_won = 0
 
@@ -123,6 +141,20 @@ func equip(id: String, slot: String) -> bool:
     return true
 
 
+# ------------------------------------------------------------- paint
+func set_paint_color(channel: String, color: Color, persist: bool = true) -> void:
+    paint[channel] = "#" + color.to_html(false)
+    if persist:
+        save_game()
+    paint_changed.emit()
+
+
+func apply_paint_preset(preset: String) -> void:
+    paint = PAINT_PRESETS[preset].duplicate()
+    save_game()
+    paint_changed.emit()
+
+
 # ------------------------------------------------------------- damage
 func max_hp(slot: String) -> int:
     return int(PartDB.stat(str(loadout.get(slot, "")), "hp", 0))
@@ -177,7 +209,7 @@ func save_game() -> void:
         return
     f.store_string(JSON.stringify({
         "money": money, "scrap_kg": scrap_kg, "inventory": inventory, "loadout": loadout,
-        "damage": damage, "matches_played": matches_played, "matches_won": matches_won,
+        "damage": damage, "paint": paint, "matches_played": matches_played, "matches_won": matches_won,
     }, "  "))
 
 
@@ -201,6 +233,10 @@ func load_game() -> void:
         if id == "" or PartDB.has_part(id):
             loadout[slot] = id
     damage = data.get("damage", {})
+    var saved_paint: Dictionary = data.get("paint", {})
+    for channel in PAINT_CHANNELS:
+        if saved_paint.has(channel):
+            paint[channel] = str(saved_paint[channel])
 
 
 # ------------------------------------------------------------- input
