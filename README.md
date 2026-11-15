@@ -84,7 +84,7 @@ tools/blender/build_all.sh               # or SKIP_RENDER=1 for models only
 | Workshop: mech dock bay sized to the mech (clamps, repair arms, turntable, boarding gangway, crew, forklift) | ✅ |
 | Human-scale props: workers (4 poses), forklift, traffic cones (`props.py`) | ✅ |
 | Salvage yard environment | blockout only |
-| Arena: night colosseum: stands with crowd, blast walls + glass, gates A/B with tunnels, floodlight towers, jumbotron, symmetric cover, wrecked mechs, destructible crates, explosive barrels | ✅ |
+| Arena: 116 m night colosseum: raised decks, three rings of cover, stands with crowd, blast walls + glass, gates A/B with tunnels, floodlight towers, jumbotron, symmetric cover, wrecked mechs, destructible crates, explosive barrels | ✅ |
 
 ![Workshop dock](docs/previews/workshop_overview.png)
 ![Arena](docs/previews/arena_overview.png)

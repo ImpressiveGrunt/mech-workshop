@@ -1,5 +1,8 @@
 """Arena: a night-time industrial colosseum sized for 15 ft (4.6 m) mechs.
 
+116 m floor (radius 58 m): long sightlines, flanking lanes, raised decks reachable
+by ramp or jump thruster, and cover spread across three rings.
+
 Layout is point-symmetric around the centre so spawn A and spawn B are fair.
 Exports assets/models/environments/arena.glb with:
   markers   spawn_A, spawn_B (mech faces the centre), arena_center
@@ -19,9 +22,11 @@ import props as pr
 random.seed(11)
 reset()
 
-R = 38.0                 # playable floor radius
+R = 58.0                 # playable floor radius (116 m across: room to boost, flank and kite)
+S = R / 38.0             # spread factor for the original cover layout
+SPAWN_R = R - 8.0
 WALL_H = 8.0             # blast wall height (mechs are 4.6 m)
-GATE_HALF = math.radians(9)
+GATE_HALF = math.asin(6.2 / (R + 1.0))   # ~12 m gate opening at any radius
 GATES = {"A": -PI / 2, "B": PI / 2}   # south / north
 M = dict(
     floor=mat("arena_floor", "#7C7A75", 0, .85),
@@ -72,10 +77,13 @@ def light(name, loc, energy, color, godot_energy, godot_range, target=None, angl
     return ob
 
 
-def mirror(fn, *args, **kw):
-    """Place something and its point-mirrored twin (x, y) -> (-x, -y)."""
-    fn(*args, **kw, _twin=False)
-    fn(*args, **kw, _twin=True)
+def mirror(fn, name, loc, *args, scale=True, **kw):
+    """Place something and its point-mirrored twin (x, y) -> (-x, -y).
+    scale=True spreads the original 38 m layout out to the current radius."""
+    if scale:
+        loc = (loc[0] * S, loc[1] * S, loc[2])
+    fn(name, loc, *args, **kw, _twin=False)
+    fn(name, loc, *args, **kw, _twin=True)
 
 
 def lw(origin, rotz, lx, ly, lz=0.0):
@@ -88,7 +96,7 @@ use_collection("floor")
 cyl("floor", R + 1.0, .5, (0, 0, -.25), M["floor"], segs=64, props=SOLID)
 # expansion-joint grid
 lines = []
-for k in range(-9, 10):
+for k in range(-int(R / 4) - 1, int(R / 4) + 2):
     v = k * 4.0
     half = math.sqrt(max(0.0, R * R - v * v))
     if half > 1:
@@ -96,8 +104,8 @@ for k in range(-9, 10):
         lines.append(((.06, 2 * half, .02), (v, 0, .005)))
 multi_box("floor_joints", lines, M["floor_dark"])
 # a few darker replacement slabs
-multi_box("floor_patches", [((4, 4, .02), (4 * random.randint(-7, 7) + 2, 4 * random.randint(-7, 7) + 2, .008))
-                            for _ in range(26) if True], M["floor_dark"])
+multi_box("floor_patches", [((4, 4, .02), (4 * random.randint(-11, 11) + 2, 4 * random.randint(-11, 11) + 2, .008))
+                            for _ in range(50)], M["floor_dark"])
 # painted rings (segment strips) + sector lines
 
 
@@ -113,14 +121,14 @@ def ring_strip(name, r, width, m, n=96, z=.012, skip_gates=False):
 
 ring_strip("ring_outer_yellow", R - 1.6, .35, M["line_y"], skip_gates=True)
 ring_strip("ring_outer_white", R - 2.3, .15, M["line_w"], skip_gates=True)
-ring_strip("ring_mid", 16.0, .25, M["line_w"], n=72)
+ring_strip("ring_mid", 24.0, .25, M["line_w"], n=96)
 for k in range(8):
     a = k * PI / 4 + PI / 8
-    c, r, L = seg_xf(polar(17, a, .012), polar(R - 2.6, a, .012))
+    c, r, L = seg_xf(polar(25, a, .012), polar(R - 2.6, a, .012))
     box(f"sector_line_{k}", (.18, .02, L), c, M["line_w"], rot=r, bevel=0)
 # scorch marks + drains
 multi_cyl("scorch_marks", [(random.uniform(.8, 2.6), .01, polar(random.uniform(8, R - 4), random.uniform(0, 2 * PI), .015))
-                           for _ in range(24)], M["scorch"], segs=10)
+                           for _ in range(40)], M["scorch"], segs=10)
 for k in range(12):
     a = k * PI / 6 + PI / 12
     if in_gate(a, .1):
@@ -132,7 +140,7 @@ for k in range(12):
 
 # spawn pads
 for g, a in GATES.items():
-    p = polar(30, a)
+    p = polar(SPAWN_R, a)
     cyl(f"spawn_pad_glow_{g}", 3.3, .03, (p[0], p[1], .02), M["glow_blue"] if g == "A" else M["glow_red"], segs=40)
     cyl(f"spawn_pad_{g}", 3.0, .05, (p[0], p[1], .03), M["floor_dark"], segs=40)
     text(f"spawn_letter_{g}", g, 2.4, (p[0], p[1], .06), rot=(0, 0, a - PI / 2 if g == "B" else a + PI / 2),
@@ -140,7 +148,7 @@ for g, a in GATES.items():
 
 # ================================================================== walls, blast glass, banners
 use_collection("walls")
-N = 60
+N = int(60 * S)
 seg_w = 2 * PI * (R + 1.0) / N
 walls, impacts, buttress, caps, bands_y, bands_k, glass = [], [], [], [], [], [], []
 lamps = []
@@ -169,8 +177,8 @@ multi_box("wall_caps", caps, M["steel"])
 multi_box("blast_glass", glass, M["glass"], props=MESHCOL)
 multi_box("wall_lamps", lamps, M["lamp"])
 # hanging banners with a white hex emblem
-for k in range(10):
-    a = 2 * PI * (k + .25) / 10
+for k in range(14):
+    a = 2 * PI * (k + .25) / 14
     if in_gate(a, .12):
         continue
     m = M["banner_red"] if k % 2 else M["banner_blue"]
@@ -230,7 +238,7 @@ for g, a in GATES.items():
 # ================================================================== stands + crowd
 use_collection("stands")
 TIERS, T0_R, T0_Z, T_DEPTH, T_RISE = 9, R + 3.2, 8.6, 1.4, 1.0
-N2 = 96
+N2 = int(96 * S)
 crowd_shirts = ["#C8372D", "#2F5D8C", "#F2C230", "#E8772E", "#3E7A4E", "#D8D8D0", "#6B4E9B"]
 crowd = {c: [] for c in crowd_shirts}
 heads = {k: [] for k in range(4)}
@@ -282,7 +290,7 @@ text("booth_sign", "LIVE", .8, (bp[0] - 2.1, bp[1], bp[2] + 1.9), rot=(PI / 2, 0
 
 # ================================================================== light towers + jumbotron
 use_collection("lights")
-TOWER_R, TOWER_H = R + 24, 34.0
+TOWER_R, TOWER_H = R + 24, 40.0
 heads_pos = []
 for k in range(4):
     a = PI / 4 + k * PI / 2
@@ -307,11 +315,11 @@ for k in range(4):
             lamps.append(((1.6, .2, 1.1), lw(polar(TOWER_R - 2.0, a, TOWER_H + 2.5), face + PI / 2, (ix - 1.5) * 2.0, 0,
                                              (iz - 1) * 1.4), (-.45, 0, face - PI / 2 + PI)))
     multi_box(f"light_tower_{k}_lamps", lamps, M["lamp"])
-    light(f"floodlight_{k}", polar(TOWER_R - 3.0, a, TOWER_H + 2.0), 260000, "#FFF4E0", 14.0, 110,
-          target=polar(6, a + PI, 0), angle=1.0)
+    light(f"floodlight_{k}", polar(TOWER_R - 3.0, a, TOWER_H + 2.0), 600000, "#FFF4E0", 20.0, 160,
+          target=polar(16, a + PI, 0), angle=1.35)  # aimed past centre: wide cones cover the far side
     heads_pos.append(polar(TOWER_R - 1.5, a, TOWER_H + 4.5))
 # jumbotron hanging over the centre on cables
-JZ = 24.0
+JZ = 30.0
 box("jumbotron_core", (7.4, 7.4, 4.4), (0, 0, JZ), M["wall_dark"], bevel=.1)
 for k in range(4):
     a = k * PI / 2
@@ -325,7 +333,7 @@ cyl("jumbotron_ring_light", 3.2, .2, (0, 0, JZ - 2.6), M["glow_blue"], segs=24)
 for k, hp in enumerate(heads_pos):
     c, r, L = seg_xf((hp[0] * .1, hp[1] * .1, JZ + 2.5), hp)
     cyl(f"jumbotron_cable_{k}", .06, L, c, M["steel"], rot=r, segs=6)
-light("jumbotron_glow", (0, 0, JZ - 3.5), 4000, "#3CE6FF", 2.0, 30)
+light("jumbotron_glow", (0, 0, JZ - 3.5), 6000, "#3CE6FF", 2.5, 40)
 
 # ================================================================== cover (point-symmetric)
 use_collection("cover")
@@ -439,9 +447,10 @@ def wreck(name, loc, rotz, _twin=False):
     multi_cyl(name + "_scorch", [(3.5, .01, (loc[0], loc[1], .018))], M["scorch"], segs=12)
 
 
-mirror(container, "container_1", (13.0, -9.0, 0), .35, "#2F5D8C")
-mirror(container, "container_2", (13.3, -11.6, 0), .35, "#B33A2E")
-mirror(container, "container_3", (13.1, -10.3, 2.6), .38, "#3E7A4E")
+GX, GY = 13.0 * (S - 1), -10.3 * (S - 1)  # stacked group moves as a unit
+mirror(container, "container_1", (13.0 + GX, -9.0 + GY, 0), .35, "#2F5D8C", scale=False)
+mirror(container, "container_2", (13.3 + GX, -11.6 + GY, 0), .35, "#B33A2E", scale=False)
+mirror(container, "container_3", (13.1 + GX, -10.3 + GY, 2.6), .38, "#3E7A4E", scale=False)
 mirror(container, "container_4", (-20.0, -14.0, 0), -.9, "#C88A2E")
 mirror(blast_wall, "blast_wall_1", (22.0, 4.0, 0), PI / 2 - .2)
 mirror(blast_wall, "blast_wall_2", (7.0, -17.5, 0), .15)
@@ -459,20 +468,62 @@ mirror(barrels, "barrels_1", (10.5, -6.5, 0))
 mirror(barrels, "barrels_2", (-18.0, -10.0, 0))
 mirror(wreck, "wreck_1", (-14.0, 14.0, 0), .7)
 
+
+def raised_deck(name, loc, rotz, _twin=False):
+    """Elevated firing deck: ramp up from the centre side, jump-thruster up the back."""
+    if _twin:
+        loc, rotz, name = (-loc[0], -loc[1], 0), rotz + PI, name + "_b"
+    o = (loc[0], loc[1], 0)
+    d = box(name, (11.0, 8.0, 2.6), lw(o, rotz, 0, 0, 1.3), M["concrete"], rot=(0, 0, rotz), bevel=.08, props=CONVEX)
+    box(name + "_top", (10.6, 7.6, .12), lw(o, rotz, 0, 0, 2.66), M["steel"], d, rot=(0, 0, rotz), bevel=0)
+    box(name + "_ramp", (7.5, 4.6, .5), lw(o, rotz, -8.6, 0, 1.25), M["concrete_dark"], rot=(0, -.33, rotz),
+        props=CONVEX)
+    multi_box(name + "_bollards", [((.6, .6, 1.2), lw(o, rotz, lx, ly, 3.3)) for lx in (-3.5, 0, 3.5, 5.0)
+                                   for ly in (-3.5, 3.5) if not (lx == -3.5)], M["line_y"], d)
+    multi_box(name + "_edge", [((11.0, .3, .06), lw(o, rotz, 0, ly, 2.75), (0, 0, rotz)) for ly in (-3.85, 3.85)],
+              M["black"], d)
+    box(name + "_parapet", (.8, 8.0, 1.3), lw(o, rotz, 5.1, 0, 3.3), M["concrete_dark"], d, rot=(0, 0, rotz),
+        props=CONVEX)
+    multi_box(name + "_lights", [((.1, .5, .2), lw(o, rotz, lx, -4.05, 2.0), (0, 0, rotz)) for lx in (-4, 0, 4)],
+              M["glow_blue"], d)
+
+
+# outer ring: the extra space gets flanking routes, high ground and spawn cover
+mirror(raised_deck, "deck_1", (36.0, 8.0, 0), 0.22, scale=False)
+mirror(raised_deck, "deck_2", (-30.0, 30.0, 0), 2.4, scale=False)
+mirror(container, "container_5", (34.0, -30.0, 0), 1.1, "#2F5D8C", scale=False)
+mirror(container, "container_6", (31.5, -32.5, 0), 1.1, "#C88A2E", scale=False)
+mirror(container, "container_7", (-44.0, -10.0, 0), 1.4, "#3E7A4E", scale=False)
+mirror(blast_wall, "blast_wall_5", (42.0, -18.0, 0), 1.2, scale=False)
+mirror(blast_wall, "blast_wall_6", (16.0, -40.0, 0), .35, scale=False)
+mirror(blast_wall, "blast_wall_7", (-8.0, -41.0, 0), -.2, scale=False)      # spawn A cover
+mirror(blast_wall, "blast_wall_8", (-38.0, -28.0, 0), .9, scale=False)
+mirror(blast_wall, "blast_wall_9", (48.0, 10.0, 0), PI / 2 + .1, scale=False)
+mirror(pillar, "pillar_3", (44.0, -32.0, 0), scale=False)
+mirror(tank_trap, "tank_trap_5", (24.0, -44.0, 0), .4, scale=False)
+mirror(tank_trap, "tank_trap_6", (-22.0, -45.0, 0), 1.0, scale=False)
+mirror(tank_trap, "tank_trap_7", (50.0, -2.0, 0), .2, scale=False)
+mirror(tank_trap, "tank_trap_8", (-50.0, 14.0, 0), .7, scale=False)
+mirror(crate_stack, "crates_3", (38.0, -40.0, 0), scale=False)
+mirror(crate_stack, "crates_4", (-46.0, 4.0, 0), scale=False)
+mirror(barrels, "barrels_3", (28.0, -16.0, 0), scale=False)
+mirror(barrels, "barrels_4", (-28.0, -36.0, 0), scale=False)
+mirror(wreck, "wreck_2", (40.0, 26.0, 0), 2.2, scale=False)
+
 # ================================================================== markers
 use_collection("markers")
 empty("arena_center", (0, 0, 0), props={"marker": "arena_center"})
-empty("spawn_A", polar(30, GATES["A"]), rot=(0, 0, PI), props={"marker": "spawn", "team": "A"})   # faces +Y
-empty("spawn_B", polar(30, GATES["B"]), rot=(0, 0, 0), props={"marker": "spawn", "team": "B"})    # faces -Y
+empty("spawn_A", polar(SPAWN_R, GATES["A"]), rot=(0, 0, PI), props={"marker": "spawn", "team": "A"})   # faces +Y
+empty("spawn_B", polar(SPAWN_R, GATES["B"]), rot=(0, 0, 0), props={"marker": "spawn", "team": "B"})    # faces -Y
 
 export_glb(os.path.join(MODELS, "environments", "arena.glb"))
 
 # ================================================================== previews (mechs added after export)
 use_collection("_preview_mechs")
-mp.assemble(mp.palette("mk1"), loc=polar(30, GATES["A"]), rotz=PI, name="preview_mech_A")
-mp.assemble(mp.palette("scrap"), loc=polar(30, GATES["B"]), weapon_L="missile_pod", name="preview_mech_B")
-render_preview("arena_overview", (-44.0, -42.0, 30.0), (0, -2, 0), lens=20, sun=.15, sun_color="#9FB4FF",
+mp.assemble(mp.palette("mk1"), loc=polar(SPAWN_R, GATES["A"]), rotz=PI, name="preview_mech_A")
+mp.assemble(mp.palette("scrap"), loc=polar(SPAWN_R, GATES["B"]), weapon_L="missile_pod", name="preview_mech_B")
+render_preview("arena_overview", (38.0, -78.0, 60.0), (0, -2, 0), lens=19, sun=.15, sun_color="#9FB4FF",
                sun_rot=(.9, 0, .8), world="#0E1626", world_strength=.35, samples=96)
-render_preview("arena_ground", (4.5, -36.0, 6.4), (0, 0, 3.0), lens=22, sun=0, world="#0E1626", world_strength=.35,
+render_preview("arena_ground", (4.5, -SPAWN_R - 6.0, 6.4), (0, 0, 3.0), lens=22, sun=0, world="#0E1626", world_strength=.35,
                samples=96)
 save_blend(os.path.join(SOURCE, "environments", "arena.blend"))

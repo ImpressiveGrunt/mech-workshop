@@ -3,7 +3,7 @@ extends Node
 ## Simple arena opponent: turns to face the target, keeps a fighting distance,
 ## twists its torso to aim, and fires when lined up. Add as a child of a Mech.
 
-@export var preferred_distance := 22.0
+@export var preferred_distance := 28.0  # the 116 m arena leaves room to keep range
 @export var spread := 0.035  # aim error per metre of distance
 
 var mech: Mech
