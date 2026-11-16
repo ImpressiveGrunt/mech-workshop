@@ -65,6 +65,9 @@ def mat(name, color="#808080", metal=0.0, rough=0.6, emit=0.0, alpha=1.0):
         b.inputs["Alpha"].default_value = alpha
         m.blend_method = 'BLEND'
     m.diffuse_color = (*hexc(color), alpha)
+    # single-sided in the engine (glTF doubleSided=false): the pilot's eye sits inside the torso shell,
+    # which must vanish from the inside, and it halves overdraw for the closed boxes everything is made of
+    m.use_backface_culling = True
     _MATS[name] = m
     return m
 

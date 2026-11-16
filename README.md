@@ -63,6 +63,28 @@ them, then 3-2-1, **FIGHT**. Destroy the enemy torso to win.
 | E | interact (salvage, sell, exit) |
 | Esc | release / capture mouse |
 
+## In-engine screenshots
+
+![Workshop](docs/screens/01_workshop.png)
+![Walking out of the gate](docs/screens/03_arena_gates_open.png)
+![Cockpit](docs/screens/05_arena_fight.png)
+![Hands on the sticks](docs/screens/06_cockpit_hands.png)
+
+## Playtest builds
+
+```bash
+godot --headless --path . --export-release "Windows" build/windows/MechWorkshop.exe
+godot --headless --path . --export-release "Linux" build/linux/MechWorkshop.x86_64
+godot --headless --path . --export-release "macOS" build/macos/MechWorkshop.zip
+```
+
+(`export_presets.cfg` is committed; Godot 4.3 export templates required.) Tests:
+
+```bash
+godot --headless --path . res://tests/smoke_test.tscn           # gameplay smoke test
+xvfb-run godot --path . res://tests/screenshots.tscn            # in-engine screenshots
+```
+
 ## Running
 
 Open the folder in **Godot 4.3+** and press Play. Progress saves to `user://save.json`.

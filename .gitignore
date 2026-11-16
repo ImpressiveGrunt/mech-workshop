@@ -1,8 +1,8 @@
 # Godot
 .godot/
 *.translation
-export_presets.cfg
 # Blender backups
 *.blend1
 *.blend2
 __pycache__/
+build/

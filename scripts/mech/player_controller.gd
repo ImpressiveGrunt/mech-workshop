@@ -93,7 +93,7 @@ func _setup_cockpit() -> void:
 func _make_screen_label(marker: Node3D, big: bool) -> Label3D:
     var l := Label3D.new()
     l.font_size = 34 if big else 30
-    l.pixel_size = 0.00055 if big else 0.00052   # sized so the longest lines fit the overhead screens
+    l.pixel_size = 0.00042 if big else 0.00036   # sized in-engine so the longest lines fit the overhead screens
     l.modulate = Color(0.45, 1.0, 0.75)
     l.outline_size = 0
     l.shaded = false
@@ -104,7 +104,7 @@ func _make_screen_label(marker: Node3D, big: bool) -> Label3D:
     l.autowrap_mode = TextServer.AUTOWRAP_OFF
     var w := float(LevelUtils.extras_of(marker).get("w", 0.2))
     var h := float(LevelUtils.extras_of(marker).get("h", 0.14))
-    l.position = Vector3(-w * 0.45, h * 0.42, 0.002)   # top-left corner of the screen
+    l.position = Vector3(-w * 0.45, h * 0.36, 0.002)   # top-left corner of the screen (inset)
     marker.add_child(l)
     return l
 
