@@ -1,0 +1,221 @@
+{
+ "bench_top": {
+  "collision": "box"
+ },
+ "cam_overview": {
+  "fov": 50,
+  "marker": "camera"
+ },
+ "cam_paint": {
+  "fov": 50,
+  "marker": "camera"
+ },
+ "cam_repair": {
+  "fov": 50,
+  "marker": "camera"
+ },
+ "cam_upgrade": {
+  "fov": 50,
+  "marker": "camera"
+ },
+ "ceiling_light_0": {
+  "godot_energy": 1.2,
+  "godot_range": 14
+ },
+ "ceiling_light_1": {
+  "godot_energy": 1.2,
+  "godot_range": 14
+ },
+ "ceiling_light_2": {
+  "godot_energy": 1.2,
+  "godot_range": 14
+ },
+ "ceiling_light_3": {
+  "godot_energy": 1.2,
+  "godot_range": 14
+ },
+ "ceiling_light_4": {
+  "godot_energy": 1.2,
+  "godot_range": 14
+ },
+ "ceiling_light_5": {
+  "godot_energy": 1.2,
+  "godot_range": 14
+ },
+ "ceiling_light_6": {
+  "godot_energy": 1.2,
+  "godot_range": 14
+ },
+ "ceiling_light_7": {
+  "godot_energy": 1.2,
+  "godot_range": 14
+ },
+ "cone_0": {
+  "prop": "cone"
+ },
+ "cone_1": {
+  "prop": "cone"
+ },
+ "cone_2": {
+  "prop": "cone"
+ },
+ "cone_3": {
+  "prop": "cone"
+ },
+ "crate_0": {
+  "collision": "box"
+ },
+ "crate_1": {
+  "collision": "box"
+ },
+ "crate_2": {
+  "collision": "box"
+ },
+ "crate_3": {
+  "collision": "box"
+ },
+ "crate_4": {
+  "collision": "box"
+ },
+ "crate_5": {
+  "collision": "box"
+ },
+ "crew_bench": {
+  "height_m": 1.8,
+  "prop": "worker"
+ },
+ "crew_boarding": {
+  "height_m": 1.8,
+  "prop": "worker"
+ },
+ "crew_chief": {
+  "height_m": 1.8,
+  "prop": "worker"
+ },
+ "crew_deck": {
+  "height_m": 1.8,
+  "prop": "worker"
+ },
+ "crew_terminal": {
+  "height_m": 1.8,
+  "prop": "worker"
+ },
+ "dock_pad": {
+  "collision": "box"
+ },
+ "drum_0": {
+  "collision": "box"
+ },
+ "drum_1": {
+  "collision": "box"
+ },
+ "drum_2": {
+  "collision": "box"
+ },
+ "drum_3": {
+  "collision": "box"
+ },
+ "drum_4": {
+  "collision": "box"
+ },
+ "floor": {
+  "collision": "box"
+ },
+ "forklift": {
+  "collision": "box",
+  "prop": "forklift"
+ },
+ "forklift_body": {
+  "collision": "box"
+ },
+ "gangway": {
+  "collision": "box"
+ },
+ "gantry_beam": {
+  "collision": "box"
+ },
+ "key_left": {
+  "godot_energy": 8.0,
+  "godot_range": 30
+ },
+ "key_right": {
+  "godot_energy": 5.0,
+  "godot_range": 30
+ },
+ "mech_dock": {
+  "marker": "mech_dock"
+ },
+ "pad_fill": {
+  "godot_energy": 1.0,
+  "godot_range": 8
+ },
+ "repair_arm_L_base": {
+  "collision": "box"
+ },
+ "repair_arm_L_spark": {
+  "godot_energy": 0.8,
+  "godot_range": 3
+ },
+ "repair_arm_R_base": {
+  "collision": "box"
+ },
+ "repair_arm_R_spark": {
+  "godot_energy": 0.8,
+  "godot_range": 3
+ },
+ "rim_left": {
+  "godot_energy": 2.5,
+  "godot_range": 12
+ },
+ "rim_right": {
+  "godot_energy": 2.5,
+  "godot_range": 12
+ },
+ "shelf_+1": {
+  "collision": "box"
+ },
+ "shelf_-1": {
+  "collision": "box"
+ },
+ "terminal_base": {
+  "collision": "box"
+ },
+ "tool_cabinet": {
+  "collision": "box"
+ },
+ "tower_L_beacon_light": {
+  "godot_energy": 0.6,
+  "godot_range": 6
+ },
+ "tower_L_columns": {
+  "collision": "box"
+ },
+ "tower_L_deck": {
+  "collision": "box"
+ },
+ "tower_R_beacon_light": {
+  "godot_energy": 0.6,
+  "godot_range": 6
+ },
+ "tower_R_columns": {
+  "collision": "box"
+ },
+ "tower_R_deck": {
+  "collision": "box"
+ },
+ "turntable": {
+  "collision": "box"
+ },
+ "wall_back": {
+  "collision": "box"
+ },
+ "wall_front": {
+  "collision": "box"
+ },
+ "wall_left": {
+  "collision": "box"
+ },
+ "wall_right": {
+  "collision": "box"
+ }
+}

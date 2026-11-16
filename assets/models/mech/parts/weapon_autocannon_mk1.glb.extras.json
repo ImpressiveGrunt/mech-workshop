@@ -1,0 +1,18 @@
+{
+ "ac_collider": {
+  "collider": "box"
+ },
+ "weapon_autocannon_mk1": {
+  "ammo": 120,
+  "damage": 35,
+  "fire_rate": 6.0,
+  "hp": 150,
+  "mass_kg": 1800,
+  "part_id": "weapon_autocannon",
+  "price": 900,
+  "range": 120,
+  "slot": "weapon",
+  "tier": "mk1",
+  "weapon_type": "ballistic"
+ }
+}

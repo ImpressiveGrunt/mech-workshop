@@ -66,9 +66,38 @@ static func add_marker(parent: Node, marker_name: String, pos: Vector3, rot_y: f
     return n
 
 
-static func instance_environment(path: String, parent: Node) -> Node3D:
+static var _extras_cache: Dictionary = {}
+
+
+## Blender writes <scene>.glb.extras.json next to every export ({object name: custom properties})
+## because Godot 4.3's glTF importer drops node extras. Re-attach them as meta "extras".
+static func apply_extras(root: Node, scene_path: String) -> void:
+    if not _extras_cache.has(scene_path):
+        var table := {}
+        var text := FileAccess.get_file_as_string(scene_path + ".extras.json")
+        var data = JSON.parse_string(text) if text != "" else null
+        if data is Dictionary:
+            for key in data:
+                table[String(key).validate_node_name()] = data[key]
+        _extras_cache[scene_path] = table
+    var extras: Dictionary = _extras_cache[scene_path]
+    if extras.is_empty():
+        return
+    for n in [root] + Mech._descendants(root):
+        var key := String(n.name)
+        if extras.has(key) and not n.has_meta("extras"):
+            n.set_meta("extras", extras[key])
+
+
+static func instance_scene(path: String) -> Node:
     var packed: PackedScene = load(path)
-    var root := packed.instantiate() as Node3D
+    var node := packed.instantiate()
+    apply_extras(node, path)
+    return node
+
+
+static func instance_environment(path: String, parent: Node) -> Node3D:
+    var root := instance_scene(path) as Node3D
     parent.add_child(root)
     for n in Mech._descendants(root):
         if n is Light3D:

@@ -1,0 +1,23 @@
+{
+ "armor_pod_cover": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 30
+ },
+ "pod_collider": {
+  "collider": "box"
+ },
+ "weapon_missile_pod_mk1": {
+  "ammo": 18,
+  "damage": 60,
+  "fire_rate": 1.5,
+  "hp": 140,
+  "mass_kg": 2000,
+  "part_id": "weapon_missile_pod",
+  "price": 1400,
+  "range": 200,
+  "slot": "weapon",
+  "tier": "mk1",
+  "weapon_type": "explosive"
+ }
+}

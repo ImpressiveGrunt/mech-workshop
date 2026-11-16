@@ -56,7 +56,7 @@ func _setup_cockpit() -> void:
     var path := str(PartDB.stat(str(mech.loadout.get("torso", "")), "cockpit_interior", ""))
     if path == "" or not ResourceLoader.exists(path) or mech.cockpit_anchor == null:
         return
-    cockpit = (load(path) as PackedScene).instantiate() as Node3D
+    cockpit = LevelUtils.instance_scene(path) as Node3D
     mech.cockpit_anchor.add_child(cockpit)
     var torso: Node = mech.part_nodes.get("torso")
     for node_name in EXTERIOR_HIDE:

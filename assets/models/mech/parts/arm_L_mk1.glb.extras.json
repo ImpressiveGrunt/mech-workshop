@@ -1,0 +1,44 @@
+{
+ "arm_L_mk1": {
+  "aim_speed": 120,
+  "hp": 260,
+  "mass_kg": 2600,
+  "part_id": "arm_L",
+  "price": 700,
+  "recoil_control": 0.6,
+  "slot": "arm_L",
+  "tier": "mk1"
+ },
+ "armor_bicep_L": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 40
+ },
+ "armor_forearm_L": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 60
+ },
+ "armor_pauldron_L": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 90
+ },
+ "armor_pauldron_top_L": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 40
+ },
+ "forearm_L_collider": {
+  "collider": "box"
+ },
+ "joint_elbow_L": {
+  "joint": "elbow"
+ },
+ "joint_shoulder_L": {
+  "joint": "shoulder"
+ },
+ "upper_arm_L_collider": {
+  "collider": "box"
+ }
+}

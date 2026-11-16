@@ -233,7 +233,29 @@ def export_glb(path, objs=None):
     bpy.ops.export_scene.gltf(filepath=path, export_format='GLB', use_selection=bool(objs),
                               export_apply=True, export_extras=True, export_yup=True,
                               export_lights=True, export_cameras=False)
+    _write_extras_sidecar(path, objs or list(bpy.context.scene.objects))
     print("EXPORTED", os.path.relpath(path, ROOT))
+
+
+def _plain(v):
+    if hasattr(v, "to_dict"):
+        return {k: _plain(x) for k, x in v.to_dict().items()}
+    if hasattr(v, "to_list"):
+        return [_plain(x) for x in v.to_list()]
+    return v
+
+
+def _write_extras_sidecar(glb_path, objs):
+    """Godot 4.3 drops glTF node extras, so every export also writes <file>.glb.extras.json:
+    {object name: custom properties}. The game re-attaches them by node name (LevelUtils.apply_extras)."""
+    import json
+    table = {}
+    for o in objs:
+        props = {k: _plain(o[k]) for k in o.keys() if not k.startswith("_") and k not in ("cycles",)}
+        if props:
+            table[o.name] = props
+    with open(glb_path + ".extras.json", "w") as f:
+        json.dump(table, f, indent=1, sort_keys=True)
 
 
 def save_blend(path):

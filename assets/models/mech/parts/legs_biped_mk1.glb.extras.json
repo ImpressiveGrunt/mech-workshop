@@ -1,0 +1,113 @@
+{
+ "armor_calf_L": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 40
+ },
+ "armor_calf_R": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 40
+ },
+ "armor_crotch": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 40
+ },
+ "armor_kneepad_L": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 50
+ },
+ "armor_kneepad_R": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 50
+ },
+ "armor_pelvis": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 60
+ },
+ "armor_shin_L": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 70
+ },
+ "armor_shin_R": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 70
+ },
+ "armor_skirt_L": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 40
+ },
+ "armor_skirt_R": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 40
+ },
+ "armor_thigh_L": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 80
+ },
+ "armor_thigh_R": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 80
+ },
+ "foot_L_collider": {
+  "collider": "box"
+ },
+ "foot_R_collider": {
+  "collider": "box"
+ },
+ "joint_ankle_L": {
+  "joint": "ankle"
+ },
+ "joint_ankle_R": {
+  "joint": "ankle"
+ },
+ "joint_hip_L": {
+  "joint": "hip"
+ },
+ "joint_hip_R": {
+  "joint": "hip"
+ },
+ "joint_knee_L": {
+  "joint": "knee"
+ },
+ "joint_knee_R": {
+  "joint": "knee"
+ },
+ "legs_biped_mk1": {
+  "hp": 420,
+  "jump": 0.0,
+  "load_capacity": 22000,
+  "mass_kg": 9000,
+  "part_id": "legs_biped",
+  "price": 1200,
+  "slot": "legs",
+  "speed": 8.0,
+  "tier": "mk1",
+  "turn_rate": 90
+ },
+ "pelvis_collider": {
+  "collider": "box"
+ },
+ "shin_L_collider": {
+  "collider": "box"
+ },
+ "shin_R_collider": {
+  "collider": "box"
+ },
+ "thigh_L_collider": {
+  "collider": "box"
+ },
+ "thigh_R_collider": {
+  "collider": "box"
+ }
+}

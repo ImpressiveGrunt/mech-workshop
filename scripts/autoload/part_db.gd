@@ -57,5 +57,4 @@ func instantiate(id: String) -> Node3D:
     if path == "" or not ResourceLoader.exists(path):
         push_error("PartDB: no scene for part '%s'" % id)
         return null
-    var packed: PackedScene = load(path)
-    return packed.instantiate() as Node3D
+    return LevelUtils.instance_scene(path) as Node3D

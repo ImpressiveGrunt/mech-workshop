@@ -1,0 +1,42 @@
+{
+ "arm_elbow_L": {
+  "arm": "elbow"
+ },
+ "arm_elbow_R": {
+  "arm": "elbow"
+ },
+ "arm_shoulder_L": {
+  "arm": "shoulder"
+ },
+ "arm_shoulder_R": {
+  "arm": "shoulder"
+ },
+ "cockpit_interior_mk1": {
+  "cockpit": true
+ },
+ "cockpit_light": {
+  "godot_energy": 0.35,
+  "godot_range": 1.5
+ },
+ "screen_radar": {
+  "h": 0.12,
+  "screen": "radar",
+  "w": 0.23
+ },
+ "screen_status": {
+  "h": 0.11,
+  "screen": "status",
+  "w": 0.17
+ },
+ "screen_weapons": {
+  "h": 0.11,
+  "screen": "weapons",
+  "w": 0.17
+ },
+ "stick_pivot_L": {
+  "joystick": "drive"
+ },
+ "stick_pivot_R": {
+  "joystick": "aim"
+ }
+}

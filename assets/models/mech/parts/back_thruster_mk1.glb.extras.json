@@ -1,0 +1,21 @@
+{
+ "armor_pack_cover": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 50
+ },
+ "back_thruster_mk1": {
+  "boost_force": 900000,
+  "fuel": 100,
+  "hp": 180,
+  "mass_kg": 1500,
+  "part_id": "back_thruster",
+  "price": 1000,
+  "recharge": 15,
+  "slot": "back",
+  "tier": "mk1"
+ },
+ "pack_collider": {
+  "collider": "box"
+ }
+}

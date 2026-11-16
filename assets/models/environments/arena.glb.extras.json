@@ -1,0 +1,1445 @@
+{
+ "arena_center": {
+  "marker": "arena_center"
+ },
+ "armor_bicep_L": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 16
+ },
+ "armor_bicep_L.001": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 16
+ },
+ "armor_bicep_L.002": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 16
+ },
+ "armor_bicep_L.003": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 16
+ },
+ "armor_calf_L": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 16
+ },
+ "armor_calf_L.001": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 16
+ },
+ "armor_calf_L.002": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 16
+ },
+ "armor_calf_L.003": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 16
+ },
+ "armor_calf_R": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 16
+ },
+ "armor_calf_R.001": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 16
+ },
+ "armor_calf_R.002": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 16
+ },
+ "armor_calf_R.003": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 16
+ },
+ "armor_chest_L": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 36
+ },
+ "armor_chest_L.001": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 36
+ },
+ "armor_chest_L.002": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 36
+ },
+ "armor_chest_L.003": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 36
+ },
+ "armor_chest_R": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 36
+ },
+ "armor_chest_R.001": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 36
+ },
+ "armor_chest_R.002": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 36
+ },
+ "armor_chest_R.003": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 36
+ },
+ "armor_crotch": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 16
+ },
+ "armor_crotch.001": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 16
+ },
+ "armor_crotch.002": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 16
+ },
+ "armor_crotch.003": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 16
+ },
+ "armor_forearm_L": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 24
+ },
+ "armor_forearm_L.001": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 24
+ },
+ "armor_forearm_L.002": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 24
+ },
+ "armor_forearm_L.003": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 24
+ },
+ "armor_kneepad_L": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 20
+ },
+ "armor_kneepad_L.001": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 20
+ },
+ "armor_kneepad_L.002": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 20
+ },
+ "armor_kneepad_L.003": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 20
+ },
+ "armor_kneepad_R": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 20
+ },
+ "armor_kneepad_R.001": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 20
+ },
+ "armor_kneepad_R.002": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 20
+ },
+ "armor_kneepad_R.003": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 20
+ },
+ "armor_pauldron_L": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 36
+ },
+ "armor_pauldron_L.001": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 36
+ },
+ "armor_pauldron_L.002": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 36
+ },
+ "armor_pauldron_L.003": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 36
+ },
+ "armor_pauldron_top_L": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 16
+ },
+ "armor_pauldron_top_L.001": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 16
+ },
+ "armor_pauldron_top_L.002": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 16
+ },
+ "armor_pauldron_top_L.003": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 16
+ },
+ "armor_pelvis": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 24
+ },
+ "armor_pelvis.001": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 24
+ },
+ "armor_pelvis.002": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 24
+ },
+ "armor_pelvis.003": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 24
+ },
+ "armor_shin_L": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 28
+ },
+ "armor_shin_L.001": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 28
+ },
+ "armor_shin_L.002": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 28
+ },
+ "armor_shin_L.003": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 28
+ },
+ "armor_shin_R": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 28
+ },
+ "armor_shin_R.001": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 28
+ },
+ "armor_shin_R.002": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 28
+ },
+ "armor_shin_R.003": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 28
+ },
+ "armor_skirt_L": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 16
+ },
+ "armor_skirt_L.001": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 16
+ },
+ "armor_skirt_L.002": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 16
+ },
+ "armor_skirt_L.003": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 16
+ },
+ "armor_skirt_R": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 16
+ },
+ "armor_skirt_R.001": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 16
+ },
+ "armor_skirt_R.002": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 16
+ },
+ "armor_skirt_R.003": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 16
+ },
+ "armor_thigh_L": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 32
+ },
+ "armor_thigh_L.001": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 32
+ },
+ "armor_thigh_L.002": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 32
+ },
+ "armor_thigh_L.003": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 32
+ },
+ "armor_thigh_R": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 32
+ },
+ "armor_thigh_R.001": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 32
+ },
+ "armor_thigh_R.002": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 32
+ },
+ "armor_thigh_R.003": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 32
+ },
+ "barrels_1_0": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "barrels_1_1": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "barrels_1_2": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "barrels_1_b_0": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "barrels_1_b_1": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "barrels_1_b_2": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "barrels_2_0": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "barrels_2_1": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "barrels_2_2": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "barrels_2_b_0": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "barrels_2_b_1": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "barrels_2_b_2": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "barrels_3_0": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "barrels_3_1": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "barrels_3_2": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "barrels_3_b_0": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "barrels_3_b_1": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "barrels_3_b_2": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "barrels_4_0": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "barrels_4_1": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "barrels_4_2": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "barrels_4_b_0": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "barrels_4_b_1": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "barrels_4_b_2": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "blast_glass": {
+  "collision": "mesh"
+ },
+ "blast_wall_1": {
+  "collision": "convex"
+ },
+ "blast_wall_1_b": {
+  "collision": "convex"
+ },
+ "blast_wall_2": {
+  "collision": "convex"
+ },
+ "blast_wall_2_b": {
+  "collision": "convex"
+ },
+ "blast_wall_3": {
+  "collision": "convex"
+ },
+ "blast_wall_3_b": {
+  "collision": "convex"
+ },
+ "blast_wall_4": {
+  "collision": "convex"
+ },
+ "blast_wall_4_b": {
+  "collision": "convex"
+ },
+ "blast_wall_5": {
+  "collision": "convex"
+ },
+ "blast_wall_5_b": {
+  "collision": "convex"
+ },
+ "blast_wall_6": {
+  "collision": "convex"
+ },
+ "blast_wall_6_b": {
+  "collision": "convex"
+ },
+ "blast_wall_7": {
+  "collision": "convex"
+ },
+ "blast_wall_7_b": {
+  "collision": "convex"
+ },
+ "blast_wall_8": {
+  "collision": "convex"
+ },
+ "blast_wall_8_b": {
+  "collision": "convex"
+ },
+ "blast_wall_9": {
+  "collision": "convex"
+ },
+ "blast_wall_9_b": {
+  "collision": "convex"
+ },
+ "cockpit_camera": {
+  "camera": "first_person"
+ },
+ "cockpit_camera.001": {
+  "camera": "first_person"
+ },
+ "cockpit_camera.002": {
+  "camera": "first_person"
+ },
+ "cockpit_camera.003": {
+  "camera": "first_person"
+ },
+ "cockpit_collider": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "cockpit_collider.001": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "cockpit_collider.002": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "cockpit_collider.003": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "container_1": {
+  "collision": "box"
+ },
+ "container_1_b": {
+  "collision": "box"
+ },
+ "container_2": {
+  "collision": "box"
+ },
+ "container_2_b": {
+  "collision": "box"
+ },
+ "container_3": {
+  "collision": "box"
+ },
+ "container_3_b": {
+  "collision": "box"
+ },
+ "container_4": {
+  "collision": "box"
+ },
+ "container_4_b": {
+  "collision": "box"
+ },
+ "container_5": {
+  "collision": "box"
+ },
+ "container_5_b": {
+  "collision": "box"
+ },
+ "container_6": {
+  "collision": "box"
+ },
+ "container_6_b": {
+  "collision": "box"
+ },
+ "container_7": {
+  "collision": "box"
+ },
+ "container_7_b": {
+  "collision": "box"
+ },
+ "core_collider": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "core_collider.001": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "core_collider.002": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "core_collider.003": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "crates_1_0": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_1_1": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_1_2": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_1_3": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_1_b_0": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_1_b_1": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_1_b_2": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_1_b_3": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_2_0": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_2_1": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_2_2": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_2_3": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_2_b_0": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_2_b_1": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_2_b_2": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_2_b_3": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_3_0": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_3_1": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_3_2": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_3_3": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_3_b_0": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_3_b_1": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_3_b_2": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_3_b_3": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_4_0": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_4_1": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_4_2": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_4_3": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_4_b_0": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_4_b_1": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_4_b_2": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "crates_4_b_3": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "deck_1": {
+  "collision": "convex"
+ },
+ "deck_1_b": {
+  "collision": "convex"
+ },
+ "deck_1_b_parapet": {
+  "collision": "convex"
+ },
+ "deck_1_b_ramp": {
+  "collision": "convex"
+ },
+ "deck_1_parapet": {
+  "collision": "convex"
+ },
+ "deck_1_ramp": {
+  "collision": "convex"
+ },
+ "deck_2": {
+  "collision": "convex"
+ },
+ "deck_2_b": {
+  "collision": "convex"
+ },
+ "deck_2_b_parapet": {
+  "collision": "convex"
+ },
+ "deck_2_b_ramp": {
+  "collision": "convex"
+ },
+ "deck_2_parapet": {
+  "collision": "convex"
+ },
+ "deck_2_ramp": {
+  "collision": "convex"
+ },
+ "floodlight_0": {
+  "godot_energy": 20.0,
+  "godot_range": 160
+ },
+ "floodlight_1": {
+  "godot_energy": 20.0,
+  "godot_range": 160
+ },
+ "floodlight_2": {
+  "godot_energy": 20.0,
+  "godot_range": 160
+ },
+ "floodlight_3": {
+  "godot_energy": 20.0,
+  "godot_range": 160
+ },
+ "floor": {
+  "collision": "box"
+ },
+ "foot_L_collider": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "foot_L_collider.001": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "foot_L_collider.002": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "foot_L_collider.003": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "foot_R_collider": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "foot_R_collider.001": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "foot_R_collider.002": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "foot_R_collider.003": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "forearm_L_collider": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "forearm_L_collider.001": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "forearm_L_collider.002": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "forearm_L_collider.003": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "gate_A_door_+1": {
+  "collision": "box",
+  "gate": "A",
+  "side": 1,
+  "slide": 5.9
+ },
+ "gate_A_door_-1": {
+  "collision": "box",
+  "gate": "A",
+  "side": -1,
+  "slide": 5.9
+ },
+ "gate_A_header": {
+  "collision": "box"
+ },
+ "gate_A_pillar_+1": {
+  "collision": "box"
+ },
+ "gate_A_pillar_-1": {
+  "collision": "box"
+ },
+ "gate_A_start": {
+  "marker": "gate_start",
+  "team": "A"
+ },
+ "gate_B_door_+1": {
+  "collision": "box",
+  "gate": "B",
+  "side": 1,
+  "slide": 5.9
+ },
+ "gate_B_door_-1": {
+  "collision": "box",
+  "gate": "B",
+  "side": -1,
+  "slide": 5.9
+ },
+ "gate_B_header": {
+  "collision": "box"
+ },
+ "gate_B_pillar_+1": {
+  "collision": "box"
+ },
+ "gate_B_pillar_-1": {
+  "collision": "box"
+ },
+ "gate_B_start": {
+  "marker": "gate_start",
+  "team": "B"
+ },
+ "joint_ankle_L": {
+  "joint": "ankle"
+ },
+ "joint_ankle_L.001": {
+  "joint": "ankle"
+ },
+ "joint_ankle_L.002": {
+  "joint": "ankle"
+ },
+ "joint_ankle_L.003": {
+  "joint": "ankle"
+ },
+ "joint_ankle_R": {
+  "joint": "ankle"
+ },
+ "joint_ankle_R.001": {
+  "joint": "ankle"
+ },
+ "joint_ankle_R.002": {
+  "joint": "ankle"
+ },
+ "joint_ankle_R.003": {
+  "joint": "ankle"
+ },
+ "joint_elbow_L": {
+  "joint": "elbow"
+ },
+ "joint_elbow_L.001": {
+  "joint": "elbow"
+ },
+ "joint_elbow_L.002": {
+  "joint": "elbow"
+ },
+ "joint_elbow_L.003": {
+  "joint": "elbow"
+ },
+ "joint_hip_L": {
+  "joint": "hip"
+ },
+ "joint_hip_L.001": {
+  "joint": "hip"
+ },
+ "joint_hip_L.002": {
+  "joint": "hip"
+ },
+ "joint_hip_L.003": {
+  "joint": "hip"
+ },
+ "joint_hip_R": {
+  "joint": "hip"
+ },
+ "joint_hip_R.001": {
+  "joint": "hip"
+ },
+ "joint_hip_R.002": {
+  "joint": "hip"
+ },
+ "joint_hip_R.003": {
+  "joint": "hip"
+ },
+ "joint_knee_L": {
+  "joint": "knee"
+ },
+ "joint_knee_L.001": {
+  "joint": "knee"
+ },
+ "joint_knee_L.002": {
+  "joint": "knee"
+ },
+ "joint_knee_L.003": {
+  "joint": "knee"
+ },
+ "joint_knee_R": {
+  "joint": "knee"
+ },
+ "joint_knee_R.001": {
+  "joint": "knee"
+ },
+ "joint_knee_R.002": {
+  "joint": "knee"
+ },
+ "joint_knee_R.003": {
+  "joint": "knee"
+ },
+ "joint_shoulder_L": {
+  "joint": "shoulder"
+ },
+ "joint_shoulder_L.001": {
+  "joint": "shoulder"
+ },
+ "joint_shoulder_L.002": {
+  "joint": "shoulder"
+ },
+ "joint_shoulder_L.003": {
+  "joint": "shoulder"
+ },
+ "jumbotron_glow": {
+  "godot_energy": 2.5,
+  "godot_range": 40
+ },
+ "light_tower_0_posts": {
+  "collision": "box"
+ },
+ "light_tower_1_posts": {
+  "collision": "box"
+ },
+ "light_tower_2_posts": {
+  "collision": "box"
+ },
+ "light_tower_3_posts": {
+  "collision": "box"
+ },
+ "pelvis_collider": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "pelvis_collider.001": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "pelvis_collider.002": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "pelvis_collider.003": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "pillar_1": {
+  "collision": "convex"
+ },
+ "pillar_1_b": {
+  "collision": "convex"
+ },
+ "pillar_2": {
+  "collision": "convex"
+ },
+ "pillar_2_b": {
+  "collision": "convex"
+ },
+ "pillar_3": {
+  "collision": "convex"
+ },
+ "pillar_3_b": {
+  "collision": "convex"
+ },
+ "platform": {
+  "collision": "convex"
+ },
+ "ramp_+1": {
+  "collision": "convex"
+ },
+ "ramp_-1": {
+  "collision": "convex"
+ },
+ "shin_L_collider": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "shin_L_collider.001": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "shin_L_collider.002": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "shin_L_collider.003": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "shin_R_collider": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "shin_R_collider.001": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "shin_R_collider.002": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "shin_R_collider.003": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "spawn_A": {
+  "marker": "spawn",
+  "team": "A"
+ },
+ "spawn_B": {
+  "marker": "spawn",
+  "team": "B"
+ },
+ "tank_trap_1": {
+  "collision": "convex"
+ },
+ "tank_trap_1_b": {
+  "collision": "convex"
+ },
+ "tank_trap_2": {
+  "collision": "convex"
+ },
+ "tank_trap_2_b": {
+  "collision": "convex"
+ },
+ "tank_trap_3": {
+  "collision": "convex"
+ },
+ "tank_trap_3_b": {
+  "collision": "convex"
+ },
+ "tank_trap_4": {
+  "collision": "convex"
+ },
+ "tank_trap_4_b": {
+  "collision": "convex"
+ },
+ "tank_trap_5": {
+  "collision": "convex"
+ },
+ "tank_trap_5_b": {
+  "collision": "convex"
+ },
+ "tank_trap_6": {
+  "collision": "convex"
+ },
+ "tank_trap_6_b": {
+  "collision": "convex"
+ },
+ "tank_trap_7": {
+  "collision": "convex"
+ },
+ "tank_trap_7_b": {
+  "collision": "convex"
+ },
+ "tank_trap_8": {
+  "collision": "convex"
+ },
+ "tank_trap_8_b": {
+  "collision": "convex"
+ },
+ "thigh_L_collider": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "thigh_L_collider.001": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "thigh_L_collider.002": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "thigh_L_collider.003": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "thigh_R_collider": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "thigh_R_collider.001": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "thigh_R_collider.002": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "thigh_R_collider.003": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "tunnel_A_floor": {
+  "collision": "box"
+ },
+ "tunnel_A_wall_+1": {
+  "collision": "box"
+ },
+ "tunnel_A_wall_-1": {
+  "collision": "box"
+ },
+ "tunnel_B_floor": {
+  "collision": "box"
+ },
+ "tunnel_B_wall_+1": {
+  "collision": "box"
+ },
+ "tunnel_B_wall_-1": {
+  "collision": "box"
+ },
+ "upper_arm_L_collider": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "upper_arm_L_collider.001": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "upper_arm_L_collider.002": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "upper_arm_L_collider.003": {
+  "collider": "box",
+  "collision": "box"
+ },
+ "wall_panels": {
+  "collision": "mesh"
+ },
+ "weak_point_reactor": {
+  "damage_multiplier": 2.5,
+  "hp": 32,
+  "weak_point": true
+ },
+ "weak_point_reactor.001": {
+  "damage_multiplier": 2.5,
+  "hp": 32,
+  "weak_point": true
+ },
+ "weak_point_reactor.002": {
+  "damage_multiplier": 2.5,
+  "hp": 32,
+  "weak_point": true
+ },
+ "weak_point_reactor.003": {
+  "damage_multiplier": 2.5,
+  "hp": 32,
+  "weak_point": true
+ },
+ "wreck_1_arm_L_wreck": {
+  "aim_speed": 120,
+  "hp": 104,
+  "mass_kg": 2600,
+  "part_id": "arm_L",
+  "price": 140,
+  "recoil_control": 0.6,
+  "slot": "arm_L",
+  "tier": "wreck",
+  "wreck": true
+ },
+ "wreck_1_b_arm_L_wreck": {
+  "aim_speed": 120,
+  "hp": 104,
+  "mass_kg": 2600,
+  "part_id": "arm_L",
+  "price": 140,
+  "recoil_control": 0.6,
+  "slot": "arm_L",
+  "tier": "wreck",
+  "wreck": true
+ },
+ "wreck_1_b_legs_biped_wreck": {
+  "hp": 168,
+  "jump": 0.0,
+  "load_capacity": 22000,
+  "mass_kg": 9000,
+  "part_id": "legs_biped",
+  "price": 240,
+  "slot": "legs",
+  "speed": 8.0,
+  "tier": "wreck",
+  "turn_rate": 90,
+  "wreck": true
+ },
+ "wreck_1_b_torso_wreck": {
+  "cockpit_height": 1.12,
+  "cockpit_interior": "res://assets/models/mech/cockpit_interior_wreck.glb",
+  "cooling": 12,
+  "hp": 240,
+  "mass_kg": 7000,
+  "part_id": "torso_mk",
+  "power": 100,
+  "price": 300,
+  "slot": "torso",
+  "tier": "wreck",
+  "wreck": true
+ },
+ "wreck_1_legs_biped_wreck": {
+  "hp": 168,
+  "jump": 0.0,
+  "load_capacity": 22000,
+  "mass_kg": 9000,
+  "part_id": "legs_biped",
+  "price": 240,
+  "slot": "legs",
+  "speed": 8.0,
+  "tier": "wreck",
+  "turn_rate": 90,
+  "wreck": true
+ },
+ "wreck_1_torso_wreck": {
+  "cockpit_height": 1.12,
+  "cockpit_interior": "res://assets/models/mech/cockpit_interior_wreck.glb",
+  "cooling": 12,
+  "hp": 240,
+  "mass_kg": 7000,
+  "part_id": "torso_mk",
+  "power": 100,
+  "price": 300,
+  "slot": "torso",
+  "tier": "wreck",
+  "wreck": true
+ },
+ "wreck_2_arm_L_wreck": {
+  "aim_speed": 120,
+  "hp": 104,
+  "mass_kg": 2600,
+  "part_id": "arm_L",
+  "price": 140,
+  "recoil_control": 0.6,
+  "slot": "arm_L",
+  "tier": "wreck",
+  "wreck": true
+ },
+ "wreck_2_b_arm_L_wreck": {
+  "aim_speed": 120,
+  "hp": 104,
+  "mass_kg": 2600,
+  "part_id": "arm_L",
+  "price": 140,
+  "recoil_control": 0.6,
+  "slot": "arm_L",
+  "tier": "wreck",
+  "wreck": true
+ },
+ "wreck_2_b_legs_biped_wreck": {
+  "hp": 168,
+  "jump": 0.0,
+  "load_capacity": 22000,
+  "mass_kg": 9000,
+  "part_id": "legs_biped",
+  "price": 240,
+  "slot": "legs",
+  "speed": 8.0,
+  "tier": "wreck",
+  "turn_rate": 90,
+  "wreck": true
+ },
+ "wreck_2_b_torso_wreck": {
+  "cockpit_height": 1.12,
+  "cockpit_interior": "res://assets/models/mech/cockpit_interior_wreck.glb",
+  "cooling": 12,
+  "hp": 240,
+  "mass_kg": 7000,
+  "part_id": "torso_mk",
+  "power": 100,
+  "price": 300,
+  "slot": "torso",
+  "tier": "wreck",
+  "wreck": true
+ },
+ "wreck_2_legs_biped_wreck": {
+  "hp": 168,
+  "jump": 0.0,
+  "load_capacity": 22000,
+  "mass_kg": 9000,
+  "part_id": "legs_biped",
+  "price": 240,
+  "slot": "legs",
+  "speed": 8.0,
+  "tier": "wreck",
+  "turn_rate": 90,
+  "wreck": true
+ },
+ "wreck_2_torso_wreck": {
+  "cockpit_height": 1.12,
+  "cockpit_interior": "res://assets/models/mech/cockpit_interior_wreck.glb",
+  "cooling": 12,
+  "hp": 240,
+  "mass_kg": 7000,
+  "part_id": "torso_mk",
+  "power": 100,
+  "price": 300,
+  "slot": "torso",
+  "tier": "wreck",
+  "wreck": true
+ }
+}

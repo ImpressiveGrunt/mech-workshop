@@ -1,0 +1,38 @@
+{
+ "armor_chest_L": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 90
+ },
+ "armor_chest_R": {
+  "armor_plate": true,
+  "detachable": true,
+  "hp": 90
+ },
+ "cockpit_camera": {
+  "camera": "first_person"
+ },
+ "cockpit_collider": {
+  "collider": "box"
+ },
+ "core_collider": {
+  "collider": "box"
+ },
+ "torso_mk1": {
+  "cockpit_height": 1.12,
+  "cockpit_interior": "res://assets/models/mech/cockpit_interior_mk1.glb",
+  "cooling": 12,
+  "hp": 600,
+  "mass_kg": 7000,
+  "part_id": "torso_mk",
+  "power": 100,
+  "price": 1500,
+  "slot": "torso",
+  "tier": "mk1"
+ },
+ "weak_point_reactor": {
+  "damage_multiplier": 2.5,
+  "hp": 80,
+  "weak_point": true
+ }
+}

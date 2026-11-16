@@ -1,0 +1,17 @@
+{
+ "ram_collider": {
+  "collider": "box"
+ },
+ "weapon_ram_fist_mk1": {
+  "damage": 80,
+  "fire_rate": 1.0,
+  "hp": 260,
+  "mass_kg": 2200,
+  "part_id": "weapon_ram_fist",
+  "price": 750,
+  "range": 4,
+  "slot": "weapon",
+  "tier": "mk1",
+  "weapon_type": "melee"
+ }
+}
