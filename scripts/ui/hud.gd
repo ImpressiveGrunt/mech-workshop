@@ -3,6 +3,19 @@ extends CanvasLayer
 ## In-cockpit HUD: crosshair, part integrity, boost fuel, ammo, prompts, messages.
 
 var mech: Mech
+var _reticle: Reticle
+
+
+## Ring drawn where the pilot is aiming; the centre "+" shows where the guns point right now.
+class Reticle extends Control:
+    var aligned := 0.0   # 1 when the guns have caught up
+
+    func _draw() -> void:
+        var col := Color(1.0, 0.75, 0.3, 0.55 + 0.4 * aligned)
+        draw_arc(Vector2.ZERO, 16.0, 0.0, TAU, 32, col, 2.0, true)
+        for k in 4:
+            var d := Vector2.from_angle(k * PI / 2.0 + PI / 4.0)
+            draw_line(d * 10.0, d * 22.0, col, 2.0, true)
 var _status: Label
 var _prompt: Label
 var _message: Label
@@ -18,11 +31,15 @@ func _ready() -> void:
     _status.offset_top = 20
     _prompt = _label(0, 0.72, 1, 0.78, 24, HORIZONTAL_ALIGNMENT_CENTER)
     _message = _label(0, 0.25, 1, 0.32, 36, HORIZONTAL_ALIGNMENT_CENTER)
+    _reticle = Reticle.new()
+    _reticle.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    add_child(_reticle)
 
 
 func _process(_delta: float) -> void:
     if mech == null or not is_instance_valid(mech):
         return
+    _update_reticle()
     if mech.has_meta("diegetic_hud"):
         _status.text = ""   # the cockpit screens show this instead
         return
@@ -37,6 +54,20 @@ func _process(_delta: float) -> void:
         var w: Weapon = mech.weapons[wslot]
         lines.append("%s  %s" % [PartDB.display_name(w.part_id), "inf" if w.ammo < 0 else str(w.ammo)])
     _status.text = "\n".join(lines)
+
+
+func _update_reticle() -> void:
+    var cam := get_viewport().get_camera_3d()
+    if cam == null or mech.is_destroyed:
+        _reticle.visible = false
+        return
+    var point := cam.global_position + mech.target_aim_direction() * 300.0
+    _reticle.visible = not cam.is_position_behind(point)
+    if _reticle.visible:
+        _reticle.position = cam.unproject_position(point)
+        var err := absf(mech.target_twist - mech.torso_twist) + absf(mech.target_pitch - mech.aim_pitch)
+        _reticle.aligned = clampf(1.0 - err / 0.05, 0.0, 1.0)
+        _reticle.queue_redraw()
 
 
 func set_prompt(text: String) -> void:

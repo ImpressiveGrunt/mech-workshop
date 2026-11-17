@@ -44,8 +44,8 @@ func _run() -> void:
     await wait(6.5)
     await shot("05_arena_fight")
     var p = get_tree().current_scene.player
-    p.aim_pitch = -0.5
-    await wait(0.5)
+    p.target_pitch = -0.5
+    await wait(1.5)
     await shot("06_cockpit_hands")
     get_tree().change_scene_to_file("res://scenes/salvage_yard/salvage_yard.tscn")
     await wait(2.5)

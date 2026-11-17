@@ -41,9 +41,9 @@ func _physics_process(delta: float) -> void:
         mech.throttle = -0.6
     else:
         mech.throttle = 0.35 * _strafe
-    mech.torso_twist = clampf(angle, -Mech.TWIST_LIMIT, Mech.TWIST_LIMIT)
+    mech.target_twist = clampf(angle, -Mech.TWIST_LIMIT, Mech.TWIST_LIMIT)
     var aim := target.global_position + Vector3(0, 3.0, 0)
-    mech.aim_pitch = clampf(atan2(aim.y - (mech.global_position.y + 3.6), dist), -Mech.PITCH_LIMIT, Mech.PITCH_LIMIT)
+    mech.target_pitch = clampf(atan2(aim.y - (mech.global_position.y + 3.6), dist), -Mech.PITCH_LIMIT, Mech.PITCH_LIMIT)
     if absf(angle - mech.torso_twist) > 0.15:
         return
     var jitter := Vector3(randf_range(-1, 1), randf_range(-1, 1), randf_range(-1, 1)) * spread * dist

@@ -25,6 +25,11 @@ const TWIST_LIMIT := deg_to_rad(110.0)
 const PITCH_LIMIT := deg_to_rad(35.0)
 const WEAK_POINT_RADIUS := 0.7
 const PLATE_RADIUS := 1.5
+# Weighted aim: the torso and arms are heavy. They chase target_twist / target_pitch with a
+# critically damped spring and a top slew speed, so the view and guns trail behind the mouse.
+const AIM_STIFFNESS := 26.0
+const AIM_MAX_TWIST_SPEED := deg_to_rad(85.0)
+const AIM_MAX_PITCH_SPEED := deg_to_rad(55.0)
 const PAINT_SUFFIXES := {"_paint": "primary", "_trim": "secondary", "_hazard": "accent", "_glow": "glow"}
 
 var loadout: Dictionary = {}
@@ -50,8 +55,13 @@ var is_destroyed := false
 var throttle := 0.0  # -1 back .. 1 forward
 var turn := 0.0      # -1 right .. 1 left
 var boosting := false
-var torso_twist := 0.0
+var torso_twist := 0.0   # actual (lags behind the target)
 var aim_pitch := 0.0
+var target_twist := 0.0  # where the pilot / AI wants to aim
+var target_pitch := 0.0
+var aim_agility := 1.0   # from the arms' aim_speed stat
+var _twist_vel := 0.0
+var _pitch_vel := 0.0
 
 # Derived from parts.
 var mass_kg := 1000.0
@@ -203,6 +213,8 @@ func _physics_process(delta: float) -> void:
     velocity += _impulse
     _impulse = Vector3.ZERO
     move_and_slide()
+    if not is_destroyed:
+        _slew_aim(delta)
     if torso_pivot:
         torso_pivot.rotation.y = torso_twist
     for s in shoulders:
@@ -236,6 +248,25 @@ func take_hit(slot: String, amount: float, at: Vector3, push: Vector3 = Vector3.
     if gait:
         gait.kick(push)
     hit_taken.emit(self, slot, amount)
+
+
+func _slew_aim(delta: float) -> void:
+    target_twist = clampf(target_twist, -TWIST_LIMIT, TWIST_LIMIT)
+    target_pitch = clampf(target_pitch, -PITCH_LIMIT, PITCH_LIMIT)
+    var k := AIM_STIFFNESS * aim_agility
+    var c := 2.0 * sqrt(k)
+    _twist_vel += ((target_twist - torso_twist) * k - _twist_vel * c) * delta
+    _pitch_vel += ((target_pitch - aim_pitch) * k - _pitch_vel * c) * delta
+    _twist_vel = clampf(_twist_vel, -AIM_MAX_TWIST_SPEED * aim_agility, AIM_MAX_TWIST_SPEED * aim_agility)
+    _pitch_vel = clampf(_pitch_vel, -AIM_MAX_PITCH_SPEED * aim_agility, AIM_MAX_PITCH_SPEED * aim_agility)
+    torso_twist = clampf(torso_twist + _twist_vel * delta, -TWIST_LIMIT, TWIST_LIMIT)
+    aim_pitch = clampf(aim_pitch + _pitch_vel * delta, -PITCH_LIMIT, PITCH_LIMIT)
+
+
+## World direction the pilot is aiming at (the target, not where the guns point yet).
+func target_aim_direction() -> Vector3:
+    var local := Basis(Vector3.UP, target_twist) * (Basis(Vector3.RIGHT, -target_pitch) * Vector3(0, 0, 1))
+    return (global_basis * local).normalized()
 
 
 func _on_gait_footstep(_side: String, world_pos: Vector3, strength: float) -> void:
@@ -375,6 +406,12 @@ func _compute_stats() -> void:
     var overload := maxf(1.0, mass_kg / float(PartDB.stat(legs_id, "load_capacity", 20000)))
     top_speed = float(PartDB.stat(legs_id, "speed", 6)) / overload
     turn_rate = deg_to_rad(float(PartDB.stat(legs_id, "turn_rate", 80)))
+    var aim_speeds := []
+    for side in ["arm_L", "arm_R"]:
+        if loadout.get(side, "") != "":
+            aim_speeds.append(float(PartDB.stat(str(loadout[side]), "aim_speed", 120)))
+    if not aim_speeds.is_empty():
+        aim_agility = clampf((aim_speeds[0] + aim_speeds[-1]) * 0.5 / 120.0, 0.5, 1.5)
     var back_id := str(loadout.get("back", ""))
     if part_nodes.has("back"):
         boost_force = float(PartDB.stat(back_id, "boost_force", 0))

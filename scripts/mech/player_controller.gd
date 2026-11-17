@@ -10,10 +10,9 @@ extends Node
 ## landing and shake when hit.
 
 const SCREEN_HZ := 10.0
-# Exterior torso pieces hidden on your own mech so they don't intrude on the cockpit.
-const EXTERIOR_HIDE := ["cockpit", "canopy", "canopy_frame", "canopy_brow", "chin", "chin_vent", "chin_vent_frame",
-    "unit_number", "headlight_L", "headlight_L_housing", "headlight_R", "headlight_R_housing", "cockpit_intake_L",
-    "cockpit_intake_L_frame", "cockpit_intake_R", "cockpit_intake_R_frame"]
+# Render layer for your own torso exterior: the cockpit camera doesn't draw it (shadows still do),
+# so no piece of the hull can intrude into the cabin.
+const HULL_LAYER := 1 << 19
 
 @export var mouse_sensitivity := 0.0025
 
@@ -37,7 +36,7 @@ var _last_aim := Vector2.ZERO
 func _ready() -> void:
     mech = get_parent() as Mech
     camera = Camera3D.new()
-    camera.fov = 75.0
+    camera.fov = 80.0
     camera.near = 0.02
     camera.far = 2000.0
     var anchor: Node3D = mech.cockpit_anchor if mech.cockpit_anchor else mech
@@ -59,10 +58,9 @@ func _setup_cockpit() -> void:
     cockpit = LevelUtils.instance_scene(path) as Node3D
     mech.cockpit_anchor.add_child(cockpit)
     var torso: Node = mech.part_nodes.get("torso")
-    for node_name in EXTERIOR_HIDE:
-        var n: Node3D = (torso.find_child(node_name, true, false) as Node3D) if torso else null
-        if n:
-            n.visible = false
+    if torso:
+        _hide_hull(torso)
+    camera.cull_mask &= ~HULL_LAYER
     for n in Mech._descendants(cockpit):
         if n is Light3D:
             LevelUtils.tune_light(n)
@@ -88,6 +86,17 @@ func _setup_cockpit() -> void:
             _cracks.append(c)
     mech.apply_paint(mech.current_paint)   # paint the cockpit trim to match
     mech.set_meta("diegetic_hud", true)
+
+
+## Put the torso's own meshes on HULL_LAYER, stopping at sockets (arms, backpack) and the cockpit mount.
+func _hide_hull(n: Node) -> void:
+    for c in n.get_children():
+        var nm := String(c.name)
+        if nm.begins_with("socket_") or nm == "cockpit_camera":
+            continue
+        if c is VisualInstance3D:
+            (c as VisualInstance3D).layers = HULL_LAYER
+        _hide_hull(c)
 
 
 func _make_screen_label(marker: Node3D, big: bool) -> Label3D:
@@ -234,10 +243,11 @@ func _unhandled_input(event: InputEvent) -> void:
         Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
     elif event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and not mech.is_destroyed:
         var motion := event as InputEventMouseMotion
-        mech.torso_twist = clampf(mech.torso_twist - motion.relative.x * mouse_sensitivity,
-                                  -Mech.TWIST_LIMIT, Mech.TWIST_LIMIT)
-        mech.aim_pitch = clampf(mech.aim_pitch - motion.relative.y * mouse_sensitivity,
-                                -Mech.PITCH_LIMIT, Mech.PITCH_LIMIT)
+        # the mouse moves the aim point; the heavy torso/arms swing after it (Mech._slew_aim)
+        mech.target_twist = clampf(mech.target_twist - motion.relative.x * mouse_sensitivity,
+                                   -Mech.TWIST_LIMIT, Mech.TWIST_LIMIT)
+        mech.target_pitch = clampf(mech.target_pitch - motion.relative.y * mouse_sensitivity,
+                                   -Mech.PITCH_LIMIT, Mech.PITCH_LIMIT)
 
 
 func _physics_process(_delta: float) -> void:
@@ -252,7 +262,7 @@ func _physics_process(_delta: float) -> void:
     mech.turn = Input.get_axis("turn_right", "turn_left")
     mech.boosting = Input.is_action_pressed("boost")
     if Input.is_action_just_pressed("center_torso"):
-        mech.torso_twist = 0.0
+        mech.target_twist = 0.0
     if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
         return
     if Input.is_action_pressed("fire_primary"):

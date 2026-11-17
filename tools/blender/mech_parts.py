@@ -419,16 +419,35 @@ def back_thruster(pal):
 
 
 # ------------------------------------------------------------------ cockpit interior (player view only)
+def _inverted_shell(name, x, y, z, m, parent):
+    """Closed cabin box with inward-facing walls and no front face (the window bulkhead closes it).
+    x, y, z are (min, max); forward is -Y, so the missing face is at y min."""
+    import bmesh as _bm, common as _c
+    bm = _bm.new()
+    _bm.ops.create_cube(bm, size=1.0)
+    for v in bm.verts:
+        v.co.x = x[0] if v.co.x < 0 else x[1]
+        v.co.y = y[0] if v.co.y < 0 else y[1]
+        v.co.z = z[0] if v.co.z < 0 else z[1]
+    _bm.ops.reverse_faces(bm, faces=bm.faces[:])
+    front = [f for f in bm.faces if all(abs(v.co.y - y[0]) < 1e-6 for v in f.verts)]
+    _bm.ops.delete(bm, geom=front, context='FACES_ONLY')
+    return _c._mesh(name, bm, m, (0, 0, 0), (0, 0, 0), parent, 0, 1, None)
+
+
 def cockpit_interior(pal):
     """Pilot's cockpit, built around the eye at the origin (looking -Y, up +Z, pilot's left = +X).
 
-    The game mounts it on cockpit_camera for the player's mech and hides the
-    exterior nose. Markers: screen_status / screen_radar / screen_weapons
-    (Godot +Z faces the pilot: live text goes there), glass_crack_1..3
-    (shown as the torso takes damage).
+    Roomy, fully enclosed cabin: an inward-facing shell (walls, floor, ceiling, back) closed at the
+    front by a bulkhead around a wide armoured window, so no angle sees out except through the glass.
+    Layout is set against the game's 80 deg vertical FOV: window ~-14..+21 deg, overhead screens
+    ~28..37 deg up, dashboard and the hands on the sticks at the bottom of the view.
+    Markers: screen_status / screen_radar / screen_weapons (Godot +Z faces the pilot), glass_crack_1..3,
+    stick_pivot_L/R (hands + forearms ride them), arm_shoulder_L/R -> arm_elbow_L/R.
     """
     t = pal["tier"]
     root = empty(f"cockpit_interior_{t}", props={"cockpit": True})
+    shell_m = mat(f"{t}_cockpit_shell", "#2E333A", .3, .65)
     panel = mat(f"{t}_cockpit_panel", "#3A4048", .4, .55)
     dark = mat(f"{t}_cockpit_dark", "#1A1D21", .3, .7)
     metal = mat(f"{t}_cockpit_metal", "#5A616B", .8, .35)
@@ -441,160 +460,179 @@ def cockpit_interior(pal):
     lamp = {c: mat(f"{t}_lamp_{c[1:]}", c, 0, .3, emit=5) for c in ("#FFB347", "#5FD38A", "#FF4B3A", "#3CE6FF")}
     copper = mat(f"{t}_pipe_copper", "#B8743A", .9, .35)
     red = mat(f"{t}_extinguisher", "#C0392B", .2, .4)
+    grate = mat(f"{t}_floor_grate", "#25292E", .6, .6)
+    rnd = random.Random(7)
+    V = Vector
 
-    # --- armoured window: frame tilted like the exterior canopy
-    TILT = .3
-    # layout vs Godot fov 75 (vertical): window spans ~-12 deg .. +22 deg, lamps just below, screens at the bottom
-    C = Vector((0, -.45, .045))
+    # --- closed cabin shell (inward faces) -------------------------------------------------------
+    X0, X1, Y0, Y1, Z0, Z1 = -.95, .95, -.95, .5, -.8, .7
+    _inverted_shell("cabin_shell", (X0, X1), (Y0, Y1), (Z0, Z1), shell_m, root)
+    multi_box("cabin_ribs", [((1.88, .06, .05), (0, y, Z1 - .03)) for y in (-.45, -.05, .3)]
+              + [((.05, .06, 1.48), (sx * (X1 - .03), y, -.05)) for sx in (-1, 1) for y in (-.5, -.1, .3)], panel, root)
+
+    # --- wide armoured window in a tilted bulkhead ------------------------------------------------
+    TILT = .25
+    C = V((0, -.66, .06))
     Rm = Euler((TILT, 0, 0)).to_matrix()
+    WW, WH = 1.16, .44
 
     def F(lx, lz, ly=0.0):
-        return tuple(C + Rm @ Vector((lx, ly, lz)))
+        return tuple(C + Rm @ V((lx, ly, lz)))
     rot = (TILT, 0, 0)
-    box("window_frame_top", (.98, .13, .1), F(0, .19), panel, root, rot=rot, bevel=.015)
-    box("window_frame_bottom", (.98, .15, .1), F(0, -.19), panel, root, rot=rot, bevel=.015)
+    box("window_frame_top", (WW + .14, .1, .07), F(0, WH / 2 + .035), panel, root, rot=rot, bevel=.012)
+    box("window_frame_bottom", (WW + .14, .12, .08), F(0, -WH / 2 - .04), panel, root, rot=rot, bevel=.012)
+    box("window_frame_stripe", (WW + .14, .105, .02), F(0, WH / 2 + .07), pal["hazard"], root, rot=rot, bevel=0)
     for s_ in (-1, 1):
-        box(f"window_frame_side_{s_:+d}", (.12, .13, .48), F(.43 * s_, 0), panel, root, rot=rot, bevel=.015)
-        box(f"window_mullion_{s_:+d}", (.028, .09, .3), F(.13 * s_, 0, .02), dark, root, rot=rot, bevel=.004)
-    box("window_frame_stripe", (.98, .135, .025), F(0, .233), pal["hazard"], root, rot=rot, bevel=0)
+        box(f"window_frame_side_{s_:+d}", (.07, .1, WH + .15), F(s_ * (WW / 2 + .035), 0), panel, root, rot=rot, bevel=.012)
+        box(f"window_mullion_{s_:+d}", (.022, .07, WH), F(s_ * .2, 0, .01), dark, root, rot=rot, bevel=.004)
     bolt_rot = (TILT - PI / 2, 0, 0)
-    bpts = [F(x, .19, .066) for x in (-.4, -.24, -.08, .08, .24, .4)] + [F(x, -.19, .066) for x in (-.4, -.2, .2, .4)]
-    bpts += [F(.43 * s_, z, .066) for s_ in (-1, 1) for z in (-.1, 0, .1)]
+    bpts = [F(x, WH / 2 + .035, .052) for x in (-.5, -.3, -.1, .1, .3, .5)] + \
+           [F(x, -WH / 2 - .04, .062) for x in (-.5, -.25, .25, .5)] + \
+           [F(s_ * (WW / 2 + .035), z, .052) for s_ in (-1, 1) for z in (-.14, 0, .14)]
     multi_cyl("window_bolts", [(.011, .012, p, bolt_rot) for p in bpts], metal, root, segs=6)
-    # laminated armour glass: two panes with a glowing edge to show the thickness
-    box("armor_glass_inner", (.74, .012, .28), F(0, 0, .025), glass_in, root, rot=rot, bevel=0)
-    box("armor_glass_outer", (.74, .012, .28), F(0, 0, -.025), glass_out, root, rot=rot, bevel=0)
-    multi_box("armor_glass_edges", [((.74, .05, .006), F(0, z), rot) for z in (-.138, .138)]
-              + [((.006, .05, .28), F(x, 0), rot) for x in (-.368, .368)], glass_edge, root)
-    rnd = random.Random(7)
-    multi_box("glass_scratches", [((rnd.uniform(.05, .2), .002, .003), F(rnd.uniform(-.3, .3), rnd.uniform(-.11, .11), .033),
-                                   (TILT, 0, rnd.uniform(-.5, .5))) for _ in range(8)], scratch, root)
-    for k, (cx, cz) in enumerate([(.22, .06), (-.25, -.05), (.02, .1)], start=1):
+    box("armor_glass_inner", (WW, .012, WH), F(0, 0, .025), glass_in, root, rot=rot, bevel=0)
+    box("armor_glass_outer", (WW, .012, WH), F(0, 0, -.025), glass_out, root, rot=rot, bevel=0)
+    multi_box("armor_glass_edges", [((WW, .05, .006), F(0, z), rot) for z in (-WH / 2 + .002, WH / 2 - .002)]
+              + [((.006, .05, WH), F(x, 0), rot) for x in (-WW / 2 + .002, WW / 2 - .002)], glass_edge, root)
+    multi_box("glass_scratches", [((rnd.uniform(.05, .2), .002, .003), F(rnd.uniform(-.45, .45), rnd.uniform(-.17, .17), .033),
+                                   (TILT, 0, rnd.uniform(-.5, .5))) for _ in range(9)], scratch, root)
+    for k, (cx, cz) in enumerate([(.33, .08), (-.36, -.07), (.03, .14)], start=1):
         rays = []
-        for j in range(7):
-            a = j * 2 * PI / 7 + rnd.uniform(-.3, .3)
-            L = rnd.uniform(.05, .13)
-            mid = F(cx + math.cos(a) * L / 2, cz + math.sin(a) * L / 2, .034)
-            rays.append(((L, .002, .004), mid, (TILT, -a, 0)))
+        for j_ in range(7):
+            a = j_ * 2 * PI / 7 + rnd.uniform(-.3, .3)
+            L = rnd.uniform(.06, .16)
+            rays.append(((L, .002, .004), F(cx + math.cos(a) * L / 2, cz + math.sin(a) * L / 2, .034), (TILT, -a, 0)))
         multi_box(f"glass_crack_{k}", rays, crack, root)
-    # bulkhead around the window: you only see out through the glass
-    box("bulkhead_top", (1.3, .05, .3), F(0, .38, .05), dark, root, rot=rot, bevel=0)
+    # bulkhead: fills the whole front of the shell except the window (extends past the shell edges)
+    top_h, bot_h = 1.0, 1.0
+    box("bulkhead_top", (2.1, .05, top_h), F(0, WH / 2 + .07 + top_h / 2, .045), dark, root, rot=rot, bevel=0)
+    box("bulkhead_bottom", (2.1, .05, bot_h), F(0, -WH / 2 - .08 - bot_h / 2, .045), dark, root, rot=rot, bevel=0)
     for s_ in (-1, 1):
-        box(f"bulkhead_side_{s_:+d}", (.3, .05, .8), F(.63 * s_, 0, .05), dark, root, rot=rot, bevel=0)
-    # caution lamps on the frame
+        box(f"bulkhead_side_{s_:+d}", (.5, .05, WH + .3), F(s_ * (WW / 2 + .07 + .25), 0, .045), dark, root, rot=rot, bevel=0)
 
-    # --- dashboard: sloped console facing the pilot
-    SL = -.6
-    Cd = Vector((0, -.315, -.19))   # front edge tucks under the window, back edge toward the pilot
+    # --- overhead screen bank (small, high, out of the sightline) ---------------------------------
+    bank = V((0, -.56, .36))
+    bn = (V((0, 0, 0)) - bank).normalized()
+    bq = tuple(bn.to_track_quat('-Y', 'Z').to_euler())
+    box("screen_bank_housing", (.86, .06, .15), tuple(bank - bn * .03), dark, root, rot=bq, bevel=.012)
+    box("screen_bank_trim", (.88, .065, .018), tuple(bank - bn * .03 + V((0, 0, -.082))), pal["trim"], root, rot=bq, bevel=.005)
+    multi_box("screen_bank_hangers", [((.03, .03, Z1 - bank.z), (x, bank.y - .04, (Z1 + bank.z) / 2)) for x in (-.33, 0, .33)],
+              metal, root)
+    for name, x, w, h in (("screen_status", .3, .17, .1), ("screen_radar", 0, .23, .11), ("screen_weapons", -.3, .17, .1)):
+        pos = V((x, bank.y + abs(x) * .15, bank.z))
+        nrm = (V((0, 0, 0)) - pos).normalized()
+        r = tuple(nrm.to_track_quat('-Y', 'Z').to_euler())
+        box(name + "_bezel", (w + .03, .02, h + .03), tuple(pos), dark, root, rot=r, bevel=.006)
+        box(name + "_glass", (w, .004, h), tuple(pos + nrm * .011), screen, root, rot=r, bevel=0)
+        empty(name, tuple(pos + nrm * .015), root, rot=r, props={"screen": name[7:], "w": w, "h": h})
+
+    # --- centre dashboard: switch panel, low in the view -----------------------------------------
+    SL = -.55
+    Cd = V((0, -.5, -.31))
     Rd = Euler((SL, 0, 0)).to_matrix()
-    n = Rd @ Vector((0, 0, 1))
+    n = Rd @ V((0, 0, 1))
 
     def D(lx, ly, h=0.0):
-        return tuple(Cd + Rd @ Vector((lx, ly, 0)) + n * h)
+        return tuple(Cd + Rd @ V((lx, ly, 0)) + n * h)
     drot = (SL, 0, 0)
-    # centre dashboard: switch panel (caution lamps, keypad, lamp row, toggles)
-    box("dash_top", (.46, .3, .05), D(0, 0), panel, root, rot=drot, bevel=.012)
-    box("dash_body", (.46, .3, .3), (0, -.34, -.38), dark, root, bevel=.02)
-    box("dash_lip", (.48, .04, .05), D(0, -.15, .01), pal["trim"], root, rot=drot, bevel=.01)
-    box("lamp_master_caution", (.09, .03, .02), D(-.1, -.07, .032), lamp["#FFB347"], root, rot=drot, bevel=.003)
-    box("lamp_warning", (.09, .03, .02), D(.1, -.07, .032), lamp["#FF4B3A"], root, rot=drot, bevel=.003)
-    box("keypad_plate", (.13, .1, .01), D(0, .03, .03), dark, root, rot=drot, bevel=.003)
-    multi_box("keypad_keys", [((.024, .02, .012), D(-.04 + c * .04, .0 + r * .028, .037), drot) for r in range(3) for c in range(3)],
+    box("dash_top", (.5, .28, .04), D(0, 0), panel, root, rot=drot, bevel=.01)
+    box("dash_body", (.5, .26, .45), (0, -.55, -.55), dark, root, bevel=.02)
+    box("dash_lip", (.52, .035, .045), D(0, -.14, .01), pal["trim"], root, rot=drot, bevel=.01)
+    box("lamp_master_caution", (.09, .028, .018), D(-.11, -.07, .028), lamp["#FFB347"], root, rot=drot, bevel=.003)
+    box("lamp_warning", (.09, .028, .018), D(.11, -.07, .028), lamp["#FF4B3A"], root, rot=drot, bevel=.003)
+    box("keypad_plate", (.13, .1, .01), D(0, .03, .026), dark, root, rot=drot, bevel=.003)
+    multi_box("keypad_keys", [((.024, .02, .012), D(-.04 + c * .04, r * .028, .033), drot) for r in range(3) for c in range(3)],
               metal, root)
     rows = {c: [] for c in lamp}
     for i in range(9):
-        c = rnd.choice(list(lamp))
-        rows[c].append(((.022, .014, .012), D(-.2 + i * .05, -.12, .03), drot))
+        rows[rnd.choice(list(lamp))].append(((.022, .014, .012), D(-.2 + i * .05, -.115, .026), drot))
     for c, parts in rows.items():
         multi_box(f"dash_lamps_{c[1:]}", parts, lamp[c], root)
-    multi_cyl("dash_toggles", [(.007, .035, D(-.2 + i * .04, .125, .03), (SL - .5, 0, 0)) for i in range(11)], metal, root,
-              segs=6)
+    multi_cyl("dash_toggles", [(.007, .035, D(-.2 + i * .04, .115, .026), (SL - .5, 0, 0)) for i in range(11)], metal, root, segs=6)
 
-    # overhead screen bank above the window, angled down at the pilot (~24-34 deg up in the 75 deg view):
-    # systems (left), nav / target (centre), weapons + boost (right)
-    bank = Vector((0, -.43, .205))
-    bn = (Vector((0, 0, 0)) - bank).normalized()
-    bq = bn.to_track_quat('-Y', 'Z')
-    box("screen_bank_housing", (.9, .07, .17), tuple(bank - bn * .03), dark, root, rot=tuple(bq.to_euler()), bevel=.012)
-    box("screen_bank_trim", (.92, .075, .02), tuple(bank - bn * .03 + Vector((0, 0, -.09))), pal["trim"], root,
-        rot=tuple(bq.to_euler()), bevel=.005)
-    multi_box("screen_bank_hangers", [((.03, .03, .2), (x, -.47, .37)) for x in (-.36, 0, .36)], metal, root)
-    for name, x, w, h in (("screen_status", .3, .17, .11), ("screen_radar", 0, .23, .12), ("screen_weapons", -.3, .17, .11)):
-        pos = Vector((x, bank.y + abs(x) * .18, bank.z))   # slight curve around the pilot
-        nrm = (Vector((0, 0, 0)) - pos).normalized()
-        r = tuple(nrm.to_track_quat('-Y', 'Z').to_euler())
-        box(name + "_bezel", (w + .03, .022, h + .03), tuple(pos), dark, root, rot=r, bevel=.006)
-        box(name + "_glass", (w, .004, h), tuple(pos + nrm * .012), screen, root, rot=r, bevel=0)
-        empty(name, tuple(pos + nrm * .016), root, rot=r, props={"screen": name[7:], "w": w, "h": h})
+    # --- footwell: grating floor and pedals ----------------------------------------------------
+    box("floor_grate", (1.2, .9, .02), (0, -.35, Z0 + .02), grate, root, bevel=0)
+    multi_box("floor_grate_slats", [((1.18, .02, .012), (0, -.75 + k * .08, Z0 + .035)) for k in range(11)], dark, root)
+    for s_ in (-1, 1):
+        box(f"pedal_{s_:+d}", (.1, .2, .025), (.15 * s_, -.62, Z0 + .12), metal, root, rot=(.7, 0, 0), bevel=.006)
 
-    # --- side consoles with twin joysticks; the pilot's gloved hands grip them.
-    # Stick tops sit in the bottom corners of the first-person view. stick_pivot_L/R are the
-    # pivots the game tilts (left = drive: W/S/A/D, right = aim: mouse); hands are parented to them.
+    # --- side consoles with twin joysticks; gloved hands + arms ----------------------------------
     glove = mat(f"{t}_pilot_glove", "#5A4636", 0, .65)
     glove_pad = mat(f"{t}_pilot_glove_pad", "#7A624C", 0, .75)
     suit = mat(f"{t}_pilot_suit", "#6B7785", 0, .85)
     suit_dark = mat(f"{t}_pilot_suit_dark", "#4A5360", 0, .9)
     rubber = mat(f"{t}_rubber_boot", "#141414", 0, .9)
-    V = Vector
     for sd in ("L", "R"):
         s_ = 1 if sd == "L" else -1           # pilot's left is +X
-        P = V((.30 * s_, -.30, -.31))        # bottom corners of the first-person view, clear of the dash
-        box(f"side_console_{sd}", (.2, .4, .12), (.36 * s_, -.25, -.38), panel, root, rot=(-.2, 0, 0), bevel=.015)
-        box(f"side_console_trim_{sd}", (.21, .03, .03), (.36 * s_, -.45, -.34), pal["trim"], root, bevel=.005)
-        cyl(f"side_gauge_{sd}", .035, .015, (.41 * s_, -.15, -.32), dark, root, rot=(-.2, 0, 0), segs=16)
-        cyl(f"side_gauge_face_{sd}", .029, .004, (.41 * s_, -.15, -.312), lamp["#FFB347"] if sd == "L" else lamp["#5FD38A"],
-            root, rot=(-.2, 0, 0), segs=16)
-        multi_box(f"side_console_lamps_{sd}", [((.015, .012, .01), (.42 * s_, -.28 + k * .03, -.325)) for k in range(4)],
+        P = V((.36 * s_, -.36, -.43))
+        box(f"side_console_{sd}", (.26, .5, .14), (.43 * s_, -.3, -.51), panel, root, rot=(-.15, 0, 0), bevel=.015)
+        box(f"side_console_pillar_{sd}", (.2, .35, .3), (.45 * s_, -.3, -.7), dark, root, bevel=.015)
+        box(f"side_console_trim_{sd}", (.27, .03, .03), (.43 * s_, -.55, -.46), pal["trim"], root, bevel=.005)
+        cyl(f"side_gauge_{sd}", .035, .015, (.49 * s_, -.17, -.44), dark, root, rot=(-.15, 0, 0), segs=16)
+        dial = mat(f"{t}_dial_{sd}", "#FFB347" if sd == "L" else "#5FD38A", 0, .4, emit=1.2)   # soft, not a glare
+        cyl(f"side_gauge_face_{sd}", .029, .004, (.49 * s_, -.17, -.432), dial, root, rot=(-.15, 0, 0), segs=16)
+        box(f"side_gauge_needle_{sd}", (.004, .024, .003), (.49 * s_ + .006, -.165, -.428), dark, root,
+            rot=(-.15, 0, .7 * s_), bevel=0)
+        multi_box(f"side_console_lamps_{sd}", [((.015, .012, .01), (.5 * s_, -.3 + k * .03, -.445)) for k in range(4)],
                   lamp["#3CE6FF"], root)
         cyl(f"stick_base_{sd}", .058, .035, tuple(P + V((0, 0, -.015))), dark, root, segs=14)
         cyl(f"stick_base_ring_{sd}", .062, .01, tuple(P), metal, root, segs=14)
         pivot = empty(f"stick_pivot_{sd}", tuple(P), root, props={"joystick": "drive" if sd == "L" else "aim"})
         cyl(f"stick_boot_{sd}", .042, .06, tuple(P + V((0, 0, .03))), rubber, pivot, segs=10, r2=.022)
         seg(f"stick_shaft_{sd}", tuple(P + V((0, 0, .05))), tuple(P + V((0, -.01, .075))), .02, .02, metal, pivot, bevel=0)
-        G = P + V((0, -.015, .125))           # grip centre
+        G = P + V((0, -.015, .125))
         box(f"stick_grip_{sd}", (.048, .058, .12), tuple(G), dark, pivot, rot=(.12, 0, 0), bevel=.014)
         box(f"stick_head_{sd}", (.052, .05, .025), tuple(G + V((0, .004, .07))), metal, pivot, rot=(.12, 0, 0), bevel=.008)
         cyl(f"stick_hat_switch_{sd}", .008, .014, tuple(G + V((-.01 * s_, .012, .087))), lamp["#3CE6FF"], pivot, segs=8)
         box(f"stick_trigger_{sd}", (.016, .018, .03), tuple(G + V((0, -.038, .035))), lamp["#FF4B3A"], pivot, bevel=.003)
-        # gloved hand: palm and back of hand on the outer side, fingers wrapped across the front, thumb on the hat
         box(f"hand_{sd}_palm", (.04, .085, .1), tuple(G + V((.042 * s_, .008, -.005))), glove, pivot, rot=(.12, 0, 0), bevel=.012)
         box(f"hand_{sd}_back", (.025, .075, .085), tuple(G + V((.064 * s_, .012, 0))), glove_pad, pivot, rot=(.12, 0, 0), bevel=.01)
         box(f"hand_{sd}_knuckles", (.032, .026, .09), tuple(G + V((.04 * s_, -.044, .002))), glove, pivot, rot=(.12, 0, 0), bevel=.008)
         for k, z in enumerate((.033, .01, -.013, -.035)):
-            reach = .056 if k else .05           # index finger rides the trigger
+            reach = .056 if k else .05
             box(f"hand_{sd}_finger_{k}_a", (reach, .023, .02), tuple(G + V((.012 * s_, -.046, z))), glove, pivot, bevel=.007)
             box(f"hand_{sd}_finger_{k}_b", (.02, .036, .019), tuple(G + V((-.02 * s_, -.026, z))), glove, pivot, bevel=.007)
         box(f"hand_{sd}_thumb_a", (.024, .022, .04), tuple(G + V((.038 * s_, .016, .055))), glove, pivot, rot=(0, -.5 * s_, 0), bevel=.008)
         box(f"hand_{sd}_thumb_b", (.022, .02, .03), tuple(G + V((.012 * s_, .014, .082))), glove, pivot, rot=(0, -1.1 * s_, 0), bevel=.007)
         box(f"hand_{sd}_cuff", (.075, .075, .055), tuple(G + V((.05 * s_, .032, -.075))), glove_pad, pivot, bevel=.012)
-        # pilot's arm: forearm rides the stick pivot; the upper arm hangs from a fixed shoulder and the game
-        # re-aims it at the elbow every frame (arm_shoulder_* looks at arm_elbow_*), so the arm bends with the stick
-        W = G + V((.05 * s_, .045, -.095))     # wrist (inside the glove cuff)
-        E = V((.36 * s_, -.03, -.44))          # elbow, low and outboard beside the seat
-        S = V((.22 * s_, .1, -.2))             # shoulder
+        W = G + V((.05 * s_, .045, -.095))
+        E = V((.44 * s_, -.06, -.6))
+        S = V((.25 * s_, .14, -.3))
         seg(f"arm_{sd}_forearm", tuple(W), tuple(E), .085, .08, suit, pivot, bevel=.02, taper=(1.25, 1.2))
         seg(f"arm_{sd}_forearm_band", tuple(W.lerp(E, .3)), tuple(W.lerp(E, .38)), .1, .095, pal["paint"], pivot, bevel=.01)
         seg(f"arm_{sd}_cuff_seam", tuple(W.lerp(E, .04)), tuple(W.lerp(E, .1)), .094, .088, suit_dark, pivot, bevel=.01)
         cyl(f"arm_{sd}_elbow_pad", .062, .1, tuple(E), suit_dark, pivot, rot=X_AXIS, segs=12)
         empty(f"arm_elbow_{sd}", tuple(E), pivot, props={"arm": "elbow"})
-        q = (E - S).to_track_quat('Y', 'Z')    # local +Y (= Godot -Z) points shoulder -> elbow
+        q = (E - S).to_track_quat('Y', 'Z')
         shoulder = empty(f"arm_shoulder_{sd}", tuple(S), root, rot=tuple(q.to_euler()), props={"arm": "shoulder"})
         seg(f"arm_{sd}_upper", tuple(S), tuple(E), .1, .095, suit, shoulder, bevel=.025, taper=(.85, .85))
-        seg(f"arm_{sd}_shoulder_flash", tuple(S.lerp(E, .12)), tuple(S.lerp(E, .3)), .108, .102, pal["paint"], shoulder,
-            bevel=.012)
+        seg(f"arm_{sd}_shoulder_flash", tuple(S.lerp(E, .12)), tuple(S.lerp(E, .3)), .108, .102, pal["paint"], shoulder, bevel=.012)
         cyl(f"arm_{sd}_shoulder", .075, .12, tuple(S), suit, shoulder, rot=X_AXIS, segs=12)
-        box(f"arm_{sd}_patch", (.012, .05, .04), tuple(S.lerp(E, .2) + V((.052 * s_, 0, 0))), pal["decal"], shoulder,
-            rot=tuple(q.to_euler()), bevel=0)
 
-    # --- ceiling: overhead panel, dome light
-    box("ceiling", (1.3, .8, .04), (0, -.1, .46), dark, root, bevel=0)
-    box("overhead_panel", (.5, .26, .03), (0, -.16, .43), panel, root, rot=(.25, 0, 0), bevel=.008)
-    multi_box("overhead_switches", [((.018, .012, .02), (-.2 + i * .04, -.16, .41)) for i in range(11)], metal, root)
-    multi_box("overhead_lamps", [((.02, .01, .012), (-.2 + i * .04, -.22, .415)) for i in range(11)], lamp["#5FD38A"], root)
-    cyl("dome_light", .045, .03, (0, .05, .44), lamp["#FF4B3A"], root, segs=12)
-    lt = point_light("cockpit_light", (0, -.05, .32), 20, "#FFB347", radius=.05, parent=root)
-    lt["godot_energy"] = 0.35
-    lt["godot_range"] = 1.5
+    # --- side walls: pipes, cables, rivets, fan, extinguisher, grab handle ------------------------
+    for s_ in (-1, 1):
+        x = (X1 - .05) * s_
+        multi_cyl(f"wall_pipes_{s_:+d}", [(.02, 1.3, (x, -.25, z), (PI / 2, 0, 0)) for z in (.45, .39)], copper, root, segs=8)
+        cable(f"wall_cables_{s_:+d}", [(x, .3, -.2), (x - .01 * s_, -.1, -.26), (x, -.6, -.15)], pal, root, r=.014)
+        bolts(f"wall_rivets_{s_:+d}", [(x + .02 * s_, y, z) for y in (.25, -.15, -.55) for z in (-.5, .55)], pal, root,
+              axis=X_AXIS, r=.012)
+        box(f"wall_panel_{s_:+d}", (.03, .5, .35), (x, -.3, .05), panel, root, bevel=.008)
+        box(f"wall_label_plate_{s_:+d}", (.01, .14, .05), (x - .02 * s_, -.3, .26), pal["decal"], root, bevel=0)
+    cyl("wall_fan", .08, .03, (X1 - .07, -.05, -.05), dark, root, rot=X_AXIS, segs=16)
+    multi_box("wall_fan_grille", [((.01, .15, .012), (X1 - .085, -.05, -.05 + dz)) for dz in (-.05, -.025, 0, .025, .05)], metal, root)
+    cyl("extinguisher", .045, .3, (X0 + .1, .1, -.3), red, root, segs=12)
+    cyl("extinguisher_head", .028, .06, (X0 + .1, .1, -.12), metal, root, segs=8)
+    multi_box("extinguisher_bracket", [((.02, .11, .02), (X0 + .055, .1, z)) for z in (-.4, -.2)], metal, root)
+    seg("grab_handle", (X1 - .08, .15, .45), (X1 - .08, -.35, .5), .025, .025, metal, root, bevel=0)
+
+    # --- ceiling: overhead switch panel, dome light, cabin light ---------------------------------
+    box("overhead_panel", (.5, .26, .03), (0, -.1, Z1 - .035), panel, root, bevel=.008)
+    multi_box("overhead_switches", [((.018, .012, .02), (-.2 + i * .04, -.1, Z1 - .06)) for i in range(11)], metal, root)
+    multi_box("overhead_lamps", [((.02, .01, .012), (-.2 + i * .04, -.17, Z1 - .055)) for i in range(11)], lamp["#5FD38A"], root)
+    cyl("dome_light", .05, .03, (0, .15, Z1 - .02), lamp["#FF4B3A"], root, segs=12)
+    lt = point_light("cockpit_light", (0, -.15, .5), 30, "#FFB347", radius=.06, parent=root)
+    lt["godot_energy"] = 0.5
+    lt["godot_range"] = 2.4
     return root
 
 

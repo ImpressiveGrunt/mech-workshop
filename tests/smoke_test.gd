@@ -97,6 +97,16 @@ func _run() -> void:
     check("legs animate (hip IK moving)", absf(hip.rotation.x - hip_rot_before) > 0.02 or steps[0] > 0)
     check("footsteps fire", steps[0] >= 3, "%d steps" % steps[0])
 
+    # weighted aim: the torso trails the target, then settles on it
+    p.target_twist = 0.8
+    await wait(0.15)
+    var early := p.torso_twist
+    await wait(2.0)
+    check("aim lags behind the mouse target", early < 0.4, "after 0.15 s: %.2f of 0.80" % early)
+    check("aim settles on the target", absf(p.torso_twist - 0.8) < 0.03, "%.2f" % p.torso_twist)
+    p.target_twist = 0.0
+    await wait(2.0)
+
     # weapons + damage
     var hp_before: float = e.part_hp["torso"]
     for i in 30:

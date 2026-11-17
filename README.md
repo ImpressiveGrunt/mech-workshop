@@ -41,7 +41,10 @@ them, then 3-2-1, **FIGHT**. Destroy the enemy torso to win.
   2-bone IK on the Blender hip/knee/ankle joints (pistons telescope with them). The body crouches, bobs
   lowest at each footfall, sways over the stance leg, leans into acceleration and turns, and staggers when
   hit. Turning on the spot makes the mech re-step. Turns wind up and down with inertia.
-- **Cockpit** (`cockpit_interior_mk1.glb`, built in Blender): you look out through layered armoured glass
+- **Weighted aiming**: the mouse moves an aim point (orange ring on screen); the heavy torso and arms swing
+  after it on a damped spring with a top slew speed, and the view and guns (centre "+") catch up a moment
+  later. AI mechs aim the same way.
+- **Cockpit** (`cockpit_interior_mk1.glb`, built in Blender): a roomy, fully enclosed cabin (80 deg view). You look out through layered armoured glass
   set in a bolted frame. Above the window an overhead bank of three screens angles down at you: systems,
   speed/heading/target, and weapons/boost. Below it, a centre switch panel carries the caution lamps,
   keypad, lamp row and toggles. Two joysticks on side
