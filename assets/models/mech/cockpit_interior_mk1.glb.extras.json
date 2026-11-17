@@ -18,6 +18,14 @@
   "godot_energy": 0.5,
   "godot_range": 2.4
  },
+ "holo_frame": {
+  "h": 0.41000000000000003,
+  "holo": true,
+  "w": 1.1199999999999999
+ },
+ "holo_hud": {
+  "holo": true
+ },
  "screen_radar": {
   "h": 0.11,
   "screen": "radar",
