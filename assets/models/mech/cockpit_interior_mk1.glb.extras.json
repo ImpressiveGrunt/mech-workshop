@@ -15,21 +15,21 @@
   "cockpit": true
  },
  "cockpit_light": {
-  "godot_energy": 0.35,
-  "godot_range": 1.5
+  "godot_energy": 0.5,
+  "godot_range": 2.4
  },
  "screen_radar": {
-  "h": 0.12,
+  "h": 0.11,
   "screen": "radar",
   "w": 0.23
  },
  "screen_status": {
-  "h": 0.11,
+  "h": 0.1,
   "screen": "status",
   "w": 0.17
  },
  "screen_weapons": {
-  "h": 0.11,
+  "h": 0.1,
   "screen": "weapons",
   "w": 0.17
  },

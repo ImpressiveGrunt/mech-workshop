@@ -1,0 +1,49 @@
+MECH WORKSHOP - playtest build 0.2 (Godot 4.3)
+================================================
+
+HOW TO RUN
+  Windows : unzip, double-click MechWorkshop.exe.
+            The build is unsigned: if SmartScreen warns, click "More info" -> "Run anyway".
+  macOS   : unzip, right-click "Mech Workshop.app" -> Open -> Open (unsigned build).
+            If macOS says it is damaged:  xattr -cr "Mech Workshop.app"
+  Linux   : unzip, then  chmod +x MechWorkshop.x86_64 && ./MechWorkshop.x86_64
+  Needs a GPU with Vulkan support.
+
+NEW IN 0.2
+  - Roomier, fully enclosed cockpit: wide armoured window, smaller overhead screens,
+    no see-through walls at any angle; 80 deg field of view.
+  - Weighted aiming: the mouse moves the orange aim ring; the heavy torso and arms swing
+    after it and the view + guns (centre "+") catch up a moment later. Lead your turns.
+
+THE LOOP
+  Workshop -> Arena (fight for money) or Salvage Yard (scrap + parts) -> back to the Workshop.
+
+WORKSHOP (mouse)
+  Upgrades / Repairs / Paint tabs on the right; click any part of the mech to upgrade it.
+  Hold < ROTATE / ROTATE > (or Q / E) to spin the mech on the turntable.
+  ENTER ARENA / SALVAGE YARD at the bottom of the panel.
+
+IN THE MECH (first person)
+  W / S        throttle forward / back        (left joystick moves with it)
+  A / D        turn the legs
+  Mouse        move the aim ring; torso + arms follow   (right joystick moves with it)
+  Left click   right-arm weapon (autocannon)
+  Right click  left-arm weapon (ram fist / missile pod)
+  Space        jump thruster
+  C            re-centre torso
+  E            interact (salvage yard: search / sell / exit)
+  Esc          release / capture the mouse
+
+ARENA
+  Gates open, both mechs walk out, gates seal, 3-2-1 FIGHT.
+  Shoot armour plates off, aim for the glowing reactor on the back, blow up red barrels.
+  Damage carries back to the workshop for repair.
+
+KNOWN LIMITS IN THIS BUILD
+  - No sound or music yet.
+  - Salvage yard is a placeholder blockout (its Blender environment is next).
+  - One AI opponent with basic behaviour.
+  - Progress saves automatically (Godot user data folder). Workshop > "New game" resets it.
+
+FEEDBACK WANTED
+  Aim weight (too slow / too fast?), cockpit roominess, walking feel, arena size, weapons.
