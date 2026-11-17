@@ -41,6 +41,14 @@ them, then 3-2-1, **FIGHT**. Destroy the enemy torso to win.
   2-bone IK on the Blender hip/knee/ankle joints (pistons telescope with them). The body crouches, bobs
   lowest at each footfall, sways over the stance leg, leans into acceleration and turns, and staggers when
   hit. Turning on the spot makes the mech re-step. Turns wind up and down with inertia.
+- **Idle stance**: when the mech stops, its legs step back to a square forward stance (feet side by side
+  under the hips).
+- **Holographic HUD + targeting** (`holo_hud.gd`, `targeting.gd`): a cyan hologram projected on the inside of
+  the armoured glass (Blender holo plane, rendered live from a SubViewport) that sways with the cockpit.
+  It shows a heading tape, gun pipper, aim ring, speed/throttle and boost bars, and weapon readiness and range.
+  Targeting brackets the target with range, health and a weak-point marker on its reactor (when visible),
+  with an edge arrow when it's off the glass. Hold the guns on a target to lock (0.9 s, needs line of
+  sight). A lock makes missiles home, and T cycles targets.
 - **Weighted aiming**: the mouse moves an aim point (orange ring on screen); the heavy torso and arms swing
   after it on a damped spring with a top slew speed, and the view and guns (centre "+") catch up a moment
   later. AI mechs aim the same way.
@@ -63,6 +71,7 @@ them, then 3-2-1, **FIGHT**. Destroy the enemy torso to win.
 | LMB / RMB | fire right / left arm weapon |
 | Space | jump thruster |
 | C | re-centre torso |
+| T | cycle target |
 | E | interact (salvage, sell, exit) |
 | Esc | release / capture mouse |
 

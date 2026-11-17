@@ -1,4 +1,4 @@
-MECH WORKSHOP - playtest build 0.2 (Godot 4.3)
+MECH WORKSHOP - playtest build 0.3 (Godot 4.3)
 ================================================
 
 HOW TO RUN
@@ -8,6 +8,12 @@ HOW TO RUN
             If macOS says it is damaged:  xattr -cr "Mech Workshop.app"
   Linux   : unzip, then  chmod +x MechWorkshop.x86_64 && ./MechWorkshop.x86_64
   Needs a GPU with Vulkan support.
+
+NEW IN 0.3
+  - Holographic HUD on the armoured glass with a targeting system: target brackets, range,
+    enemy part health, weak-point marker, off-screen arrow. Hold the guns on a target to LOCK;
+    locked missiles home in. T cycles targets.
+  - Idle: when you stop, the legs step back to a square, forward-facing stance.
 
 NEW IN 0.2
   - Roomier, fully enclosed cockpit: wide armoured window, smaller overhead screens,
@@ -31,6 +37,7 @@ IN THE MECH (first person)
   Right click  left-arm weapon (ram fist / missile pod)
   Space        jump thruster
   C            re-centre torso
+  T            cycle target
   E            interact (salvage yard: search / sell / exit)
   Esc          release / capture the mouse
 

@@ -20,6 +20,8 @@ var mech: Mech
 var camera: Camera3D
 var enabled := true  # false = movement/weapons locked (e.g. match intro); looking around still works
 var cockpit: Node3D
+var targeting: Targeting
+var holo: HoloHud
 var _base_pos := Vector3.ZERO
 var _shake := 0.0
 var _air_time := 0.0
@@ -44,6 +46,10 @@ func _ready() -> void:
     if anchor == mech:
         camera.position = Vector3(0, 3.6, 0)
     _base_pos = camera.position
+    targeting = Targeting.new()
+    targeting.mech = mech
+    targeting.camera = camera
+    add_child(targeting)
     camera.current = true
     Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
     mech.hit_taken.connect(_on_hit)
@@ -84,8 +90,42 @@ func _setup_cockpit() -> void:
         if c:
             c.visible = false
             _cracks.append(c)
+    _setup_holo()
     mech.apply_paint(mech.current_paint)   # paint the cockpit trim to match
     mech.set_meta("diegetic_hud", true)
+
+
+## Holographic HUD: render HoloHud into a SubViewport and show it on the Blender holo plane.
+func _setup_holo() -> void:
+    var frame := cockpit.find_child("holo_frame", true, false) as Node3D
+    var surface := cockpit.find_child("holo_hud", true, false) as MeshInstance3D
+    if frame == null or surface == null:
+        return
+    var e := LevelUtils.extras_of(frame)
+    var size_m := Vector2(float(e.get("w", 1.1)), float(e.get("h", 0.4)))
+    var vp := SubViewport.new()
+    vp.size = Vector2i(int(size_m.x * 1000.0), int(size_m.y * 1000.0))   # 1 px = 1 mm on the glass
+    vp.transparent_bg = true
+    vp.disable_3d = true
+    vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+    add_child(vp)
+    holo = HoloHud.new()
+    holo.mech = mech
+    holo.camera = camera
+    holo.targeting = targeting
+    holo.frame = frame
+    holo.size_m = size_m
+    holo.size = Vector2(vp.size)
+    vp.add_child(holo)
+    var m := StandardMaterial3D.new()
+    m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+    m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+    m.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+    m.cull_mode = BaseMaterial3D.CULL_DISABLED
+    m.albedo_texture = vp.get_texture()
+    surface.material_override = m
+    surface.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+    mech.set_meta("holo_hud", true)
 
 
 ## Put the torso's own meshes on HULL_LAYER, stopping at sockets (arms, backpack) and the cockpit mount.
@@ -263,6 +303,8 @@ func _physics_process(_delta: float) -> void:
     mech.boosting = Input.is_action_pressed("boost")
     if Input.is_action_just_pressed("center_torso"):
         mech.target_twist = 0.0
+    if Input.is_action_just_pressed("target_cycle") and targeting:
+        targeting.cycle()
     if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
         return
     if Input.is_action_pressed("fire_primary"):
@@ -273,7 +315,11 @@ func _physics_process(_delta: float) -> void:
 
 func _fire(slot: String) -> void:
     var w: Weapon = mech.weapons.get(slot)
-    if w:
+    if w == null:
+        return
+    if w.weapon_type == "explosive" and targeting and targeting.locked and targeting.target:
+        w.fire(Targeting.aim_point_of(targeting.target))   # locked missiles home in on centre mass
+    else:
         w.fire(aim_point())
 
 

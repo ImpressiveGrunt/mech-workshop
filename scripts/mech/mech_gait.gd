@@ -22,7 +22,9 @@ const CROUCH_MOVE := 0.24
 const BOB := 0.16
 const SWAY := 0.05
 const ROLL := 0.035
-const SETTLE_DIST := 0.28    # re-step when a foot is this far from home
+const SETTLE_DIST := 0.28    # re-step when a foot is this far from home while moving
+const IDLE_DELAY := 0.35     # after this long standing still, square the stance up again
+const IDLE_SETTLE := 0.04    # ...stepping any foot further than this back under its hip, facing forward
 
 var mech: Mech
 var pelvis: Node3D
@@ -35,6 +37,7 @@ var _lean := 0.0
 var _roll := 0.0
 var _kick := Vector2.ZERO
 var _last_fwd := 0.0
+var _idle_time := 0.0
 
 
 func setup(owner_mech: Mech, legs_root: Node3D) -> bool:
@@ -85,6 +88,7 @@ func _physics_process(delta: float) -> void:
     var speed := vel.length()
     _speed_f = move_toward(_speed_f, clampf(speed / 6.0, 0.0, 1.0), delta * 2.5)
     var cycle := clampf(1.6 + speed * 0.36, 1.6, 4.0)   # metres travelled per full two-step cycle
+    _idle_time = _idle_time + delta if speed < 0.2 and absf(mech.yaw_velocity) < 0.1 else 0.0
 
     # advance the gait: walking, turning on the spot, or settling stray feet
     var drive := maxf(speed, absf(mech.yaw_velocity) * 1.8)
@@ -99,7 +103,8 @@ func _physics_process(delta: float) -> void:
         var target := _ground(mech.to_global(leg["home"]) + ahead, leg["ankle_h"])
         var foot: Vector3
         var toe := 0.0
-        if lp >= DUTY:
+        var squared: bool = _idle_time > IDLE_DELAY and _home_offset(leg) < IDLE_SETTLE and not leg["swinging"]
+        if lp >= DUTY and not squared:
             if not leg["swinging"]:
                 leg["swinging"] = true
                 leg["from"] = leg["planted"]
@@ -161,12 +166,17 @@ func _ground(p: Vector3, ankle_h: float) -> Vector3:
     return hit["position"] + Vector3.UP * ankle_h
 
 
+func _home_offset(leg: Dictionary) -> float:
+    var d: Vector3 = leg["planted"] - mech.to_global(leg["home"])
+    d.y = 0.0
+    return d.length()
+
+
+## Moving: re-step only stray feet. Idle: keep stepping until both feet are back under the hips.
 func _needs_step() -> bool:
+    var limit := IDLE_SETTLE if _idle_time > IDLE_DELAY else SETTLE_DIST
     for leg in legs:
-        var home := mech.to_global(leg["home"])
-        var d: Vector3 = leg["planted"] - home
-        d.y = 0.0
-        if d.length() > SETTLE_DIST:
+        if _home_offset(leg) > limit:
             return true
     return false
 

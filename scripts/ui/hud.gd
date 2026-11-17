@@ -4,6 +4,7 @@ extends CanvasLayer
 
 var mech: Mech
 var _reticle: Reticle
+var _crosshair: Label
 
 
 ## Ring drawn where the pilot is aiming; the centre "+" shows where the guns point right now.
@@ -23,8 +24,8 @@ var _message_token := 0
 
 
 func _ready() -> void:
-    var crosshair := _label(0, 0, 1, 1, 28, HORIZONTAL_ALIGNMENT_CENTER)
-    crosshair.text = "+"
+    _crosshair = _label(0, 0, 1, 1, 28, HORIZONTAL_ALIGNMENT_CENTER)
+    _crosshair.text = "+"
     _status = _label(0, 0, 0.4, 0.5, 18, HORIZONTAL_ALIGNMENT_LEFT)
     _status.vertical_alignment = VERTICAL_ALIGNMENT_TOP
     _status.offset_left = 20
@@ -39,7 +40,12 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
     if mech == null or not is_instance_valid(mech):
         return
-    _update_reticle()
+    var holo_active := mech.has_meta("holo_hud")   # the cockpit hologram draws aim + targeting instead
+    _crosshair.visible = not holo_active
+    if holo_active:
+        _reticle.visible = false
+    else:
+        _update_reticle()
     if mech.has_meta("diegetic_hud"):
         _status.text = ""   # the cockpit screens show this instead
         return

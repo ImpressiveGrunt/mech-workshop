@@ -248,6 +248,7 @@ func _setup_input() -> void:
     _bind_key("boost", KEY_SPACE)
     _bind_key("interact", KEY_E)
     _bind_key("center_torso", KEY_C)
+    _bind_key("target_cycle", KEY_T)
     _bind_key("pause", KEY_ESCAPE)
     _bind_mouse("fire_primary", MOUSE_BUTTON_LEFT)    # right-arm weapon
     _bind_mouse("fire_secondary", MOUSE_BUTTON_RIGHT)  # left-arm weapon

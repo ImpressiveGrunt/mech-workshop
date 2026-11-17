@@ -43,7 +43,16 @@ func _run() -> void:
     await shot("04_arena_walkout")
     await wait(6.5)
     await shot("05_arena_fight")
-    var p = get_tree().current_scene.player
+    var ar = get_tree().current_scene
+    var p = ar.player
+    for i in 120:   # aim at the enemy until the hologram locks on
+        var to: Vector3 = Targeting.aim_point_of(ar.enemy) - ar.player_ctrl.camera.global_position
+        var local: Vector3 = p.global_basis.inverse() * to
+        p.target_twist = atan2(local.x, local.z)
+        p.target_pitch = atan2(local.y, Vector2(local.x, local.z).length())
+        await get_tree().physics_frame
+    await shot("08_holo_target_lock")
+    p.target_twist = 0.0
     p.target_pitch = -0.5
     await wait(1.5)
     await shot("06_cockpit_hands")

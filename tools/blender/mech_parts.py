@@ -503,6 +503,30 @@ def cockpit_interior(pal):
             L = rnd.uniform(.06, .16)
             rays.append(((L, .002, .004), F(cx + math.cos(a) * L / 2, cz + math.sin(a) * L / 2, .034), (TILT, -a, 0)))
         multi_box(f"glass_crack_{k}", rays, crack, root)
+    # holographic HUD: an emitter-projected plane just inside the glass. The game renders the HUD into
+    # it live. holo_frame axes (in Godot): +X pilot's right, +Y up, +Z toward the pilot; size in extras.
+    holo_m = mat(f"{t}_holo_screen", "#3CE6FF", 0, .2, emit=.3, alpha=.06)
+    HW, HH = WW - .04, WH - .03
+    hc = V(F(0, 0, .085))
+    hrot = Euler((TILT, 0, 0)).to_matrix() @ Euler((0, 0, PI)).to_matrix()
+    import bmesh as _bm, common as _c
+    bm = _bm.new()
+    uv = bm.loops.layers.uv.new("UVMap")
+    corners = [(-.5, -.5), (.5, -.5), (.5, .5), (-.5, .5)]           # (pilot-right, up) in [-.5, .5]
+    verts = [bm.verts.new(hc + hrot @ V((cx * HW, 0, cz * HH))) for cx, cz in corners]
+    face = bm.faces.new(verts)
+    face.normal_update()
+    if face.normal.y < 0:                                            # must face the pilot (+Y)
+        face.normal_flip()
+    for loop in face.loops:
+        lx = (hrot.inverted() @ (loop.vert.co - hc))
+        loop[uv].uv = (lx.x / HW + .5, lx.z / HH + .5)
+    holo = _c._mesh("holo_hud", bm, holo_m, (0, 0, 0), (0, 0, 0), root, 0, 1, {"holo": True})
+    holo.data.uv_layers.active_index = 0
+    empty("holo_frame", tuple(hc), root, rot=tuple(hrot.to_euler()), props={"holo": True, "w": HW, "h": HH})
+    box("holo_projector", (.18, .07, .04), F(0, WH / 2 + .02, .09), dark, root, rot=rot, bevel=.008)
+    box("holo_projector_lens", (.12, .01, .012), F(0, WH / 2 + .005, .125), lamp["#3CE6FF"], root, rot=rot, bevel=0)
+
     # bulkhead: fills the whole front of the shell except the window (extends past the shell edges)
     top_h, bot_h = 1.0, 1.0
     box("bulkhead_top", (2.1, .05, top_h), F(0, WH / 2 + .07 + top_h / 2, .045), dark, root, rot=rot, bevel=0)

@@ -84,6 +84,9 @@ func _run() -> void:
     check("gates closed again", door_closed)
     check("screens show live text", str(pc._screens["radar"].text).contains("SPD"), str(pc._screens["radar"].text).left(30))
 
+    ar.enemy_ai.enabled = false   # no incoming fire while checking the gait (hits knock the mech)
+    e.throttle = 0.0
+    e.turn = 0.0
     # walk forward with the real input action
     var hip: Node3D = p.gait.legs[0]["hip"]
     var hip_rot_before := hip.rotation.x
@@ -96,6 +99,20 @@ func _run() -> void:
     check("player walks forward", spd > 3.0, "%.1f m/s" % spd)
     check("legs animate (hip IK moving)", absf(hip.rotation.x - hip_rot_before) > 0.02 or steps[0] > 0)
     check("footsteps fire", steps[0] >= 3, "%d steps" % steps[0])
+    await wait(3.0)
+    var offs := [p.gait._home_offset(p.gait.legs[0]), p.gait._home_offset(p.gait.legs[1])]
+    check("idle: feet step back to a square forward stance", offs[0] < 0.06 and offs[1] < 0.06,
+        "offsets %.2f / %.2f m" % offs)
+    check("hologram HUD mounted", pc.holo != null)
+    ar.enemy_ai.enabled = true
+    check("targeting acquires the enemy", pc.targeting.target == e)
+    for i in 150:   # hold the guns on the enemy
+        var to := Targeting.aim_point_of(e) - pc.camera.global_position
+        var local := p.global_basis.inverse() * to
+        p.target_twist = atan2(local.x, local.z)
+        p.target_pitch = atan2(local.y, Vector2(local.x, local.z).length())
+        await get_tree().physics_frame
+    check("lock-on when the guns stay on target", pc.targeting.locked, "lock %.2f, LOS %s" % [pc.targeting.lock, pc.targeting.has_line_of_sight])
 
     # weighted aim: the torso trails the target, then settles on it
     p.target_twist = 0.8

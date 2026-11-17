@@ -18,7 +18,8 @@
   arena doors `{gate, side, slide}` (slide along local X),
   cockpit markers `screen_status/radar/weapons` (Godot +Z faces pilot), `glass_crack_1..3`,
   `stick_pivot_L/R` (joysticks; pilot hands + forearms parented to them),
-  `arm_shoulder_L/R` (upper arm along local +Y; game aims it at) `arm_elbow_L/R`.
+  `arm_shoulder_L/R` (upper arm along local +Y; game aims it at) `arm_elbow_L/R`,
+  `holo_hud` (UV'd plane) + `holo_frame` (Godot +X right, +Y up, +Z to pilot; extras w/h in m).
 - Godot 4.3 drops glTF node extras: every Blender export also writes `<file>.glb.extras.json`, and the game
   re-attaches it (`LevelUtils.apply_extras` / `instance_scene`). Always load models through those helpers.
 - Smoke test (run after changes): `godot --headless --path . res://tests/smoke_test.tscn` -> `SMOKE TEST: PASSED`.
