@@ -1,6 +1,6 @@
 class_name Targeting
 extends Node
-## Player targeting: picks a target (most central in front, T cycles), checks line of sight,
+## Player targeting: picks a target (most central in front, middle mouse cycles), checks line of sight,
 ## and builds a lock while the guns are held on it. A locked target makes missiles home in.
 
 signal target_changed(target: Mech)

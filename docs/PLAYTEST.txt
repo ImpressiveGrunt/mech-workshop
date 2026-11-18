@@ -1,4 +1,4 @@
-MECH WORKSHOP - playtest build 0.6 (Godot 4.3)
+MECH WORKSHOP - playtest build 0.7 (Godot 4.3)
 ================================================
 
 HOW TO RUN
@@ -8,6 +8,11 @@ HOW TO RUN
             If macOS says it is damaged:  xattr -cr "Mech Workshop.app"
   Linux   : unzip, then  chmod +x MechWorkshop.x86_64 && ./MechWorkshop.x86_64
   Needs a GPU with Vulkan support.
+
+NEW IN 0.7
+  - Mouse buttons match the arms: LEFT click = left-arm weapon, RIGHT click = right-arm weapon.
+  - Middle mouse button cycles targets (was T).
+  - No walking animation in mid air: the legs hang during jumps and both feet plant on landing.
 
 NEW IN 0.6
   - A / D now STRAFE. The legs turn to follow your mouse aim, so they always face forward.
@@ -30,7 +35,7 @@ NEW IN 0.4
 NEW IN 0.3
   - Holographic HUD on the armoured glass with a targeting system: target brackets, range,
     enemy part health, weak-point marker, off-screen arrow. Hold the guns on a target to LOCK;
-    locked missiles home in. T cycles targets.
+    locked missiles home in. Middle mouse cycles targets.
   - Idle: when you stop, the legs step back to a square, forward-facing stance.
 
 NEW IN 0.2
@@ -54,11 +59,11 @@ IN THE MECH (first person)
   Mouse        move the aim ring; torso + arms follow, legs turn after them
   V            first / third person
   Left Alt     hold to free-look
-  Left click   right-arm weapon (autocannon)
-  Right click  left-arm weapon (ram fist / missile pod)
+  Left click   left-arm weapon (ram fist / missile pod)
+  Right click  right-arm weapon (autocannon)
   Space        jump thruster
   C            re-centre torso
-  T            cycle target
+  Middle mouse cycle target
   R            reset the testing grounds
   E            interact (salvage yard: search / sell / exit)
   Esc          release / capture the mouse

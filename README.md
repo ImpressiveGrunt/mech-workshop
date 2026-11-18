@@ -42,7 +42,8 @@ them, then 3-2-1, **FIGHT**. Destroy the enemy torso to win.
   Planted feet keep their world position and heading (no sliding, no twisting). The swing peels off heel-first,
   lifts early and lands heel-first. 2-bone IK on the Blender hip/knee/ankle joints never hyperextends, and the
   pistons telescope with them. The body crouches with speed, dips on each footfall, sways and leans. Damaged legs
-  limp, turning on the spot re-steps, and stopping squares the feet up.
+  limp, turning on the spot re-steps, and stopping squares the feet up. In mid air the legs stop stepping and hang;
+  both feet plant together on landing.
 - **Strafe + legs follow the aim**: A/D sidestep (65 % of forward speed), and the legs turn under the torso to
   face wherever you aim, so they always point forward. Sidesteps use hip roll, so the legs swing out sideways.
 - **Views**: V toggles a third-person chase camera, which shows an aim ring, gun crosshair and target bracket and
@@ -55,7 +56,7 @@ them, then 3-2-1, **FIGHT**. Destroy the enemy torso to win.
   It shows a heading tape, gun pipper, aim ring, speed/throttle and boost bars, and weapon readiness and range.
   Targeting brackets the target with range, health and a weak-point marker on its reactor (when visible),
   with an edge arrow when it's off the glass. Hold the guns on a target to lock (0.9 s, needs line of
-  sight). A lock makes missiles home, and T cycles targets.
+  sight). A lock makes missiles home, and middle mouse cycles targets.
 - **Weighted aiming**: the mouse moves an aim point (orange ring on screen); the heavy torso and arms swing
   after it on a damped spring with a top slew speed, and the view and guns (centre "+") catch up a moment
   later. AI mechs aim the same way.
@@ -76,10 +77,10 @@ them, then 3-2-1, **FIGHT**. Destroy the enemy torso to win.
 | W / S | throttle forward / back |
 | A / D | strafe left / right (legs keep facing forward) |
 | Mouse | aim torso + arms; the legs turn to follow your aim |
-| LMB / RMB | fire right / left arm weapon |
+| LMB / RMB | fire left / right arm weapon |
 | Space | jump thruster |
 | C | re-centre torso |
-| T | cycle target |
+| Middle mouse | cycle target |
 | V | first / third person |
 | Hold Left Alt | free-look (camera only, aim stays put) |
 | E | interact (salvage, sell, exit) |

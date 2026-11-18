@@ -164,7 +164,7 @@ func _draw_target() -> void:
     if targeting.locked and _has_missiles():
         strip += "     MISSILES HOMING"
     _text(Vector2(size.x / 2 - 300, size.y - 22), strip, 14, c, HORIZONTAL_ALIGNMENT_CENTER, 600)
-    _text(Vector2(size.x / 2 - 80, size.y - 6), "[T] NEXT TARGET", 11, CYAN, HORIZONTAL_ALIGNMENT_CENTER, 160)
+    _text(Vector2(size.x / 2 - 80, size.y - 6), "[MMB] NEXT TARGET", 11, CYAN, HORIZONTAL_ALIGNMENT_CENTER, 160)
 
 
 func _draw_weak_point(t: Mech) -> void:

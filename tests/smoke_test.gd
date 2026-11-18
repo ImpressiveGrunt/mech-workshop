@@ -30,6 +30,14 @@ func _ready() -> void:
 func _run() -> void:
     var gs = GameState
     var db = PartDB
+    var btn := func(action: String) -> int:
+        for ev in InputMap.action_get_events(action):
+            if ev is InputEventMouseButton:
+                return ev.button_index
+        return -1
+    check("LMB = left arm, RMB = right arm, MMB = next target",
+        btn.call("fire_left") == MOUSE_BUTTON_LEFT and btn.call("fire_right") == MOUSE_BUTTON_RIGHT
+        and btn.call("target_cycle") == MOUSE_BUTTON_MIDDLE)
     check("PartDB loaded parts", db.parts.size() >= 8, "%d parts" % db.parts.size())
     gs.new_game()
 
@@ -150,6 +158,30 @@ func _run() -> void:
         "lateral %.1f m/s, fwd %.1f, yaw drift %.3f" % [lateral, fwd_v, wrapf(p.global_rotation.y - yaw_before, -PI, PI)])
     check("strafing legs stay sane", knee_min > 0.0, "min knee %.0f" % knee_min)
     await wait(1.5)
+    # airborne: no walking animation in mid air, both feet plant on landing
+    var air_steps := [0]
+    var count_air := func(_m, _pos, _s): air_steps[0] += 1
+    p.global_position += Vector3(0, 12.0, 0)
+    p.velocity = Vector3(0, 0, 0)
+    Input.action_press("move_forward")      # trying to walk in mid air must not animate steps
+    await wait(0.4)
+    p.footstep.connect(count_air)
+    var phase_air: float = p.gait.phase
+    await wait(0.4)
+    var still_air := not p.is_on_floor()
+    var no_steps: bool = air_steps[0] == 0 and is_equal_approx(p.gait.phase, phase_air)
+    check("no walking animation in mid air", still_air and p.gait.airborne and no_steps,
+        "airborne %s, steps %d, phase %.2f -> %.2f" % [p.gait.airborne, air_steps[0], phase_air, p.gait.phase])
+    Input.action_release("move_forward")
+    var t_land := 0.0
+    while not p.is_on_floor() and t_land < 4.0:
+        await get_tree().physics_frame
+        t_land += 1.0 / 60.0
+    await wait(0.1)
+    p.footstep.disconnect(count_air)
+    check("both feet plant on landing", not p.gait.airborne and air_steps[0] >= 2, "%d footfalls" % air_steps[0])
+    await wait(1.5)
+
     # free-look (hold Alt): camera moves, aim doesn't
     var aim_before := p.target_twist
     Input.action_press("freelook")

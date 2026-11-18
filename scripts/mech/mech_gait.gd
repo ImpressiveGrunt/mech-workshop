@@ -14,6 +14,8 @@ extends Node
 ##   over the stance leg, leans into acceleration and turns, and staggers from hits.
 ## * Turning on the spot re-steps; after stopping, the feet square up under the hips.
 ## * Heavily damaged legs limp: uneven timing, shorter lift, more sway.
+## * Airborne (thruster jump, falling): no stepping; the legs hang under the hips, knees slightly
+##   bent and feet trailing the motion. On landing both feet plant together with a heavy dip.
 ## Emits footstep(side, world_pos, strength) on every footfall.
 
 signal footstep(side: String, world_pos: Vector3, strength: float)
@@ -36,6 +38,8 @@ const FOOT_YAW_MAX := 0.6      # how far a planted foot may stay twisted relativ
 const SETTLE_DIST := 0.3       # re-step when a foot strays this far from home while moving / turning
 const IDLE_DELAY := 0.35       # after this long standing still, square the stance up again
 const IDLE_SETTLE := 0.04
+const AIR_DELAY := 0.12        # off the floor this long = airborne (ignores tiny bumps)
+const AIR_HANG := 0.35         # feet hang this far below their standing height (knees relax)
 
 var mech: Mech
 var pelvis: Node3D
@@ -54,6 +58,8 @@ var _kick := Vector2.ZERO
 var _last_fwd := 0.0
 var _idle_time := 0.0
 var _grounded_once := false
+var _air_time := 0.0
+var airborne := false
 
 
 func setup(owner_mech: Mech, legs_root: Node3D) -> bool:
@@ -106,6 +112,8 @@ func _physics_process(delta: float) -> void:
         for leg in legs:
             leg["planted"] = _ground(mech.to_global(leg["home"]), leg["ankle_h"])
             leg["yaw"] = mech.global_rotation.y
+    if _update_airborne(delta):
+        return
     var vel := mech.velocity
     vel.y = 0.0
     var speed := vel.length()
@@ -172,6 +180,45 @@ func _physics_process(delta: float) -> void:
             if stance_t > 0.8 and stepping and not squared:
                 pitch = (stance_t - 0.8) / 0.2 * 0.25 * (0.4 + 0.6 * _speed_f)   # heel lifts before toe-off
         _solve(leg, foot, pitch, yaw_off)
+
+
+## Returns true while airborne (legs posed here, no stepping).
+func _update_airborne(delta: float) -> bool:
+    if mech.is_on_floor():
+        _air_time = 0.0
+        if airborne:
+            _land()
+        return false
+    _air_time += delta
+    if _air_time < AIR_DELAY or not _grounded_once:
+        return false
+    airborne = true
+    _idle_time = 0.0
+    _apply_body(delta)
+    var drift := mech.velocity
+    drift.y = 0.0
+    var trail := mech.global_basis.inverse() * (-drift * 0.06)       # feet lag behind the motion
+    trail = Vector3(clampf(trail.x, -0.3, 0.3), 0.0, clampf(trail.z, -0.4, 0.4))
+    for leg in legs:
+        leg["swinging"] = false
+        var hang: Vector3 = leg["home"] + trail + Vector3(0, -AIR_HANG, 0.12)
+        var foot := mech.to_global(hang)
+        leg["planted"] = foot
+        leg["yaw"] = mech.global_rotation.y
+        _solve(leg, foot, -0.15, 0.0)
+    return true
+
+
+func _land() -> void:
+    airborne = false
+    var fall := clampf(-mech.velocity.y / 12.0, 0.4, 1.6)
+    _impact_vel -= IMPACT * 14.0 * fall                               # heavy two-footed landing
+    for leg in legs:
+        leg["planted"] = _ground(mech.to_global(leg["home"]), leg["ankle_h"])
+        leg["yaw"] = mech.global_rotation.y
+        leg["swinging"] = false
+        footstep.emit(leg["side"], leg["planted"], fall)
+    phase = 0.0
 
 
 func _apply_body(delta: float) -> void:

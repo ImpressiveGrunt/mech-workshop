@@ -2,8 +2,8 @@ class_name PlayerController
 extends Node
 ## Mech controls. Add as a child of a built Mech.
 ##   W/S throttle, A/D strafe; the mouse aims the torso and arms, and the legs turn to follow the aim
-##   (so they always face forward). LMB right-arm weapon, RMB left-arm weapon, Space boost,
-##   V first / third person, hold Left Alt to free-look (camera only, aim stays put), T next target.
+##   (so they always face forward). LMB left-arm weapon, RMB right-arm weapon, Space boost,
+##   V first / third person, hold Left Alt to free-look (camera only, aim stays put), MMB next target.
 ## You sit inside a Blender-built cockpit (mounted on cockpit_camera) and look
 ## out through its armoured glass. Dashboard screens show live status, radar
 ## and weapons; the glass cracks as the torso takes damage. The camera rides the
@@ -382,10 +382,10 @@ func _physics_process(_delta: float) -> void:
         targeting.cycle()
     if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
         return
-    if Input.is_action_pressed("fire_primary"):
-        _fire("weapon_R")
-    if Input.is_action_pressed("fire_secondary"):
+    if Input.is_action_pressed("fire_left"):
         _fire("weapon_L")
+    if Input.is_action_pressed("fire_right"):
+        _fire("weapon_R")
 
 
 func _fire(slot: String) -> void:

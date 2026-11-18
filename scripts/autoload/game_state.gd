@@ -251,11 +251,11 @@ func _setup_input() -> void:
     _bind_key("boost", KEY_SPACE)
     _bind_key("interact", KEY_E)
     _bind_key("center_torso", KEY_C)
-    _bind_key("target_cycle", KEY_T)
     _bind_key("reset_range", KEY_R)
     _bind_key("pause", KEY_ESCAPE)
-    _bind_mouse("fire_primary", MOUSE_BUTTON_LEFT)    # right-arm weapon
-    _bind_mouse("fire_secondary", MOUSE_BUTTON_RIGHT)  # left-arm weapon
+    _bind_mouse("fire_left", MOUSE_BUTTON_LEFT)      # left-arm weapon
+    _bind_mouse("fire_right", MOUSE_BUTTON_RIGHT)    # right-arm weapon
+    _bind_mouse("target_cycle", MOUSE_BUTTON_MIDDLE)
 
 
 func _bind_key(action: String, key: Key) -> void:
