@@ -207,7 +207,7 @@
   "part_id": "legs_biped",
   "price": 1200,
   "slot": "legs",
-  "speed": 8.0,
+  "speed": 6.0,
   "tier": "mk1",
   "turn_rate": 90
  },
