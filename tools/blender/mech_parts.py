@@ -120,7 +120,7 @@ def stripes(name, center, size, pal, parent, n=4, rot=(0, 0, 0)):
 def legs_biped(pal):
     t = pal["tier"]
     root = empty(f"legs_biped_{t}", props=meta("legs_biped", "legs", t, 9000, 420, 1200,
-                                                 speed=8.0, turn_rate=90, jump=0.0, load_capacity=22000))
+                                                 speed=6.0, turn_rate=90, jump=0.0, load_capacity=22000))
     pelvis = box("pelvis", (1.3, .9, .5), (0, 0, 2.25), pal["frame"], root, bevel=.06)
     box("armor_pelvis", (1.1, .14, .42), (0, -.5, 2.25), pal["paint"], pelvis, props=armor(60, t))
     box("pelvis_stripe", (1.12, .05, .08), (0, -.58, 2.36), pal["hazard"], pelvis, bevel=0)

@@ -99,6 +99,10 @@ func _run() -> void:
     check("player walks forward", spd > 3.0, "%.1f m/s" % spd)
     check("legs animate (hip IK moving)", absf(hip.rotation.x - hip_rot_before) > 0.02 or steps[0] > 0)
     check("footsteps fire", steps[0] >= 3, "%d steps" % steps[0])
+    var min_knee := 999.0
+    for leg in p.gait.legs:
+        min_knee = minf(min_knee, rad_to_deg(leg["knee"].rotation.x))
+    check("knees never hyperextend", min_knee > 0.0, "min knee %.0f deg" % min_knee)
     await wait(3.0)
     var offs := [p.gait._home_offset(p.gait.legs[0]), p.gait._home_offset(p.gait.legs[1])]
     check("idle: feet step back to a square forward stance", offs[0] < 0.06 and offs[1] < 0.06,

@@ -1,4 +1,4 @@
-MECH WORKSHOP - playtest build 0.4 (Godot 4.3)
+MECH WORKSHOP - playtest build 0.5 (Godot 4.3)
 ================================================
 
 HOW TO RUN
@@ -8,6 +8,12 @@ HOW TO RUN
             If macOS says it is damaged:  xattr -cr "Mech Workshop.app"
   Linux   : unzip, then  chmod +x MechWorkshop.x86_64 && ./MechWorkshop.x86_64
   Needs a GPU with Vulkan support.
+
+NEW IN 0.5
+  - Reworked leg movement: heavier, slower strides that the legs can actually reach (no more
+    knees snapping backwards or feet sliding), heel-off / heel-strike steps, a weight dip on
+    every footfall, planted feet no longer twist when turning, feet land on the ground at spawn,
+    damaged legs limp. Starter legs top speed is now 18 km/h.
 
 NEW IN 0.4
   - Testing grounds (Workshop > TEST GROUNDS): target dummies at 25-150 m that respawn, a
@@ -62,4 +68,4 @@ KNOWN LIMITS IN THIS BUILD
   - Progress saves automatically (Godot user data folder). Workshop > "New game" resets it.
 
 FEEDBACK WANTED
-  Aim weight (too slow / too fast?), cockpit roominess, walking feel, arena size, weapons.
+  Walking: stride length, cadence, top speed. Aim weight (too slow / too fast?), cockpit roominess, walking feel, arena size, weapons.

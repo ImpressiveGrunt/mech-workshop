@@ -48,7 +48,7 @@
       "price": 1200,
       "scene": "res://assets/models/mech/parts/legs_biped_mk1.glb",
       "slot": "legs",
-      "speed": 8.0,
+      "speed": 6.0,
       "tier": "mk1",
       "turn_rate": 90
     },

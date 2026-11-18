@@ -37,10 +37,12 @@ them, then 3-2-1, **FIGHT**. Destroy the enemy torso to win.
 
 ## Walking and cockpit
 
-- **Procedural gait** (`scripts/mech/mech_gait.gd`): feet plant and stay put; each leg is solved with
-  2-bone IK on the Blender hip/knee/ankle joints (pistons telescope with them). The body crouches, bobs
-  lowest at each footfall, sways over the stance leg, leans into acceleration and turns, and staggers when
-  hit. Turning on the spot makes the mech re-step. Turns wind up and down with inertia.
+- **Procedural gait** (`scripts/mech/mech_gait.gd`): stride length is capped by what the legs can reach at the
+  current crouch, so speed comes from cadence: slow heavy steps when walking, about 2.6 steps/s at full speed.
+  Planted feet keep their world position and heading (no sliding, no twisting). The swing peels off heel-first,
+  lifts early and lands heel-first. 2-bone IK on the Blender hip/knee/ankle joints never hyperextends, and the
+  pistons telescope with them. The body crouches with speed, dips on each footfall, sways and leans. Damaged legs
+  limp, turning on the spot re-steps, and stopping squares the feet up.
 - **Idle stance**: when the mech stops, its legs step back to a square forward stance (feet side by side
   under the hips).
 - **Holographic HUD + targeting** (`holo_hud.gd`, `targeting.gd`): a cyan hologram projected on the inside of
