@@ -419,9 +419,9 @@ def back_thruster(pal):
 
 
 # ------------------------------------------------------------------ cockpit interior (player view only)
-def _inverted_shell(name, x, y, z, m, parent):
-    """Closed cabin box with inward-facing walls and no front face (the window bulkhead closes it).
-    x, y, z are (min, max); forward is -Y, so the missing face is at y min."""
+def _inverted_shell(name, x, y, z, m, parent, keep_sides=True):
+    """Cabin box with inward-facing faces and no front face (the window bulkheads close it).
+    x, y, z are (min, max); forward is -Y. keep_sides=False also drops the side faces."""
     import bmesh as _bm, common as _c
     bm = _bm.new()
     _bm.ops.create_cube(bm, size=1.0)
@@ -430,7 +430,9 @@ def _inverted_shell(name, x, y, z, m, parent):
         v.co.y = y[0] if v.co.y < 0 else y[1]
         v.co.z = z[0] if v.co.z < 0 else z[1]
     _bm.ops.reverse_faces(bm, faces=bm.faces[:])
-    front = [f for f in bm.faces if all(abs(v.co.y - y[0]) < 1e-6 for v in f.verts)]
+    front = [f for f in bm.faces if all(abs(v.co.y - y[0]) < 1e-6 for v in f.verts)
+             or (not keep_sides and (all(abs(v.co.x - x[0]) < 1e-6 for v in f.verts)
+                                     or all(abs(v.co.x - x[1]) < 1e-6 for v in f.verts)))]
     _bm.ops.delete(bm, geom=front, context='FACES_ONLY')
     return _c._mesh(name, bm, m, (0, 0, 0), (0, 0, 0), parent, 0, 1, None)
 
@@ -465,16 +467,20 @@ def cockpit_interior(pal):
     V = Vector
 
     # --- closed cabin shell (inward faces) -------------------------------------------------------
-    X0, X1, Y0, Y1, Z0, Z1 = -.95, .95, -.95, .5, -.8, .7
-    _inverted_shell("cabin_shell", (X0, X1), (Y0, Y1), (Z0, Z1), shell_m, root)
-    multi_box("cabin_ribs", [((1.88, .06, .05), (0, y, Z1 - .03)) for y in (-.45, -.05, .3)]
-              + [((.05, .06, 1.48), (sx * (X1 - .03), y, -.05)) for sx in (-1, 1) for y in (-.5, -.1, .3)], panel, root)
+    X0, X1, Y0, Y1, Z0, Z1 = -1.06, 1.06, -.95, .5, -.8, .7
+    SIDE_Y = -.2                 # side walls start here; the angled side windows fill the corners ahead of it
+    _inverted_shell("cabin_shell", (X0, X1), (Y0, Y1), (Z0, Z1), shell_m, root, keep_sides=False)
+    for s_ in (-1, 1):
+        box(f"cabin_wall_{s_:+d}", (.05, Y1 - SIDE_Y + .02, Z1 - Z0), (s_ * (X1 - .02), (SIDE_Y + Y1) / 2, (Z0 + Z1) / 2),
+            shell_m, root, bevel=0)
+    multi_box("cabin_ribs", [((2.1, .06, .05), (0, y, Z1 - .03)) for y in (-.45, -.05, .3)]
+              + [((.05, .06, 1.48), (sx * (X1 - .07), y, -.05)) for sx in (-1, 1) for y in (-.05, .3)], panel, root)
 
     # --- wide armoured window in a tilted bulkhead ------------------------------------------------
     TILT = .25
-    C = V((0, -.66, .06))
+    C = V((0, -.66, .02))
     Rm = Euler((TILT, 0, 0)).to_matrix()
-    WW, WH = 1.16, .44
+    WW, WH = 1.16, .56             # taller: more ground ahead
 
     def F(lx, lz, ly=0.0):
         return tuple(C + Rm @ V((lx, ly, lz)))
@@ -484,7 +490,7 @@ def cockpit_interior(pal):
     box("window_frame_stripe", (WW + .14, .105, .02), F(0, WH / 2 + .07), pal["hazard"], root, rot=rot, bevel=0)
     for s_ in (-1, 1):
         box(f"window_frame_side_{s_:+d}", (.07, .1, WH + .15), F(s_ * (WW / 2 + .035), 0), panel, root, rot=rot, bevel=.012)
-        box(f"window_mullion_{s_:+d}", (.022, .07, WH), F(s_ * .2, 0, .01), dark, root, rot=rot, bevel=.004)
+        box(f"window_mullion_{s_:+d}", (.016, .06, WH), F(s_ * .2, 0, .01), dark, root, rot=rot, bevel=.003)
     bolt_rot = (TILT - PI / 2, 0, 0)
     bpts = [F(x, WH / 2 + .035, .052) for x in (-.5, -.3, -.1, .1, .3, .5)] + \
            [F(x, -WH / 2 - .04, .062) for x in (-.5, -.25, .25, .5)] + \
@@ -529,20 +535,46 @@ def cockpit_interior(pal):
 
     # bulkhead: fills the whole front of the shell except the window (extends past the shell edges)
     top_h, bot_h = 1.0, 1.0
-    box("bulkhead_top", (2.1, .05, top_h), F(0, WH / 2 + .07 + top_h / 2, .045), dark, root, rot=rot, bevel=0)
-    box("bulkhead_bottom", (2.1, .05, bot_h), F(0, -WH / 2 - .08 - bot_h / 2, .045), dark, root, rot=rot, bevel=0)
+    box("bulkhead_top", (WW + .16, .05, top_h), F(0, WH / 2 + .07 + top_h / 2, .045), dark, root, rot=rot, bevel=0)
+    box("bulkhead_bottom", (WW + .16, .05, bot_h), F(0, -WH / 2 - .08 - bot_h / 2, .045), dark, root, rot=rot, bevel=0)
+
+    # --- wraparound side windows: angled panes hinged at the main window's edges, sweeping back
+    #     toward the pilot for peripheral vision (pilot's left = +X) ---------------------------------
+    SW, YAW = .6, math.radians(50)
+    hinge_x = WW / 2 + .07
     for s_ in (-1, 1):
-        box(f"bulkhead_side_{s_:+d}", (.5, .05, WH + .3), F(s_ * (WW / 2 + .07 + .25), 0, .045), dark, root, rot=rot, bevel=0)
+        Hn = V(F(s_ * hinge_x, 0))
+        Rs = Euler((0, 0, s_ * YAW)).to_matrix() @ Euler((TILT * .6, 0, 0)).to_matrix()
+        srot = tuple((Euler((0, 0, s_ * YAW)).to_matrix() @ Euler((TILT * .6, 0, 0)).to_matrix()).to_euler())
+
+        def S(u, lz, ly=0.0, s_=s_, Hn=Hn, Rs=Rs):
+            return tuple(Hn + Rs @ V((s_ * u, ly, lz)))
+        sh = WH + .02
+        box(f"side_glass_inner_{s_:+d}", (SW - .08, .012, sh), S(SW / 2, 0, .025), glass_in, root, rot=srot, bevel=0)
+        box(f"side_glass_outer_{s_:+d}", (SW - .08, .012, sh), S(SW / 2, 0, -.025), glass_out, root, rot=srot, bevel=0)
+        multi_box(f"side_glass_edges_{s_:+d}", [((SW - .08, .05, .006), S(SW / 2, z), srot) for z in (-sh / 2, sh / 2)],
+                  glass_edge, root)
+        box(f"side_frame_top_{s_:+d}", (SW, .1, .07), S(SW / 2, sh / 2 + .035), panel, root, rot=srot, bevel=.01)
+        box(f"side_frame_bottom_{s_:+d}", (SW, .12, .08), S(SW / 2, -sh / 2 - .04), panel, root, rot=srot, bevel=.01)
+        box(f"side_frame_outer_{s_:+d}", (.07, .1, sh + .15), S(SW - .035, 0), panel, root, rot=srot, bevel=.01)
+        multi_cyl(f"side_frame_bolts_{s_:+d}", [(.01, .012, S(u, z, .052), (srot[0] - PI / 2, srot[1], srot[2]))
+                                                 for u in (.12, .3, .48) for z in (sh / 2 + .035, -sh / 2 - .04)], metal, root, segs=6)
+        box(f"side_bulkhead_top_{s_:+d}", (SW + .1, .05, 1.0), S(SW / 2, sh / 2 + .57, .045), dark, root, rot=srot, bevel=0)
+        box(f"side_bulkhead_bottom_{s_:+d}", (SW + .1, .05, 1.0), S(SW / 2, -sh / 2 - .58, .045), dark, root, rot=srot, bevel=0)
+        box(f"side_bulkhead_outer_{s_:+d}", (.16, .05, 2.2), S(SW + .03, 0, .045), dark, root, rot=srot, bevel=0)
+        # corner post where the side pane meets the main window (covers the seam, top to bottom)
+        box(f"window_corner_post_{s_:+d}", (.1, .14, 2.4), tuple(Hn + V((0, .02, 0))), dark, root, rot=rot, bevel=.01)
+        box(f"window_corner_trim_{s_:+d}", (.07, .145, WH + .1), tuple(Hn + V((0, .025, 0))), panel, root, rot=rot, bevel=.01)
 
     # --- overhead screen bank (small, high, out of the sightline) ---------------------------------
-    bank = V((0, -.56, .36))
+    bank = V((0, -.52, .36))       # above the taller window, ~35 deg up: inside the top of the 86 deg view
     bn = (V((0, 0, 0)) - bank).normalized()
     bq = tuple(bn.to_track_quat('-Y', 'Z').to_euler())
     box("screen_bank_housing", (.86, .06, .15), tuple(bank - bn * .03), dark, root, rot=bq, bevel=.012)
     box("screen_bank_trim", (.88, .065, .018), tuple(bank - bn * .03 + V((0, 0, -.082))), pal["trim"], root, rot=bq, bevel=.005)
     multi_box("screen_bank_hangers", [((.03, .03, Z1 - bank.z), (x, bank.y - .04, (Z1 + bank.z) / 2)) for x in (-.33, 0, .33)],
               metal, root)
-    for name, x, w, h in (("screen_status", .3, .17, .1), ("screen_radar", 0, .23, .11), ("screen_weapons", -.3, .17, .1)):
+    for name, x, w, h in (("screen_status", .3, .17, .095), ("screen_radar", 0, .23, .105), ("screen_weapons", -.3, .17, .095)):
         pos = V((x, bank.y + abs(x) * .15, bank.z))
         nrm = (V((0, 0, 0)) - pos).normalized()
         r = tuple(nrm.to_track_quat('-Y', 'Z').to_euler())
@@ -552,7 +584,7 @@ def cockpit_interior(pal):
 
     # --- centre dashboard: switch panel, low in the view -----------------------------------------
     SL = -.55
-    Cd = V((0, -.5, -.31))
+    Cd = V((0, -.5, -.37))         # below the taller window
     Rd = Euler((SL, 0, 0)).to_matrix()
     n = Rd @ V((0, 0, 1))
 
@@ -635,19 +667,19 @@ def cockpit_interior(pal):
 
     # --- side walls: pipes, cables, rivets, fan, extinguisher, grab handle ------------------------
     for s_ in (-1, 1):
-        x = (X1 - .05) * s_
-        multi_cyl(f"wall_pipes_{s_:+d}", [(.02, 1.3, (x, -.25, z), (PI / 2, 0, 0)) for z in (.45, .39)], copper, root, segs=8)
-        cable(f"wall_cables_{s_:+d}", [(x, .3, -.2), (x - .01 * s_, -.1, -.26), (x, -.6, -.15)], pal, root, r=.014)
-        bolts(f"wall_rivets_{s_:+d}", [(x + .02 * s_, y, z) for y in (.25, -.15, -.55) for z in (-.5, .55)], pal, root,
+        x = (X1 - .07) * s_
+        multi_cyl(f"wall_pipes_{s_:+d}", [(.02, .66, (x, .15, z), (PI / 2, 0, 0)) for z in (.5, .44)], copper, root, segs=8)
+        cable(f"wall_cables_{s_:+d}", [(x, .45, -.2), (x - .01 * s_, .15, -.26), (x, -.15, -.18)], pal, root, r=.014)
+        bolts(f"wall_rivets_{s_:+d}", [(x + .02 * s_, y, z) for y in (.4, .1, -.12) for z in (-.5, .55)], pal, root,
               axis=X_AXIS, r=.012)
-        box(f"wall_panel_{s_:+d}", (.03, .5, .35), (x, -.3, .05), panel, root, bevel=.008)
-        box(f"wall_label_plate_{s_:+d}", (.01, .14, .05), (x - .02 * s_, -.3, .26), pal["decal"], root, bevel=0)
-    cyl("wall_fan", .08, .03, (X1 - .07, -.05, -.05), dark, root, rot=X_AXIS, segs=16)
-    multi_box("wall_fan_grille", [((.01, .15, .012), (X1 - .085, -.05, -.05 + dz)) for dz in (-.05, -.025, 0, .025, .05)], metal, root)
-    cyl("extinguisher", .045, .3, (X0 + .1, .1, -.3), red, root, segs=12)
-    cyl("extinguisher_head", .028, .06, (X0 + .1, .1, -.12), metal, root, segs=8)
-    multi_box("extinguisher_bracket", [((.02, .11, .02), (X0 + .055, .1, z)) for z in (-.4, -.2)], metal, root)
-    seg("grab_handle", (X1 - .08, .15, .45), (X1 - .08, -.35, .5), .025, .025, metal, root, bevel=0)
+        box(f"wall_panel_{s_:+d}", (.03, .4, .35), (x, .15, .05), panel, root, bevel=.008)
+        box(f"wall_label_plate_{s_:+d}", (.01, .14, .05), (x - .02 * s_, .15, .26), pal["decal"], root, bevel=0)
+    cyl("wall_fan", .08, .03, (X1 - .09, .32, -.05), dark, root, rot=X_AXIS, segs=16)
+    multi_box("wall_fan_grille", [((.01, .15, .012), (X1 - .105, .32, -.05 + dz)) for dz in (-.05, -.025, 0, .025, .05)], metal, root)
+    cyl("extinguisher", .045, .3, (X0 + .12, .2, -.3), red, root, segs=12)
+    cyl("extinguisher_head", .028, .06, (X0 + .12, .2, -.12), metal, root, segs=8)
+    multi_box("extinguisher_bracket", [((.02, .11, .02), (X0 + .075, .2, z)) for z in (-.4, -.2)], metal, root)
+    seg("grab_handle", (X1 - .1, .4, .45), (X1 - .1, -.1, .5), .025, .025, metal, root, bevel=0)
 
     # --- ceiling: overhead switch panel, dome light, cabin light ---------------------------------
     box("overhead_panel", (.5, .26, .03), (0, -.1, Z1 - .035), panel, root, bevel=.008)

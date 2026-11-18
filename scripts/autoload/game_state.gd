@@ -15,6 +15,7 @@ const SCENES := {
     "workshop": "res://scenes/workshop/workshop.tscn",
     "arena": "res://scenes/arena/arena.tscn",
     "salvage_yard": "res://scenes/salvage_yard/salvage_yard.tscn",
+    "testing_grounds": "res://scenes/testing_grounds/testing_grounds.tscn",
 }
 const SLOTS := ["legs", "torso", "arm_L", "arm_R", "weapon_L", "weapon_R", "back"]
 const STARTING_LOADOUT := {
@@ -249,6 +250,7 @@ func _setup_input() -> void:
     _bind_key("interact", KEY_E)
     _bind_key("center_torso", KEY_C)
     _bind_key("target_cycle", KEY_T)
+    _bind_key("reset_range", KEY_R)
     _bind_key("pause", KEY_ESCAPE)
     _bind_mouse("fire_primary", MOUSE_BUTTON_LEFT)    # right-arm weapon
     _bind_mouse("fire_secondary", MOUSE_BUTTON_RIGHT)  # left-arm weapon

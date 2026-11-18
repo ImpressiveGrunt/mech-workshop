@@ -1,4 +1,4 @@
-MECH WORKSHOP - playtest build 0.3 (Godot 4.3)
+MECH WORKSHOP - playtest build 0.4 (Godot 4.3)
 ================================================
 
 HOW TO RUN
@@ -8,6 +8,13 @@ HOW TO RUN
             If macOS says it is damaged:  xattr -cr "Mech Workshop.app"
   Linux   : unzip, then  chmod +x MechWorkshop.x86_64 && ./MechWorkshop.x86_64
   Needs a GPU with Vulkan support.
+
+NEW IN 0.4
+  - Testing grounds (Workshop > TEST GROUNDS): target dummies at 25-150 m that respawn, a
+    patrolling dummy, ramps, 2/4/6 m jump blocks, slalom, crates and barrels.
+    R = reset everything (repair, ammo, dummies). Damage here doesn't count. EXIT pad + E to leave.
+  - Cockpit visibility: wraparound side windows for peripheral vision, taller main window,
+    wider 86 deg view, screens moved up out of the way.
 
 NEW IN 0.3
   - Holographic HUD on the armoured glass with a targeting system: target brackets, range,
@@ -23,6 +30,7 @@ NEW IN 0.2
 
 THE LOOP
   Workshop -> Arena (fight for money) or Salvage Yard (scrap + parts) -> back to the Workshop.
+  Test Grounds: practise with no consequences.
 
 WORKSHOP (mouse)
   Upgrades / Repairs / Paint tabs on the right; click any part of the mech to upgrade it.
@@ -38,6 +46,7 @@ IN THE MECH (first person)
   Space        jump thruster
   C            re-centre torso
   T            cycle target
+  R            reset the testing grounds
   E            interact (salvage yard: search / sell / exit)
   Esc          release / capture the mouse
 

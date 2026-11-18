@@ -76,10 +76,10 @@ for tier in TIERS:
         box(f"preview_block_{i}", (6.0, 2.4, 2.6), (x, y, 1.3), mat(f"preview_block_{i}", ["#2F5D8C", "#B33A2E", "#3E7A4E"][i], .3, .6),
             rot=(0, 0, r))
     render_preview(f"mech_{tier}_cockpit_view", tuple(eye), tuple(eye + Vector((0, -10, -.25))),
-                   lens=20.25 / (2 * math.tan(math.radians(40))), sun=0)   # = Godot fov 80 (vertical)
+                   lens=20.25 / (2 * math.tan(math.radians(43))), sun=0)   # = Godot fov 86 (vertical)
     # looking down (aim pitch about -30 deg): gloved hands on the sticks and the pilot's arms
     render_preview(f"mech_{tier}_cockpit_hands", tuple(eye), tuple(eye + Vector((0, -10, -5.8))),
-                   lens=20.25 / (2 * math.tan(math.radians(40))), sun=0)
+                   lens=20.25 / (2 * math.tan(math.radians(43))), sun=0)
     render_preview(f"mech_{tier}_cockpit_detail", tuple(eye + Vector((.08, .1, .02))), tuple(eye + Vector((-.15, -1, -.35))),
                    lens=16, sun=0)
 

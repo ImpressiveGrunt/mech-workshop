@@ -246,7 +246,7 @@ func _build_ui() -> void:
     pv.add_child(HSeparator.new())
     var deploy := HBoxContainer.new()
     pv.add_child(deploy)
-    for pair in [["ENTER ARENA", "arena"], ["SALVAGE YARD", "salvage_yard"]]:
+    for pair in [["ENTER ARENA", "arena"], ["SALVAGE YARD", "salvage_yard"], ["TEST GROUNDS", "testing_grounds"]]:
         var b := _button(pair[0], GameState.go_to.bind(pair[1]))
         b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
         b.custom_minimum_size.y = 52

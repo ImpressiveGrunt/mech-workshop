@@ -56,6 +56,9 @@ func _run() -> void:
     p.target_pitch = -0.5
     await wait(1.5)
     await shot("06_cockpit_hands")
+    get_tree().change_scene_to_file("res://scenes/testing_grounds/testing_grounds.tscn")
+    await wait(3.0)
+    await shot("09_testing_grounds")
     get_tree().change_scene_to_file("res://scenes/salvage_yard/salvage_yard.tscn")
     await wait(2.5)
     await shot("07_salvage_yard")

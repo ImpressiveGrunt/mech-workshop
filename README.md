@@ -59,7 +59,8 @@ them, then 3-2-1, **FIGHT**. Destroy the enemy torso to win.
   consoles sit in the bottom corners of the view, gripped by the pilot's gloved hands (thumb on the hat
   switch, finger on the trigger). The left stick tilts with W/S/A/D and the right with your aim, and the
   hands move with them. Around you: piped side walls and an overhead panel. The glass cracks at
-  75 / 50 / 25 % torso integrity.
+  75 / 50 / 25 % torso integrity. Wraparound glass: angled side windows either side of the main pane give
+  peripheral vision (86 deg view).
 
 ## Controls (in the mech)
 
@@ -137,6 +138,7 @@ tools/blender/build_all.sh               # or SKIP_RENDER=1 for models only
 |---|---|
 | Starter mech Mk1: legs, torso, two arms, autocannon, ram fist, missile pod, jump thruster | ✅ |
 | Workshop: mech dock bay sized to the mech (clamps, repair arms, turntable, boarding gangway, crew, forklift) | ✅ |
+| Testing grounds: firing lanes with distance markers and respawning dummies, patrol dummy, ramps, 2/4/6 m jump blocks, slalom, crates/barrels, tower | ✅ |
 | Human-scale props: workers (4 poses), forklift, traffic cones (`props.py`) | ✅ |
 | Salvage yard environment | blockout only |
 | Arena: 116 m night colosseum: raised decks, three rings of cover, stands with crowd, blast walls + glass, gates A/B with tunnels, floodlight towers, jumbotron, symmetric cover, wrecked mechs, destructible crates, explosive barrels | ✅ |

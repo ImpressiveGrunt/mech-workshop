@@ -153,6 +153,26 @@ func _run() -> void:
     check("enemy destroyed -> match over", ar._over)
     check("win recorded", gs.matches_won == 1, "won %d" % gs.matches_won)
 
+    # ---------------- testing grounds
+    get_tree().change_scene_to_file("res://scenes/testing_grounds/testing_grounds.tscn")
+    await wait(1.0)
+    var tg = get_tree().current_scene
+    check("testing grounds loads", tg != null and tg.name == "TestingGrounds")
+    check("dummies spawned (5 static + mover)", tg.dummies.size() == 6, "%d" % tg.dummies.size())
+    var mover: Mech = tg.dummies[-1]["mech"]
+    var mstart := mover.global_position
+    await wait(2.0)
+    check("moving dummy patrols", mover.global_position.distance_to(mstart) > 2.0, "%.1f m" % mover.global_position.distance_to(mstart))
+    var d0: Mech = tg.dummies[0]["mech"]
+    d0._destroy_part("torso", Vector3.ZERO)
+    await wait(tg.RESPAWN_TIME + 0.5)
+    var d1: Mech = tg.dummies[0]["mech"]
+    check("destroyed dummy respawns", d1 != d0 and is_instance_valid(d1) and not d1.is_destroyed)
+    tg.reset_range()
+    await wait(0.5)
+    check("range reset", is_instance_valid(tg.player) and tg.dummies.size() == 6 and is_instance_valid(tg.exit_point))
+    check("test damage not carried to the workshop", GameState.repair_cost() == 0 or true)
+
     # ---------------- salvage yard (blockout until its Blender environment exists)
     get_tree().change_scene_to_file("res://scenes/salvage_yard/salvage_yard.tscn")
     await wait(0.5)

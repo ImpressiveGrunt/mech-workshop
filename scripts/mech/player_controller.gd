@@ -38,7 +38,7 @@ var _last_aim := Vector2.ZERO
 func _ready() -> void:
     mech = get_parent() as Mech
     camera = Camera3D.new()
-    camera.fov = 80.0
+    camera.fov = 86.0   # wide view for the wraparound glass
     camera.near = 0.02
     camera.far = 2000.0
     var anchor: Node3D = mech.cockpit_anchor if mech.cockpit_anchor else mech
