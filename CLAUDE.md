@@ -23,4 +23,7 @@
 - Godot 4.3 drops glTF node extras: every Blender export also writes `<file>.glb.extras.json`, and the game
   re-attaches it (`LevelUtils.apply_extras` / `instance_scene`). Always load models through those helpers.
 - Smoke test (run after changes): `godot --headless --path . res://tests/smoke_test.tscn` -> `SMOKE TEST: PASSED`.
+- Playtest builds: the user only wants the **Windows** zip. Export just the "Windows" preset
+  (`godot --headless --path . --export-release "Windows" build/windows/MechWorkshop.exe`), zip it with
+  `docs/PLAYTEST.txt` as `build/MechWorkshop-playtest-<version>-windows.zip`, and send only that file.
 - Quick draft renders: `PREVIEW_SCALE=0.4 blender -b ... --python tools/blender/build_X.py`.
