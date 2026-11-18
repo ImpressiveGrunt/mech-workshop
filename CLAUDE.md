@@ -26,4 +26,7 @@
 - Playtest builds: the user only wants the **Windows** zip. Export just the "Windows" preset
   (`godot --headless --path . --export-release "Windows" build/windows/MechWorkshop.exe`), zip it with
   `docs/PLAYTEST.txt` as `build/MechWorkshop-playtest-<version>-windows.zip`, and send only that file.
+- **All sounds are synthesized** by `tools/audio/build_sounds.py` (numpy + scipy) into `assets/audio/` with the
+  manifest `data/sounds.json` (generated; don't hand-edit). Play them through the `Audio` autoload
+  (`play` 3D one-shot, `play_2d`, `loop`, `loop_2d`, `set_level`). Variants are `name_1.._3`, called by base name.
 - Quick draft renders: `PREVIEW_SCALE=0.4 blender -b ... --python tools/blender/build_X.py`.

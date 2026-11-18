@@ -1,4 +1,4 @@
-MECH WORKSHOP - playtest build 0.7 (Godot 4.3)
+MECH WORKSHOP - playtest build 0.8 (Godot 4.3)
 ================================================
 
 HOW TO RUN
@@ -8,6 +8,12 @@ HOW TO RUN
             If macOS says it is damaged:  xattr -cr "Mech Workshop.app"
   Linux   : unzip, then  chmod +x MechWorkshop.x86_64 && ./MechWorkshop.x86_64
   Needs a GPU with Vulkan support.
+
+NEW IN 0.8
+  - SOUND: 40 synthesized effects: heavy footsteps and landings, servo whine, thruster roar,
+    reactor hum, autocannon / missiles / ram fist, metal impacts, armour tearing off, explosions,
+    gate motors and slams, crowd and cheers, countdown + horn, lock-on tones, damage warning,
+    workshop ambience and welding, wind, UI clicks and purchase chimes.
 
 NEW IN 0.7
   - Mouse buttons match the arms: LEFT click = left-arm weapon, RIGHT click = right-arm weapon.
@@ -74,10 +80,10 @@ ARENA
   Damage carries back to the workshop for repair.
 
 KNOWN LIMITS IN THIS BUILD
-  - No sound or music yet.
+  - No music yet (sound effects only).
   - Salvage yard is a placeholder blockout (its Blender environment is next).
   - One AI opponent with basic behaviour.
   - Progress saves automatically (Godot user data folder). Workshop > "New game" resets it.
 
 FEEDBACK WANTED
-  Walking: stride length, cadence, top speed. Aim weight (too slow / too fast?), cockpit roominess, walking feel, arena size, weapons.
+  Sound: anything too loud / quiet / annoying? Walking: stride length, cadence, top speed. Aim weight (too slow / too fast?), cockpit roominess, walking feel, arena size, weapons.

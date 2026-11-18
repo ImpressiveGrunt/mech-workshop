@@ -1,0 +1,285 @@
+{
+ "generated_by": "tools/audio/build_sounds.py",
+ "sounds": {
+  "armor_break": {
+   "bus": "SFX",
+   "length": 1.961,
+   "loop": false,
+   "range": 140,
+   "volume_db": -2
+  },
+  "autocannon_1": {
+   "bus": "SFX",
+   "length": 1.493,
+   "loop": false,
+   "range": 220,
+   "volume_db": -2
+  },
+  "autocannon_2": {
+   "bus": "SFX",
+   "length": 1.523,
+   "loop": false,
+   "range": 220,
+   "volume_db": -2
+  },
+  "autocannon_3": {
+   "bus": "SFX",
+   "length": 1.47,
+   "loop": false,
+   "range": 220,
+   "volume_db": -2
+  },
+  "countdown_beep": {
+   "bus": "UI",
+   "length": 0.16,
+   "loop": false,
+   "range": 80.0,
+   "volume_db": -6
+  },
+  "crate_break": {
+   "bus": "SFX",
+   "length": 0.898,
+   "loop": false,
+   "range": 100,
+   "volume_db": -3
+  },
+  "crowd_cheer": {
+   "bus": "Ambience",
+   "length": 5.801,
+   "loop": false,
+   "range": 80.0,
+   "volume_db": -6
+  },
+  "crowd_loop": {
+   "bus": "Ambience",
+   "length": 8.0,
+   "loop": true,
+   "range": 80.0,
+   "volume_db": -14
+  },
+  "explosion_large": {
+   "bus": "SFX",
+   "length": 6.853,
+   "loop": false,
+   "range": 320,
+   "volume_db": 0
+  },
+  "explosion_small": {
+   "bus": "SFX",
+   "length": 4.044,
+   "loop": false,
+   "range": 250,
+   "volume_db": 0
+  },
+  "fight_horn": {
+   "bus": "UI",
+   "length": 3.75,
+   "loop": false,
+   "range": 80.0,
+   "volume_db": -3
+  },
+  "footstep_1": {
+   "bus": "SFX",
+   "length": 1.304,
+   "loop": false,
+   "range": 110,
+   "volume_db": -2
+  },
+  "footstep_2": {
+   "bus": "SFX",
+   "length": 1.299,
+   "loop": false,
+   "range": 110,
+   "volume_db": -2
+  },
+  "footstep_3": {
+   "bus": "SFX",
+   "length": 1.248,
+   "loop": false,
+   "range": 110,
+   "volume_db": -2
+  },
+  "gate_motor_loop": {
+   "bus": "SFX",
+   "length": 2.6,
+   "loop": true,
+   "range": 120,
+   "volume_db": -4
+  },
+  "gate_slam": {
+   "bus": "SFX",
+   "length": 4.633,
+   "loop": false,
+   "range": 260,
+   "volume_db": 0
+  },
+  "impact_ground": {
+   "bus": "SFX",
+   "length": 0.945,
+   "loop": false,
+   "range": 90,
+   "volume_db": -6
+  },
+  "impact_metal_1": {
+   "bus": "SFX",
+   "length": 1.361,
+   "loop": false,
+   "range": 120,
+   "volume_db": -4
+  },
+  "impact_metal_2": {
+   "bus": "SFX",
+   "length": 1.457,
+   "loop": false,
+   "range": 120,
+   "volume_db": -4
+  },
+  "impact_metal_3": {
+   "bus": "SFX",
+   "length": 1.387,
+   "loop": false,
+   "range": 120,
+   "volume_db": -4
+  },
+  "land_heavy": {
+   "bus": "SFX",
+   "length": 2.329,
+   "loop": false,
+   "range": 140,
+   "volume_db": 0
+  },
+  "lock_tick": {
+   "bus": "UI",
+   "length": 0.045,
+   "loop": false,
+   "range": 80.0,
+   "volume_db": -12
+  },
+  "lock_tone_loop": {
+   "bus": "UI",
+   "length": 0.4,
+   "loop": true,
+   "range": 80.0,
+   "volume_db": -14
+  },
+  "missile_launch": {
+   "bus": "SFX",
+   "length": 2.692,
+   "loop": false,
+   "range": 200,
+   "volume_db": -2
+  },
+  "ram_fist": {
+   "bus": "SFX",
+   "length": 1.929,
+   "loop": false,
+   "range": 120,
+   "volume_db": -1
+  },
+  "reactor_hum_loop": {
+   "bus": "SFX",
+   "length": 3.5,
+   "loop": true,
+   "range": 25,
+   "volume_db": -16
+  },
+  "salvage_search": {
+   "bus": "SFX",
+   "length": 2.272,
+   "loop": false,
+   "range": 50,
+   "volume_db": -4
+  },
+  "servo_loop": {
+   "bus": "SFX",
+   "length": 1.7,
+   "loop": true,
+   "range": 40,
+   "volume_db": -10
+  },
+  "target_switch": {
+   "bus": "UI",
+   "length": 0.14,
+   "loop": false,
+   "range": 80.0,
+   "volume_db": -10
+  },
+  "thruster_loop": {
+   "bus": "SFX",
+   "length": 2.6,
+   "loop": true,
+   "range": 150,
+   "volume_db": -3
+  },
+  "thruster_start": {
+   "bus": "SFX",
+   "length": 1.786,
+   "loop": false,
+   "range": 150,
+   "volume_db": -2
+  },
+  "ui_click": {
+   "bus": "UI",
+   "length": 0.05,
+   "loop": false,
+   "range": 80.0,
+   "volume_db": -8
+  },
+  "ui_confirm": {
+   "bus": "UI",
+   "length": 0.26,
+   "loop": false,
+   "range": 80.0,
+   "volume_db": -8
+  },
+  "ui_error": {
+   "bus": "UI",
+   "length": 0.26,
+   "loop": false,
+   "range": 80.0,
+   "volume_db": -12
+  },
+  "ui_hover": {
+   "bus": "UI",
+   "length": 0.03,
+   "loop": false,
+   "range": 80.0,
+   "volume_db": -18
+  },
+  "ui_purchase": {
+   "bus": "UI",
+   "length": 1.772,
+   "loop": false,
+   "range": 80.0,
+   "volume_db": -6
+  },
+  "warning_beep": {
+   "bus": "UI",
+   "length": 0.32,
+   "loop": false,
+   "range": 80.0,
+   "volume_db": -10
+  },
+  "weld_loop": {
+   "bus": "SFX",
+   "length": 3.0,
+   "loop": true,
+   "range": 30,
+   "volume_db": -14
+  },
+  "wind_loop": {
+   "bus": "Ambience",
+   "length": 8.0,
+   "loop": true,
+   "range": 80.0,
+   "volume_db": -16
+  },
+  "workshop_ambience_loop": {
+   "bus": "Ambience",
+   "length": 10.0,
+   "loop": true,
+   "range": 80.0,
+   "volume_db": -12
+  }
+ }
+}

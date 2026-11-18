@@ -48,6 +48,11 @@ var _paint_cache: Dictionary = {}
 var _highlight_mat: StandardMaterial3D
 var gait: MechGait
 var current_paint: Dictionary = {}
+var _snd_servo: AudioStreamPlayer3D
+var _snd_thruster: AudioStreamPlayer3D
+var _snd_hum: AudioStreamPlayer3D
+var _thrust_level := 0.0
+var _was_boosting := false
 var yaw_velocity := 0.0   # rad/s, eased so heavy mechs wind up and wind down their turns
 var is_destroyed := false
 
@@ -100,6 +105,7 @@ func build(new_loadout: Dictionary, carried_damage: Dictionary = {}, paint: Dict
     add_child(gait)
     if gait.setup(self, legs):
         gait.footstep.connect(_on_gait_footstep)
+        gait.landed.connect(_on_gait_landed)
     else:
         gait.queue_free()
         gait = null
@@ -122,6 +128,7 @@ func build(new_loadout: Dictionary, carried_damage: Dictionary = {}, paint: Dict
                 weapons[wslot] = w
         _spawn("back", _find(torso, "socket_back"))
     _compute_stats()
+    _setup_sounds()
     for slot in carried_damage:
         if part_hp.has(slot):
             part_hp[slot] = maxf(1.0, part_hp[slot] - float(carried_damage[slot]))
@@ -230,6 +237,7 @@ func _physics_process(delta: float) -> void:
     move_and_slide()
     if not is_destroyed:
         _slew_aim(delta)
+    _update_sounds(delta)
     if torso_pivot:
         torso_pivot.rotation.y = torso_twist
     for s in shoulders:
@@ -254,6 +262,7 @@ func take_hit(slot: String, amount: float, at: Vector3, push: Vector3 = Vector3.
         else:
             dmg = -plate["hp"] * 0.5
             plates.erase(plate)
+            Audio.play("armor_break", plate["node"].global_position)
             _detach(plate["node"], push)
     if dmg > 0.0:
         part_hp[slot] = maxf(0.0, part_hp[slot] - dmg)
@@ -285,7 +294,43 @@ func target_aim_direction() -> Vector3:
 
 
 func _on_gait_footstep(_side: String, world_pos: Vector3, strength: float) -> void:
-    footstep.emit(self, world_pos, strength * clampf(mass_kg / 25000.0, 0.5, 2.0))
+    var s := strength * clampf(mass_kg / 25000.0, 0.5, 2.0)
+    footstep.emit(self, world_pos, s)
+    Audio.play("footstep", world_pos, linear_to_db(clampf(s, 0.25, 1.4)), clampf(1.15 - s * 0.15, 0.85, 1.1))
+
+
+func _on_gait_landed(world_pos: Vector3, strength: float) -> void:
+    Audio.play("land_heavy", world_pos, linear_to_db(clampf(strength, 0.4, 1.5)))
+
+
+func _setup_sounds() -> void:
+    if torso_pivot:
+        _snd_servo = Audio.loop("servo_loop", torso_pivot)
+        _snd_hum = Audio.loop("reactor_hum_loop", torso_pivot)
+        Audio.set_level(_snd_servo, 0.0)
+    var back: Node3D = part_nodes.get("back")
+    if back:
+        _snd_thruster = Audio.loop("thruster_loop", back)
+        Audio.set_level(_snd_thruster, 0.0)
+
+
+func _update_sounds(delta: float) -> void:
+    if is_destroyed:
+        for p in [_snd_servo, _snd_thruster, _snd_hum]:
+            Audio.set_level(p, 0.0)
+        return
+    # torso / arm servos whine with how hard they are slewing (and the legs turning)
+    var effort := clampf((absf(_twist_vel) + absf(_pitch_vel) + absf(yaw_velocity) * 0.6) / 1.2, 0.0, 1.0)
+    Audio.set_level(_snd_servo, effort)
+    if _snd_servo:
+        _snd_servo.pitch_scale = 0.8 + 0.5 * effort
+    # jump thruster: ignition burst on the rising edge, roar while it burns
+    var burning := boosting and fuel > 0.0 and boost_force > 0.0
+    if burning and not _was_boosting and part_nodes.has("back"):
+        Audio.play("thruster_start", part_nodes["back"].global_position)
+    _was_boosting = burning
+    _thrust_level = move_toward(_thrust_level, 1.0 if burning else 0.0, delta * (6.0 if burning else 3.0))
+    Audio.set_level(_snd_thruster, _thrust_level)
 
 
 func _nearest_plate(slot: String, at: Vector3) -> Dictionary:
@@ -303,6 +348,9 @@ func _nearest_plate(slot: String, at: Vector3) -> Dictionary:
 
 func _destroy_part(slot: String, push: Vector3) -> void:
     part_destroyed.emit(self, slot)
+    var node: Node3D = part_nodes.get(slot)
+    if slot != "torso":
+        Audio.play("explosion_small", node.global_position if node and is_instance_valid(node) else global_position + Vector3.UP * 3.0)
     match slot:
         "torso":
             _explode(push)
@@ -322,6 +370,7 @@ func _destroy_part(slot: String, push: Vector3) -> void:
 
 
 func _explode(push: Vector3) -> void:
+    Audio.play("explosion_large", global_position + Vector3.UP * 3.0)
     is_destroyed = true
     weapons.clear()
     for slot in ["weapon_L", "weapon_R", "arm_L", "arm_R", "back"]:

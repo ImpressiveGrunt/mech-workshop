@@ -25,6 +25,7 @@ func _ready() -> void:
         spots.append(n)
         _add_beacon(n)
     sell_point = LevelUtils.find_marker(root, "sell_point")
+    Audio.loop_2d("wind_loop")
     exit_point = LevelUtils.find_marker(root, "exit_to_workshop")
     var spawn := LevelUtils.find_marker(root, "mech_spawn")
 
@@ -73,6 +74,7 @@ func _interact(it: Dictionary) -> void:
         "search":
             _busy = true
             hud.set_prompt("Searching...")
+            Audio.play("salvage_search", (it["node"] as Node3D).global_position)
             await get_tree().create_timer(1.5).timeout
             var spot: Node3D = it["node"]
             spots.erase(spot)
@@ -82,8 +84,10 @@ func _interact(it: Dictionary) -> void:
         "sell":
             if GameState.scrap_kg == 0:
                 hud.show_message("Nothing to sell", 2.0)
+                Audio.play_2d("ui_error")
             else:
                 hud.show_message("Sold scrap for $%d" % GameState.sell_scrap(), 3.0)
+                Audio.play_2d("ui_purchase")
         "exit":
             Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
             GameState.go_to("workshop")
@@ -97,6 +101,7 @@ func _roll_loot() -> String:
         var id: String = PartDB.sorted_ids().pick_random()
         GameState.add_part(id)
         msg += "   FOUND PART: %s" % PartDB.display_name(id)
+        Audio.play_2d("ui_confirm")
     return msg
 
 

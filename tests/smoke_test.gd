@@ -38,6 +38,8 @@ func _run() -> void:
     check("LMB = left arm, RMB = right arm, MMB = next target",
         btn.call("fire_left") == MOUSE_BUTTON_LEFT and btn.call("fire_right") == MOUSE_BUTTON_RIGHT
         and btn.call("target_cycle") == MOUSE_BUTTON_MIDDLE)
+    check("all synthesized sounds loaded", Audio.streams.size() == Audio.info.size() and Audio.streams.size() >= 40,
+        "%d / %d" % [Audio.streams.size(), Audio.info.size()])
     check("PartDB loaded parts", db.parts.size() >= 8, "%d parts" % db.parts.size())
     gs.new_game()
 
@@ -231,11 +233,22 @@ func _run() -> void:
     check("enemy destroyed -> match over", ar._over)
     check("win recorded", gs.matches_won == 1, "won %d" % gs.matches_won)
 
+    for s in ["footstep", "autocannon", "gate_motor_loop", "gate_slam", "countdown_beep", "fight_horn", "crowd_loop",
+              "servo_loop", "explosion_large", "land_heavy", "lock_tick", "workshop_ambience_loop"]:
+        check("sound played: " + s, int(Audio.played.get(s, 0)) > 0, "%d" % int(Audio.played.get(s, 0)))
+
     # ---------------- testing grounds
     get_tree().change_scene_to_file("res://scenes/testing_grounds/testing_grounds.tscn")
     await wait(1.0)
     var tg = get_tree().current_scene
     check("testing grounds loads", tg != null and tg.name == "TestingGrounds")
+    for n in Mech._descendants(tg):
+        if n is Destructible and not n.explosive:
+            n.take_damage(999.0, n.global_position)
+            break
+    await wait(0.2)
+    check("sound played: crate_break", int(Audio.played.get("crate_break", 0)) > 0)
+    check("sound played: wind_loop", int(Audio.played.get("wind_loop", 0)) > 0)
     check("dummies spawned (5 static + mover)", tg.dummies.size() == 6, "%d" % tg.dummies.size())
     var mover: Mech = tg.dummies[-1]["mech"]
     var mstart := mover.global_position

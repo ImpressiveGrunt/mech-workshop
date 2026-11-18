@@ -38,6 +38,9 @@ var _air_time := 0.0
 var _screens: Dictionary = {}   # "status" / "radar" / "weapons" -> Label3D
 var _cracks: Array = []
 var _screen_timer := 0.0
+var _snd_lock: AudioStreamPlayer
+var _lock_tick_t := 0.0
+var _warn_t := 0.0
 var _stick_drive: Node3D        # left joystick: tilts with W/S (pitch) and A/D (roll)
 var _stick_aim: Node3D          # right joystick: tilts with torso twist / aim pitch rate (mouse)
 var _arms: Array = []           # [{shoulder, elbow}]: upper arms re-aimed at the elbows each frame
@@ -67,6 +70,9 @@ func _ready() -> void:
     targeting = Targeting.new()
     targeting.mech = mech
     targeting.camera = aim
+    targeting.target_changed.connect(func(t): if t != null: Audio.play_2d("target_switch"))
+    _snd_lock = Audio.loop_2d("lock_tone_loop", 0.0, self)
+    Audio.set_level(_snd_lock, 0.0)
     add_child(targeting)
     camera.current = true
     Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -208,6 +214,7 @@ func _process(delta: float) -> void:
     if third_person:
         _update_third_person(delta, jitter)
     _animate_sticks(delta)
+    _cockpit_tones(delta)
     _screen_timer -= delta
     if cockpit and _screen_timer <= 0.0:
         _screen_timer = 1.0 / SCREEN_HZ
@@ -236,6 +243,22 @@ func _update_third_person(delta: float, jitter: Vector2) -> void:
     var look_target := pivot + Vector3(sin(yaw), 0, cos(yaw)) * 8.0
     if tp_camera.global_position.distance_to(look_target) > 0.1:
         tp_camera.look_at(look_target, Vector3.UP)
+
+
+## Lock-on ticks speed up as the lock builds; a steady tone while locked; torso damage warning.
+func _cockpit_tones(delta: float) -> void:
+    var locking := targeting != null and targeting.target != null and targeting.lock > 0.0 and not targeting.locked
+    if locking:
+        _lock_tick_t -= delta
+        if _lock_tick_t <= 0.0:
+            _lock_tick_t = lerpf(0.3, 0.07, targeting.lock)
+            Audio.play_2d("lock_tick")
+    Audio.set_level(_snd_lock, 1.0 if targeting != null and targeting.locked and not mech.is_destroyed else 0.0)
+    var torso_f: float = mech.part_hp.get("torso", 1.0) / maxf(1.0, mech.part_max_hp.get("torso", 1.0))
+    _warn_t -= delta
+    if torso_f < 0.3 and not mech.is_destroyed and _warn_t <= 0.0:
+        _warn_t = 1.4
+        Audio.play_2d("warning_beep")
 
 
 func apply_freelook(relative: Vector2) -> void:

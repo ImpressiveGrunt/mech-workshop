@@ -21,6 +21,7 @@ var player_ctrl: PlayerController
 var enemy_ai: AIController
 var _over := false
 var _doors: Array = []          # [{node, closed, open}]
+var _crowd: AudioStreamPlayer
 
 
 func _ready() -> void:
@@ -29,6 +30,7 @@ func _ready() -> void:
         # Night bout under floodlights (the Blender arena brings its own lights).
         LevelUtils.add_lighting(self, Color(0.05, 0.08, 0.15), Color(0.04, 0.04, 0.05), 0.25)
         root = LevelUtils.instance_environment(ENV_PATH, self)
+        _crowd = Audio.loop_2d("crowd_loop")
     else:
         LevelUtils.add_lighting(self, Color(0.3, 0.42, 0.65), Color(0.25, 0.23, 0.2), 1.2)
         root = _build_blockout()
@@ -48,6 +50,8 @@ func _ready() -> void:
     enemy.add_child(enemy_ai)
     player.destroyed.connect(_on_mech_destroyed)
     enemy.destroyed.connect(_on_mech_destroyed)
+    for m in [player, enemy]:
+        m.part_destroyed.connect(func(_m, _slot): Audio.play_2d("crowd_cheer", -8.0))
 
     hud = Hud.new()
     add_child(hud)
@@ -87,6 +91,7 @@ func _run_intro(walk_to: Dictionary) -> void:
     player_ctrl.add_shake(0.3)  # the doors slam shut behind you
     for n in ["3", "2", "1"]:
         hud.show_message(n, 0.9)
+        Audio.play_2d("countdown_beep")
         await get_tree().create_timer(0.8).timeout
     _start_fight()
 
@@ -94,6 +99,8 @@ func _run_intro(walk_to: Dictionary) -> void:
 func _start_fight() -> void:
     player_ctrl.enabled = true
     enemy_ai.enabled = true
+    Audio.play_2d("fight_horn")
+    Audio.play_2d("crowd_cheer")
     hud.show_message("FIGHT!", 2.0)
 
 
@@ -126,9 +133,20 @@ func _move_gates(open: bool) -> void:
     if _doors.is_empty():
         return
     var tw := create_tween().set_parallel(true).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+    var motors := []
     for d in _doors:
         tw.tween_property(d["node"], "transform", d["open"] if open else d["closed"], GATE_TIME)
+        motors.append(Audio.loop("gate_motor_loop", d["node"]))
     await tw.finished
+    for m in motors:
+        if m:
+            m.queue_free()
+    var slammed := {}
+    for d in _doors:   # one slam / clunk per gate
+        var g := str(LevelUtils.extras_of(d["node"]).get("gate", ""))
+        if not slammed.has(g):
+            slammed[g] = true
+            Audio.play("gate_slam", d["node"].global_position, 0.0 if not open else -8.0, 1.0 if not open else 1.2)
 
 
 func _spawn_mech(loadout: Dictionary, damage: Dictionary, marker: Node3D, paint: Dictionary) -> Mech:
@@ -159,6 +177,7 @@ func _on_mech_destroyed(m: Mech) -> void:
     var won := m == enemy
     var reward := WIN_REWARD if won else LOSS_REWARD
     GameState.finish_match(won, player.damage_report(), reward)
+    Audio.play_2d("crowd_cheer", 3.0 if won else -2.0)
     if won:
         var scrap := randi_range(40, 90)
         GameState.add_scrap(scrap)

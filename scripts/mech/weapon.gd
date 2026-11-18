@@ -47,13 +47,19 @@ func fire(aim_point: Vector3) -> void:
     if ammo > 0:
         ammo -= 1
     var from := muzzle.global_position if muzzle else global_position
+    Audio.play({"ballistic": "autocannon", "explosive": "missile_launch", "melee": "ram_fist"}.get(weapon_type, "autocannon"), from)
     var dir := (aim_point - from).normalized()
     var end := from + dir * weapon_range
     var hit := _ray(from, end)
     if not hit.is_empty():
         end = hit["position"]
         _apply_hit(hit["collider"], end, dir, damage)
+        if weapon_type != "explosive":
+            var c = hit["collider"]
+            var metal: bool = (c is Area3D and c.has_meta("mech")) or c is RigidBody3D
+            Audio.play("impact_metal" if metal else "impact_ground", end, 0.0 if weapon_type == "ballistic" else 4.0)
     if weapon_type == "explosive":
+        Audio.play("explosion_small", end, -2.0)
         _splash(end)
     _tracer(from, end)
 

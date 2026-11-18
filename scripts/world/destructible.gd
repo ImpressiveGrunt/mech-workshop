@@ -50,6 +50,7 @@ func _break(at: Vector3) -> void:
     var material := visual.get_active_material(0)
     for i in 6:
         _spawn_chunk(center, aabb.size, material, at)
+    Audio.play("crate_break" if not explosive else "explosion_large", center)
     if explosive:
         _explode(center)
     queue_free()

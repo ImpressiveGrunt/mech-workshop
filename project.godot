@@ -13,6 +13,7 @@ config/features=PackedStringArray("4.3", "Forward Plus")
 
 PartDB="*res://scripts/autoload/part_db.gd"
 GameState="*res://scripts/autoload/game_state.gd"
+Audio="*res://scripts/autoload/audio.gd"
 
 [display]
 

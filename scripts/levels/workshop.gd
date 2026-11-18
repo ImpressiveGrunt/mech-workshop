@@ -26,6 +26,7 @@ var _tab_buttons: Dictionary = {}
 var _dock_yaw := 0.0
 var _spin := 0.0                       # -1 / 0 / +1 while a rotate control is held
 var _turntable: Dictionary = {}        # node -> rest transform
+var _snd_turntable: AudioStreamPlayer3D
 
 
 func _ready() -> void:
@@ -34,9 +35,17 @@ func _ready() -> void:
     var root: Node3D
     if ResourceLoader.exists(ENV_PATH):
         root = LevelUtils.instance_environment(ENV_PATH, self)
+        for weld in ["repair_arm_L_weld", "repair_arm_R_weld"]:
+            var w := LevelUtils.find_marker(root, weld)
+            if w:
+                Audio.loop("weld_loop", w)
     else:
         root = _build_blockout()
     dock = LevelUtils.find_marker(root, "mech_dock")
+    Audio.loop_2d("workshop_ambience_loop")
+    if dock:
+        _snd_turntable = Audio.loop("gate_motor_loop", dock, -6.0)
+        Audio.set_level(_snd_turntable, 0.0)
     for node_name in TURNTABLE_NODES:
         var n := LevelUtils.find_marker(root, node_name)
         if n:
@@ -86,6 +95,7 @@ func _move_camera(marker_name: String) -> void:
 
 
 func _process(delta: float) -> void:
+    Audio.set_level(_snd_turntable, absf(_spin), -6.0)
     if _spin != 0.0:
         _dock_yaw = wrapf(_dock_yaw + _spin * ROTATE_SPEED * delta, -PI, PI)
         _apply_dock_yaw()
@@ -262,6 +272,7 @@ func _build_ui() -> void:
 
 
 func _on_tab_pressed(key: String) -> void:
+    Audio.play_2d("ui_click")
     _show_tab("" if _tab == key else key)  # clicking the open tab returns to overview
 
 
@@ -377,12 +388,19 @@ func _part_card(id: String, action: String) -> void:
 
 
 func _equip(id: String) -> void:
-    GameState.equip(id, _slot)
+    Audio.play_2d("ui_confirm" if GameState.equip(id, _slot) else "ui_error")
 
 
 func _buy_and_equip(id: String) -> void:
     if GameState.buy_part(id):
+        Audio.play_2d("ui_purchase")
         GameState.equip(id, _slot)
+    else:
+        Audio.play_2d("ui_error")
+
+
+func _repair(slot: String) -> void:
+    Audio.play_2d("ui_purchase" if GameState.repair(slot) else "ui_error")
 
 
 # ------------------------------------------------------------- repairs
@@ -411,7 +429,7 @@ func _build_repairs() -> void:
         row.add_child(bar)
         var cost := GameState.repair_cost(slot)
         if cost > 0:
-            row.add_child(_button("$%d" % cost, GameState.repair.bind(slot), cost > GameState.money))
+            row.add_child(_button("$%d" % cost, _repair.bind(slot), cost > GameState.money))
         else:
             var ok := Label.new()
             ok.text = "  OK  "
@@ -422,7 +440,7 @@ func _build_repairs() -> void:
     if total == 0:
         _note("All systems nominal.")
     else:
-        var b := _button("REPAIR EVERYTHING  ·  $%d" % total, GameState.repair.bind(""), total > GameState.money)
+        var b := _button("REPAIR EVERYTHING  ·  $%d" % total, _repair.bind(""), total > GameState.money)
         b.custom_minimum_size.y = 46
         _content.add_child(b)
         _note("Repairs cost $%d per HP. Missing armour plates are refitted." % GameState.REPAIR_COST_PER_HP)
@@ -466,6 +484,7 @@ func _on_color_dragged(color: Color, channel: String) -> void:
 
 
 func _apply_preset(preset: String) -> void:
+    Audio.play_2d("ui_confirm")
     GameState.apply_paint_preset(preset)
     _refresh()
 
@@ -504,7 +523,9 @@ func _button(t: String, action: Callable, disabled: bool = false) -> Button:
     var b := Button.new()
     b.text = t
     b.disabled = disabled
+    b.pressed.connect(Audio.play_2d.bind("ui_click"))
     b.pressed.connect(action)
+    b.mouse_entered.connect(func(): if not b.disabled: Audio.play_2d("ui_hover"))
     return b
 
 

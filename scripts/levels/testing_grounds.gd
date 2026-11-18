@@ -28,6 +28,7 @@ func _ready() -> void:
     else:
         root = _build_blockout()
     exit_point = LevelUtils.find_marker(root, "exit_to_workshop")
+    Audio.loop_2d("wind_loop")
     var spawn := LevelUtils.find_marker(root, "mech_spawn")
     player = Mech.new()
     add_child(player)
@@ -145,6 +146,7 @@ func reset_range() -> void:
         if fresh:
             d["marker"] = fresh
     hud.show_message("RANGE RESET", 1.5)
+    Audio.play_2d("ui_confirm")
 
 
 func _build_blockout() -> Node3D:

@@ -19,6 +19,7 @@ extends Node
 ## Emits footstep(side, world_pos, strength) on every footfall.
 
 signal footstep(side: String, world_pos: Vector3, strength: float)
+signal landed(world_pos: Vector3, strength: float)
 
 const DUTY_SLOW := 0.64        # fraction of the cycle each foot is planted when walking (long double support)
 const DUTY_FAST := 0.5         # ...at full speed (brief double support, longer swing)
@@ -212,6 +213,7 @@ func _update_airborne(delta: float) -> bool:
 func _land() -> void:
     airborne = false
     var fall := clampf(-mech.velocity.y / 12.0, 0.4, 1.6)
+    landed.emit(mech.global_position, fall)
     _impact_vel -= IMPACT * 14.0 * fall                               # heavy two-footed landing
     for leg in legs:
         leg["planted"] = _ground(mech.to_global(leg["home"]), leg["ankle_h"])

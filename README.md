@@ -93,6 +93,29 @@ them, then 3-2-1, **FIGHT**. Destroy the enemy torso to win.
 ![Cockpit](docs/screens/05_arena_fight.png)
 ![Hands on the sticks](docs/screens/06_cockpit_hands.png)
 
+## Sound design
+
+All 40 sound effects are **synthesized from scratch** by `tools/audio/build_sounds.py`, using oscillators,
+filtered noise, inharmonic metal partials, distortion and convolution reverb. That keeps them original and
+reproducible like the models. The script writes `assets/audio/*.wav` and `data/sounds.json`, which holds each
+sound's bus, volume, loop flag and 3D range. The `Audio` autoload plays them. Listen to `docs/sound_reel.wav`
+for a quick tour.
+
+| Where | Sounds |
+|---|---|
+| Mech | footsteps (3 variants, scaled by mass and speed), heavy landing, servo whine on torso/arm slew, jump-thruster ignition and roar loop, reactor hum |
+| Weapons | autocannon (3 variants), missile launch, ram fist, metal / ground impacts, missile and barrel explosions |
+| Damage | armour plate tearing off, part destroyed explosion, mech destroyed explosion, crate splinter |
+| Arena | gate motors, gate slam, crowd murmur loop, crowd cheers (match start, parts destroyed, result), countdown beeps, fight horn |
+| Cockpit | lock-on ticks that speed up, locked tone, target switch blip, low torso warning beep |
+| Workshop | ambience loop, welding crackle on the repair arms, turntable motor, UI click / hover / confirm / purchase / error |
+| Outdoors | wind loop (testing grounds, salvage yard), salvage rummage, sell chime |
+
+```bash
+python3 -m pip install numpy scipy
+python3 tools/audio/build_sounds.py
+```
+
 ## Playtest builds
 
 ```bash
