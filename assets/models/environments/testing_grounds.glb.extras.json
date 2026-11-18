@@ -1,0 +1,244 @@
+{
+ "backstop_berm": {
+  "collision": "convex"
+ },
+ "container_0": {
+  "collision": "box"
+ },
+ "container_1": {
+  "collision": "box"
+ },
+ "container_2": {
+  "collision": "box"
+ },
+ "cover_wall_0": {
+  "collision": "convex"
+ },
+ "cover_wall_1": {
+  "collision": "convex"
+ },
+ "cover_wall_2": {
+  "collision": "convex"
+ },
+ "dummy_1": {
+  "marker": "dummy",
+  "range_m": 25
+ },
+ "dummy_2": {
+  "marker": "dummy",
+  "range_m": 50
+ },
+ "dummy_3": {
+  "marker": "dummy",
+  "range_m": 75
+ },
+ "dummy_4": {
+  "marker": "dummy",
+  "range_m": 100
+ },
+ "dummy_5": {
+  "marker": "dummy",
+  "range_m": 150
+ },
+ "exit_to_workshop": {
+  "marker": "exit"
+ },
+ "fence_panels": {
+  "collision": "mesh"
+ },
+ "ground": {
+  "collision": "box"
+ },
+ "jump_block_0": {
+  "collision": "box"
+ },
+ "jump_block_1": {
+  "collision": "box"
+ },
+ "jump_block_2": {
+  "collision": "box"
+ },
+ "mech_spawn": {
+  "marker": "spawn"
+ },
+ "mover_a": {
+  "marker": "mover"
+ },
+ "mover_b": {
+  "marker": "mover"
+ },
+ "perimeter_barriers": {
+  "collision": "mesh"
+ },
+ "ramp_0": {
+  "collision": "convex"
+ },
+ "ramp_1": {
+  "collision": "convex"
+ },
+ "ramp_deck_0": {
+  "collision": "box"
+ },
+ "ramp_deck_1": {
+  "collision": "box"
+ },
+ "range_post_100_+1": {
+  "collision": "box"
+ },
+ "range_post_100_-1": {
+  "collision": "box"
+ },
+ "range_post_150_+1": {
+  "collision": "box"
+ },
+ "range_post_150_-1": {
+  "collision": "box"
+ },
+ "range_post_25_+1": {
+  "collision": "box"
+ },
+ "range_post_25_-1": {
+  "collision": "box"
+ },
+ "range_post_50_+1": {
+  "collision": "box"
+ },
+ "range_post_50_-1": {
+  "collision": "box"
+ },
+ "range_post_75_+1": {
+  "collision": "box"
+ },
+ "range_post_75_-1": {
+  "collision": "box"
+ },
+ "sign_board": {
+  "collision": "box"
+ },
+ "slalom_pillar_0": {
+  "collision": "convex"
+ },
+ "slalom_pillar_1": {
+  "collision": "convex"
+ },
+ "slalom_pillar_2": {
+  "collision": "convex"
+ },
+ "slalom_pillar_3": {
+  "collision": "convex"
+ },
+ "slalom_pillar_4": {
+  "collision": "convex"
+ },
+ "slalom_pillar_5": {
+  "collision": "convex"
+ },
+ "slalom_pillar_6": {
+  "collision": "convex"
+ },
+ "test_barrel_0": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "test_barrel_1": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "test_barrel_2": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "test_barrel_3": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "test_barrel_4": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "test_barrel_5": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "test_barrel_6": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "test_barrel_7": {
+  "collision": "box",
+  "destructible": true,
+  "explosive": true,
+  "hp": 30
+ },
+ "test_crate_0": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "test_crate_1": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "test_crate_2": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "test_crate_3": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "test_crate_4": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "test_crate_5": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "test_crate_6": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "test_crate_7": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "test_crate_8": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "test_crate_9": {
+  "collision": "box",
+  "destructible": true,
+  "hp": 120
+ },
+ "tower_base": {
+  "collision": "box"
+ },
+ "tower_crew": {
+  "height_m": 1.8,
+  "prop": "worker"
+ }
+}
