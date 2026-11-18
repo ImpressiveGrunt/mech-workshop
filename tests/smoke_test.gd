@@ -118,15 +118,57 @@ func _run() -> void:
         await get_tree().physics_frame
     check("lock-on when the guns stay on target", pc.targeting.locked, "lock %.2f, LOS %s" % [pc.targeting.lock, pc.targeting.has_line_of_sight])
 
-    # weighted aim: the torso trails the target, then settles on it
+    # weighted aim: the torso trails the target, then settles; the legs turn to follow the aim
+    ar.enemy_ai.enabled = false
+    var yaw0 := p.global_rotation.y
     p.target_twist = 0.8
     await wait(0.15)
-    var early := p.torso_twist
-    await wait(2.0)
+    var early := wrapf(p.global_rotation.y + p.torso_twist - yaw0, -PI, PI)
+    await wait(3.0)
+    var gun_yaw := wrapf(p.global_rotation.y + p.torso_twist - yaw0, -PI, PI)
+    var legs_yaw := wrapf(p.global_rotation.y - yaw0, -PI, PI)
     check("aim lags behind the mouse target", early < 0.4, "after 0.15 s: %.2f of 0.80" % early)
-    check("aim settles on the target", absf(p.torso_twist - 0.8) < 0.03, "%.2f" % p.torso_twist)
-    p.target_twist = 0.0
-    await wait(2.0)
+    check("aim settles on the target", absf(gun_yaw - 0.8) < 0.04, "%.2f" % gun_yaw)
+    check("legs turn to face the aim", absf(legs_yaw - 0.8) < 0.06 and absf(p.torso_twist) < 0.06,
+        "legs %.2f, torso twist %.2f" % [legs_yaw, p.torso_twist])
+    # A / D strafe: sideways movement, legs keep facing forward
+    var yaw_before := p.global_rotation.y
+    Input.action_press("strafe_left")
+    var lateral := 0.0
+    var fwd_v := 0.0
+    var knee_min := 999.0
+    for i in 90:   # 1.5 s; record peak sideways speed (cover may stop it later)
+        await get_tree().physics_frame
+        var lv := p.velocity.dot(p.global_basis.x)
+        if lv > lateral:
+            lateral = lv
+            fwd_v = p.velocity.dot(p.global_basis.z)
+        for leg in p.gait.legs:
+            knee_min = minf(knee_min, rad_to_deg(leg["knee"].rotation.x))
+    Input.action_release("strafe_left")
+    check("A strafes left without turning", lateral > 2.0 and absf(fwd_v) < 0.5 and absf(wrapf(p.global_rotation.y - yaw_before, -PI, PI)) < 0.03,
+        "lateral %.1f m/s, fwd %.1f, yaw drift %.3f" % [lateral, fwd_v, wrapf(p.global_rotation.y - yaw_before, -PI, PI)])
+    check("strafing legs stay sane", knee_min > 0.0, "min knee %.0f" % knee_min)
+    await wait(1.5)
+    # free-look (hold Alt): camera moves, aim doesn't
+    var aim_before := p.target_twist
+    Input.action_press("freelook")
+    pc.apply_freelook(Vector2(-300, 0))
+    await wait(0.1)
+    check("free-look turns the camera, not the aim", absf(pc.look.x) > 0.3 and absf(p.target_twist - aim_before) < 0.001,
+        "look %.2f, aim moved %.3f" % [pc.look.x, p.target_twist - aim_before])
+    Input.action_release("freelook")
+    await wait(1.0)
+    check("free-look swings back on release", absf(pc.look.x) < 0.02, "%.3f" % pc.look.x)
+    # third person
+    pc.set_third_person(true)
+    await wait(0.6)
+    var tp_d := pc.tp_camera.global_position.distance_to(p.global_position)
+    check("third-person camera behind the mech", pc.tp_camera.current and not pc.cockpit.visible and tp_d > 6.0 and tp_d < 16.0,
+        "distance %.1f m" % tp_d)
+    pc.set_third_person(false)
+    check("back to the cockpit", pc.camera.current and pc.cockpit.visible)
+    ar.enemy_ai.enabled = true
 
     # weapons + damage
     var hp_before: float = e.part_hp["torso"]

@@ -53,7 +53,10 @@ var is_destroyed := false
 
 # Inputs written by a controller.
 var throttle := 0.0  # -1 back .. 1 forward
-var turn := 0.0      # -1 right .. 1 left
+var turn := 0.0      # -1 right .. 1 left (explicit leg turning: AI, autopilot)
+var strafe := 0.0    # -1 right .. 1 left (sidestep relative to the legs)
+var legs_follow_aim := false   # player mode: legs turn to face where the torso aims
+const STRAFE_FACTOR := 0.65    # sidestepping is slower than walking forward
 var boosting := false
 var torso_twist := 0.0   # actual (lags behind the target)
 var aim_pitch := 0.0
@@ -194,12 +197,24 @@ func is_part_alive(slot: String) -> bool:
 # ------------------------------------------------------------- movement
 func _physics_process(delta: float) -> void:
     var legs_ok := is_part_alive("legs")
-    var target_yaw := 0.0 if is_destroyed else turn * turn_rate * (1.0 if legs_ok else 0.4)
+    var steer := turn
+    if legs_follow_aim and absf(turn) < 0.01:
+        steer = clampf(target_twist * 2.5, -1.0, 1.0)   # legs swing round under the torso's aim
+    var target_yaw := 0.0 if is_destroyed else steer * turn_rate * (1.0 if legs_ok else 0.4)
     yaw_velocity = move_toward(yaw_velocity, target_yaw, turn_rate * 2.5 * delta)
-    rotate_y(yaw_velocity * delta)
+    var dyaw := yaw_velocity * delta
+    rotate_y(dyaw)
+    if legs_follow_aim:
+        # keep the aim fixed in the world while the legs turn underneath it
+        torso_twist -= dyaw
+        target_twist -= dyaw
     var forward := global_basis.z  # models face +Z (Blender -Y)
+    var left := global_basis.x     # pilot's left is +X
     var speed := top_speed * (1.0 if legs_ok else 0.25)
-    var target := forward * throttle * speed if not is_destroyed else Vector3.ZERO
+    var wish := forward * throttle + left * strafe * STRAFE_FACTOR
+    if wish.length() > 1.0:
+        wish = wish.normalized()
+    var target := wish * speed if not is_destroyed else Vector3.ZERO
     var accel := clampf(180000.0 / mass_kg, 2.5, 14.0)   # ~6.7 m/s^2 for the 27 t starter mech
     var horizontal := Vector3(velocity.x, 0, velocity.z).move_toward(target, accel * delta)
     velocity.x = horizontal.x

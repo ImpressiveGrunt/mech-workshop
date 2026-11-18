@@ -10,7 +10,8 @@ const AMBER := Color(1.0, 0.75, 0.3)
 const RED := Color(1.0, 0.32, 0.25)
 
 var mech: Mech
-var camera: Camera3D
+var camera: Camera3D   # the pilot's eye (projection origin)
+var aim: Node3D        # gun direction (unaffected by free-look)
 var targeting: Targeting
 var frame: Node3D
 var size_m := Vector2(1.12, 0.41)
@@ -49,7 +50,7 @@ func _col(c: Color, a: float = 1.0) -> Color:
 
 
 func _draw() -> void:
-    if mech == null or camera == null or frame == null or mech.is_destroyed:
+    if mech == null or camera == null or aim == null or frame == null or mech.is_destroyed:
         return
     if _flicker > 0.05:
         draw_set_transform(Vector2(randf_range(-6, 6) * _flicker, 0))
@@ -77,7 +78,7 @@ func _draw_frame() -> void:
 
 
 func _draw_compass() -> void:
-    var fwd := -camera.global_basis.z
+    var fwd := -aim.global_basis.z
     var heading := fposmod(rad_to_deg(atan2(fwd.x, fwd.z)), 360.0)
     var cx := size.x / 2
     var y := 34.0
@@ -101,7 +102,7 @@ func _draw_compass() -> void:
 
 func _draw_aim() -> void:
     # gun pipper: where the guns point right now
-    var pip = project(camera.global_position - camera.global_basis.z * 300.0)
+    var pip = project(aim.global_position - aim.global_basis.z * 300.0)
     if pip != null:
         for d in [Vector2(1, 0), Vector2(-1, 0), Vector2(0, 1), Vector2(0, -1)]:
             draw_line(pip + d * 6.0, pip + d * 16.0, _col(CYAN), 2.0)
@@ -183,7 +184,7 @@ func _draw_weak_point(t: Mech) -> void:
 
 
 func _draw_offscreen_arrow(t: Mech, c: Color, dist: float) -> void:
-    var local := camera.global_transform.affine_inverse() * Targeting.aim_point_of(t)
+    var local := aim.global_transform.affine_inverse() * Targeting.aim_point_of(t)
     var dir := Vector2(local.x, -local.y)
     if dir.length() < 0.001:
         dir = Vector2(0, 1)

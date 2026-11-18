@@ -49,6 +49,7 @@ func _ready() -> void:
     hud = Hud.new()
     add_child(hud)
     hud.mech = player
+    _link_hud()
     hud.show_message("TEST GROUNDS: [R] reset   [E] on EXIT pad to leave", 5.0)
 
 
@@ -118,6 +119,7 @@ func _drive_mover() -> void:
 ## Repair the player, refill ammo, respawn every dummy and the breakable props.
 func reset_range() -> void:
     var t := player.global_transform
+    var was_third_person := player_ctrl != null and is_instance_valid(player_ctrl) and player_ctrl.third_person
     player.queue_free()
     player = Mech.new()
     add_child(player)
@@ -125,7 +127,10 @@ func reset_range() -> void:
     player.build(GameState.loadout, {}, GameState.paint)
     player_ctrl = PlayerController.new()
     player.add_child(player_ctrl)
+    if was_third_person:
+        player_ctrl.set_third_person.call_deferred(true)
     hud.mech = player
+    _link_hud()
     for d in dummies:
         _replace_dummy(d)
     var env_name := root.name
@@ -156,3 +161,10 @@ func _build_blockout() -> Node3D:
     LevelUtils.add_marker(r, "mover_a", Vector3(26, 0, -20))
     LevelUtils.add_marker(r, "mover_b", Vector3(-26, 0, -20))
     return r
+
+
+func _link_hud() -> void:
+    for c in player.get_children():
+        if c is PlayerController:
+            hud.aim = c.aim
+            hud.targeting = c.targeting

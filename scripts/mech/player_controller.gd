@@ -1,8 +1,9 @@
 class_name PlayerController
 extends Node
-## First-person mech controls. Add as a child of a built Mech.
-##   W/S throttle, A/D turn legs, mouse twists the torso and pitches the arms,
-##   LMB right-arm weapon, RMB left-arm weapon, Space boost, C centre torso.
+## Mech controls. Add as a child of a built Mech.
+##   W/S throttle, A/D strafe; the mouse aims the torso and arms, and the legs turn to follow the aim
+##   (so they always face forward). LMB right-arm weapon, RMB left-arm weapon, Space boost,
+##   V first / third person, hold Left Alt to free-look (camera only, aim stays put), T next target.
 ## You sit inside a Blender-built cockpit (mounted on cockpit_camera) and look
 ## out through its armoured glass. Dashboard screens show live status, radar
 ## and weapons; the glass cracks as the torso takes damage. The camera rides the
@@ -17,7 +18,16 @@ const HULL_LAYER := 1 << 19
 @export var mouse_sensitivity := 0.0025
 
 var mech: Mech
-var camera: Camera3D
+var camera: Camera3D            # first-person eye (cockpit)
+var aim: Node3D                 # where the guns point: same place as the eye, ignores free-look
+var tp_camera: Camera3D         # third-person chase camera
+var third_person := false
+var look := Vector2.ZERO        # free-look offset (yaw, pitch), rad
+var _tp_pos := Vector3.ZERO
+const LOOK_YAW_MAX := deg_to_rad(150.0)
+const LOOK_PITCH_MAX := deg_to_rad(60.0)
+const TP_DISTANCE := 12.0
+const TP_HEIGHT := 3.2
 var enabled := true  # false = movement/weapons locked (e.g. match intro); looking around still works
 var cockpit: Node3D
 var targeting: Targeting
@@ -46,9 +56,17 @@ func _ready() -> void:
     if anchor == mech:
         camera.position = Vector3(0, 3.6, 0)
     _base_pos = camera.position
+    aim = Node3D.new()
+    anchor.add_child(aim)
+    aim.position = _base_pos
+    tp_camera = Camera3D.new()
+    tp_camera.fov = 70.0
+    tp_camera.far = 2000.0
+    add_child(tp_camera)            # under a plain Node: positioned in world space each frame
+    _tp_pos = mech.global_position + Vector3(0, 6, -10)
     targeting = Targeting.new()
     targeting.mech = mech
-    targeting.camera = camera
+    targeting.camera = aim
     add_child(targeting)
     camera.current = true
     Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
@@ -112,6 +130,7 @@ func _setup_holo() -> void:
     holo = HoloHud.new()
     holo.mech = mech
     holo.camera = camera
+    holo.aim = aim
     holo.targeting = targeting
     holo.frame = frame
     holo.size_m = size_m
@@ -181,7 +200,13 @@ func _process(delta: float) -> void:
     var jitter := Vector2(randf_range(-1, 1), randf_range(-1, 1)) * _shake * 0.08
     camera.position = _base_pos + Vector3(jitter.x, jitter.y, 0)   # the gait moves the cockpit itself
     # Godot cameras look down -Z; mech models face +Z, hence the PI yaw.
-    camera.rotation = Vector3(mech.aim_pitch + jitter.y * 0.3, PI, jitter.x * 0.3)
+    aim.rotation = Vector3(mech.aim_pitch, PI, 0)
+    if not Input.is_action_pressed("freelook"):
+        look = look.lerp(Vector2.ZERO, minf(1.0, delta * 8.0))   # swing back to the aim on release
+    var fp_look := look if not third_person else Vector2.ZERO
+    camera.rotation = Vector3(mech.aim_pitch + fp_look.y + jitter.y * 0.3, PI + fp_look.x, jitter.x * 0.3)
+    if third_person:
+        _update_third_person(delta, jitter)
     _animate_sticks(delta)
     _screen_timer -= delta
     if cockpit and _screen_timer <= 0.0:
@@ -192,6 +217,49 @@ func _process(delta: float) -> void:
 ## The pilot's hands ride the sticks (they are parented to the pivots in Blender).
 ## Godot pivot space: +X = mech left, +Z = forward; tilting the stick top forward is +rotation.x,
 ## toward the left is -rotation.z.
+## Chase camera behind and above the mech, looking where you aim (free-look orbits it).
+func _update_third_person(delta: float, jitter: Vector2) -> void:
+    var fwd := -aim.global_basis.z
+    var yaw := atan2(fwd.x, fwd.z) + look.x
+    var pitch := clampf(asin(clampf(fwd.y, -1.0, 1.0)) * 0.6 - look.y, -0.5, 0.9)
+    var pivot := mech.global_position + Vector3(0, mech.cockpit_anchor.global_position.y - mech.global_position.y + 0.6, 0) \
+        if mech.cockpit_anchor else mech.global_position + Vector3(0, 4.0, 0)
+    var back := -Vector3(sin(yaw), 0, cos(yaw)) * cos(pitch) + Vector3.UP * sin(pitch + 0.25)
+    var want := pivot + back.normalized() * TP_DISTANCE
+    var q := PhysicsRayQueryParameters3D.create(pivot, want, Mech.LAYER_WORLD)
+    q.exclude = [mech.get_rid()]
+    var hit := mech.get_world_3d().direct_space_state.intersect_ray(q)
+    if not hit.is_empty():
+        want = hit["position"] + (pivot - want).normalized() * 0.5   # don't clip into walls
+    _tp_pos = _tp_pos.lerp(want, minf(1.0, delta * 10.0))
+    tp_camera.global_position = _tp_pos + Vector3(jitter.x, jitter.y, 0) * 2.0
+    var look_target := pivot + Vector3(sin(yaw), 0, cos(yaw)) * 8.0
+    if tp_camera.global_position.distance_to(look_target) > 0.1:
+        tp_camera.look_at(look_target, Vector3.UP)
+
+
+func apply_freelook(relative: Vector2) -> void:
+    look.x = clampf(look.x - relative.x * mouse_sensitivity, -LOOK_YAW_MAX, LOOK_YAW_MAX)
+    look.y = clampf(look.y - relative.y * mouse_sensitivity, -LOOK_PITCH_MAX, LOOK_PITCH_MAX)
+
+
+func set_third_person(on: bool) -> void:
+    third_person = on
+    if on:
+        _tp_pos = mech.global_position + Vector3(0, 6, 0) - (-aim.global_basis.z) * TP_DISTANCE
+    tp_camera.current = on
+    camera.current = not on
+    if cockpit:
+        cockpit.visible = not on
+    if on:
+        mech.remove_meta("holo_hud")
+        mech.remove_meta("diegetic_hud")
+    elif cockpit:
+        mech.set_meta("diegetic_hud", true)
+        if holo:
+            mech.set_meta("holo_hud", true)
+
+
 func _animate_sticks(delta: float) -> void:
     const MAX_TILT := 0.32
     var aim := Vector2(mech.torso_twist, mech.aim_pitch)
@@ -199,7 +267,7 @@ func _animate_sticks(delta: float) -> void:
         _aim_rate = _aim_rate.lerp((aim - _last_aim) / delta, minf(1.0, delta * 12.0))
     _last_aim = aim
     if _stick_drive:
-        var target := Vector3(mech.throttle * MAX_TILT, 0.0, -mech.turn * MAX_TILT)
+        var target := Vector3(mech.throttle * MAX_TILT, 0.0, -(mech.turn + mech.strafe) * MAX_TILT)
         _stick_drive.rotation = _stick_drive.rotation.lerp(target, minf(1.0, delta * 10.0))
     if _stick_aim:
         var target := Vector3(clampf(-_aim_rate.y * 0.12, -MAX_TILT, MAX_TILT), 0.0,
@@ -225,7 +293,7 @@ func _update_screens() -> void:
         _screens["status"].modulate = Color(1.0, 0.45, 0.35) if mech.part_hp.get("torso", 1.0) < mech.part_max_hp.get("torso", 1.0) * 0.35 else Color(0.45, 1.0, 0.75)
     if _screens.has("radar"):
         var speed := Vector2(mech.velocity.x, mech.velocity.z).length() * 3.6
-        var fwd := -camera.global_basis.z
+        var fwd := -aim.global_basis.z
         var heading := fposmod(rad_to_deg(atan2(fwd.x, fwd.z)), 360.0)
         var text := "SPD %3d km/h   HDG %03d\nTWIST %+4d   PITCH %+3d" % [int(speed), int(heading),
             int(rad_to_deg(mech.torso_twist)), int(rad_to_deg(mech.aim_pitch))]
@@ -281,6 +349,8 @@ func _unhandled_input(event: InputEvent) -> void:
         Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if captured else Input.MOUSE_MODE_CAPTURED
     elif event is InputEventMouseButton and event.pressed and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
         Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+    elif event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and Input.is_action_pressed("freelook"):
+        apply_freelook((event as InputEventMouseMotion).relative)   # free-look: move only the camera
     elif event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and not mech.is_destroyed:
         var motion := event as InputEventMouseMotion
         # the mouse moves the aim point; the heavy torso/arms swing after it (Mech._slew_aim)
@@ -291,15 +361,20 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _physics_process(_delta: float) -> void:
+    if Input.is_action_just_pressed("toggle_view"):
+        set_third_person(not third_person)
     if mech.is_destroyed:
         mech.throttle = 0.0
         mech.turn = 0.0
+        mech.strafe = 0.0
         mech.boosting = false
         return
+    mech.legs_follow_aim = enabled
     if not enabled:
         return  # someone else (the intro autopilot) is driving
     mech.throttle = Input.get_axis("move_back", "move_forward")
-    mech.turn = Input.get_axis("turn_right", "turn_left")
+    mech.strafe = Input.get_axis("strafe_right", "strafe_left")
+    mech.turn = 0.0
     mech.boosting = Input.is_action_pressed("boost")
     if Input.is_action_just_pressed("center_torso"):
         mech.target_twist = 0.0
@@ -324,12 +399,12 @@ func _fire(slot: String) -> void:
 
 
 func aim_point() -> Vector3:
-    var from := camera.global_position
-    var to := from - camera.global_basis.z * 500.0
+    var from := aim.global_position
+    var to := from - aim.global_basis.z * 500.0
     var q := PhysicsRayQueryParameters3D.create(from, to, Mech.LAYER_WORLD | Mech.LAYER_HITBOX | Mech.LAYER_DEBRIS)
     q.collide_with_areas = true
     var ex: Array[RID] = [mech.get_rid()]
     ex.append_array(mech.hitbox_rids)
     q.exclude = ex
-    var hit := camera.get_world_3d().direct_space_state.intersect_ray(q)
+    var hit := aim.get_world_3d().direct_space_state.intersect_ray(q)
     return hit["position"] if not hit.is_empty() else to

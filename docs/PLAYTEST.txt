@@ -1,4 +1,4 @@
-MECH WORKSHOP - playtest build 0.5 (Godot 4.3)
+MECH WORKSHOP - playtest build 0.6 (Godot 4.3)
 ================================================
 
 HOW TO RUN
@@ -8,6 +8,11 @@ HOW TO RUN
             If macOS says it is damaged:  xattr -cr "Mech Workshop.app"
   Linux   : unzip, then  chmod +x MechWorkshop.x86_64 && ./MechWorkshop.x86_64
   Needs a GPU with Vulkan support.
+
+NEW IN 0.6
+  - A / D now STRAFE. The legs turn to follow your mouse aim, so they always face forward.
+  - V toggles first / third person (chase camera with crosshair + target bracket).
+  - Hold Left Alt to free-look: the camera moves, your aim doesn't; it swings back on release.
 
 NEW IN 0.5
   - Reworked leg movement: heavier, slower strides that the legs can actually reach (no more
@@ -45,8 +50,10 @@ WORKSHOP (mouse)
 
 IN THE MECH (first person)
   W / S        throttle forward / back        (left joystick moves with it)
-  A / D        turn the legs
-  Mouse        move the aim ring; torso + arms follow   (right joystick moves with it)
+  A / D        strafe left / right (legs keep facing forward)
+  Mouse        move the aim ring; torso + arms follow, legs turn after them
+  V            first / third person
+  Left Alt     hold to free-look
   Left click   right-arm weapon (autocannon)
   Right click  left-arm weapon (ram fist / missile pod)
   Space        jump thruster

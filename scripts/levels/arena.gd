@@ -52,6 +52,7 @@ func _ready() -> void:
     hud = Hud.new()
     add_child(hud)
     hud.mech = player
+    _link_hud()
     if intro:
         _run_intro({player: spawn_a.global_position, enemy: spawn_b.global_position})
     else:
@@ -186,3 +187,10 @@ func _build_blockout() -> Node3D:
     LevelUtils.add_marker(root, "spawn_A", Vector3(0, 0, -32), 0.0)  # faces +Z
     LevelUtils.add_marker(root, "spawn_B", Vector3(0, 0, 32), PI)
     return root
+
+
+func _link_hud() -> void:
+    for c in player.get_children():
+        if c is PlayerController:
+            hud.aim = c.aim
+            hud.targeting = c.targeting

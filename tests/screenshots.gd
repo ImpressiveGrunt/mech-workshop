@@ -59,6 +59,11 @@ func _run() -> void:
     get_tree().change_scene_to_file("res://scenes/testing_grounds/testing_grounds.tscn")
     await wait(3.0)
     await shot("09_testing_grounds")
+    var tgc = get_tree().current_scene.player_ctrl
+    tgc.set_third_person(true)
+    await wait(1.5)
+    await shot("10_third_person")
+    tgc.set_third_person(false)
     get_tree().change_scene_to_file("res://scenes/salvage_yard/salvage_yard.tscn")
     await wait(2.5)
     await shot("07_salvage_yard")

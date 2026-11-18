@@ -31,6 +31,7 @@ const BOB := 0.1
 const IMPACT := 0.09           # weight dip on each footfall (m)
 const SWAY := 0.07
 const ROLL := 0.04
+const HIP_ROLL_MAX := 0.35     # how far a leg can swing out sideways (rad): limits strafe stride
 const FOOT_YAW_MAX := 0.6      # how far a planted foot may stay twisted relative to the body (rad)
 const SETTLE_DIST := 0.3       # re-step when a foot strays this far from home while moving / turning
 const IDLE_DELAY := 0.35       # after this long standing still, square the stance up again
@@ -115,6 +116,9 @@ func _physics_process(delta: float) -> void:
     # cadence: heavy and slow when walking, quicker at speed, but never a stride the legs can't reach
     var limp := _limp()
     var half := minf(MAX_HALF_STRIDE, _reach_half() * 0.92)
+    if speed > 0.2:   # sideways steps are shorter than forward ones (hip roll limit)
+        var lateral := absf(mech.global_basis.x.dot(vel / speed))
+        half = lerpf(half, minf(half, _lateral_half()), lateral)
     _duty = lerpf(DUTY_SLOW, DUTY_FAST, _speed_f)
     var want := lerpf(CYCLE_SLOW, CYCLE_FAST, _speed_f)
     if speed > 0.05:
@@ -199,15 +203,19 @@ func _solve(leg: Dictionary, foot_world: Vector3, pitch: float, yaw_off: float) 
     var l1: float = leg["l1"]
     var l2: float = leg["l2"]
     var local := pelvis.global_transform.affine_inverse() * foot_world - hip.position
-    var dist := clampf(Vector2(local.y, local.z).length(), (l1 + l2) * 0.35, (l1 + l2) * REACH)
-    var phi := atan2(local.z, -local.y)
+    # hip roll swings the leg plane out sideways toward the foot; then solve in that plane
+    var roll := clampf(atan2(local.x, -local.y), -HIP_ROLL_MAX, HIP_ROLL_MAX)
+    var down := Vector2(local.x, local.y).length()
+    var dist := clampf(Vector2(down, local.z).length(), (l1 + l2) * 0.35, (l1 + l2) * REACH)
+    var phi := atan2(local.z, down)
     var a1 := acos(clampf((l1 * l1 + dist * dist - l2 * l2) / (2.0 * l1 * dist), -1.0, 1.0))
     var a2 := acos(clampf((l1 * l1 + l2 * l2 - dist * dist) / (2.0 * l1 * l2), -1.0, 1.0))
     var thigh := phi + a1
     var shin := thigh - (PI - a2)
-    hip.rotation.x = -(thigh - leg["thigh_rest"])
-    knee.rotation.x = -((shin - thigh) - (leg["shin_rest"] - leg["thigh_rest"]))
-    ankle.rotation = Vector3(-(pelvis.rotation.x + hip.rotation.x + knee.rotation.x) + pitch, yaw_off, 0)
+    hip.basis = Basis(Vector3(0, 0, 1), roll) * Basis(Vector3(1, 0, 0), -(thigh - leg["thigh_rest"]))
+    knee.rotation = Vector3(-((shin - thigh) - (leg["shin_rest"] - leg["thigh_rest"])), 0, 0)
+    # foot stays flat on the ground in the mech's frame, with heel/toe pitch and planted yaw
+    ankle.global_basis = mech.global_basis * Basis(Vector3.UP, yaw_off) * Basis(Vector3.RIGHT, pitch)
 
 
 ## Horizontal reach of the legs at the current crouch (how far a foot can be ahead/behind the hip).
@@ -223,9 +231,15 @@ func _overreached(half: float) -> bool:
         if leg["swinging"]:
             continue
         var d: Vector3 = mech.to_local(leg["planted"]) - leg["home"]
-        if absf(d.z) > half * 1.08:
+        if absf(d.z) > half * 1.08 or absf(d.x) > _lateral_half() * 1.15:
             return true
     return false
+
+
+func _lateral_half() -> float:
+    var leg: Dictionary = legs[0]
+    var hip_h: float = (_pelvis_rest.origin.y - lerpf(CROUCH_IDLE, CROUCH_MOVE, _speed_f)) + leg["hip"].position.y - leg["ankle_h"]
+    return tan(HIP_ROLL_MAX) * hip_h * 0.9
 
 
 func _limp() -> float:

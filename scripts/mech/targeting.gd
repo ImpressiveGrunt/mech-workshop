@@ -11,7 +11,7 @@ const LOCK_RANGE := 220.0
 const ACQUIRE_CONE := deg_to_rad(75.0)
 
 var mech: Mech
-var camera: Camera3D
+var camera: Node3D   # the aim reference (eye position, gun direction)
 var target: Mech
 var lock := 0.0          # 0..1 lock progress
 var locked := false
@@ -86,4 +86,4 @@ func _set_target(t: Mech) -> void:
 func _line_of_sight(t: Mech) -> bool:
     var q := PhysicsRayQueryParameters3D.create(camera.global_position, aim_point_of(t), Mech.LAYER_WORLD)
     q.exclude = [mech.get_rid()]
-    return camera.get_world_3d().direct_space_state.intersect_ray(q).is_empty()
+    return mech.get_world_3d().direct_space_state.intersect_ray(q).is_empty()

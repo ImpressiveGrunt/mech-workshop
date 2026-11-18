@@ -37,6 +37,7 @@ func _ready() -> void:
     hud = Hud.new()
     add_child(hud)
     hud.mech = player
+    _link_hud()
     hud.show_message("SALVAGE YARD: search the glowing piles", 4.0)
 
 
@@ -141,3 +142,10 @@ func _build_blockout() -> Node3D:
     LevelUtils.add_marker(root, "exit_to_workshop", Vector3(0, 0, -76))
     LevelUtils.add_marker(root, "mech_spawn", Vector3(0, 0, -68), 0.0)
     return root
+
+
+func _link_hud() -> void:
+    for c in player.get_children():
+        if c is PlayerController:
+            hud.aim = c.aim
+            hud.targeting = c.targeting

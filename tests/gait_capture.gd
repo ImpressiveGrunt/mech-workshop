@@ -32,15 +32,16 @@ func _run() -> void:
     tg.add_child(cam)
     cam.current = true
     tg.hud.visible = false
-    var phases := [["walk", 1.0, 0.0, 3.0], ["turn", 0.0, 1.0, 1.6], ["stop", 0.0, 0.0, 1.6]]
+    var phases := [["walk", 1.0, 0.0, 3.0], ["strafe", 0.0, 0.0, 2.0], ["stop", 0.0, 0.0, 1.6]]
     var n := 0
     for ph in phases:
         m.throttle = ph[1]
         m.turn = ph[2]
+        m.strafe = 1.0 if ph[0] == "strafe" else 0.0
         var t := 0.0
         var next := 0.0
         while t < ph[3]:
-            var side: Vector3 = m.global_basis.x
+            var side: Vector3 = m.global_basis.x if ph[0] != "strafe" else m.global_basis.z   # strafe: view from the front
             cam.global_position = m.global_position + side * 13.0 + Vector3(0, 2.6, 0)
             cam.look_at(m.global_position + Vector3(0, 2.0, 0))
             await get_tree().physics_frame

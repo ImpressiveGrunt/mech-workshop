@@ -244,8 +244,10 @@ func load_game() -> void:
 func _setup_input() -> void:
     _bind_key("move_forward", KEY_W)
     _bind_key("move_back", KEY_S)
-    _bind_key("turn_left", KEY_A)
-    _bind_key("turn_right", KEY_D)
+    _bind_key("strafe_left", KEY_A)
+    _bind_key("strafe_right", KEY_D)
+    _bind_key("toggle_view", KEY_V)
+    _bind_key("freelook", KEY_ALT)
     _bind_key("boost", KEY_SPACE)
     _bind_key("interact", KEY_E)
     _bind_key("center_torso", KEY_C)

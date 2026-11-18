@@ -43,6 +43,11 @@ them, then 3-2-1, **FIGHT**. Destroy the enemy torso to win.
   lifts early and lands heel-first. 2-bone IK on the Blender hip/knee/ankle joints never hyperextends, and the
   pistons telescope with them. The body crouches with speed, dips on each footfall, sways and leans. Damaged legs
   limp, turning on the spot re-steps, and stopping squares the feet up.
+- **Strafe + legs follow the aim**: A/D sidestep (65 % of forward speed), and the legs turn under the torso to
+  face wherever you aim, so they always point forward. Sidesteps use hip roll, so the legs swing out sideways.
+- **Views**: V toggles a third-person chase camera, which shows an aim ring, gun crosshair and target bracket and
+  pulls in so it doesn't clip into walls. Hold Left Alt to free-look: the camera turns (and orbits in third person)
+  while your aim stays put, and the view swings back on release.
 - **Idle stance**: when the mech stops, its legs step back to a square forward stance (feet side by side
   under the hips).
 - **Holographic HUD + targeting** (`holo_hud.gd`, `targeting.gd`): a cyan hologram projected on the inside of
@@ -69,12 +74,14 @@ them, then 3-2-1, **FIGHT**. Destroy the enemy torso to win.
 | Input | Action |
 |---|---|
 | W / S | throttle forward / back |
-| A / D | turn legs |
-| Mouse | twist torso / aim arms |
+| A / D | strafe left / right (legs keep facing forward) |
+| Mouse | aim torso + arms; the legs turn to follow your aim |
 | LMB / RMB | fire right / left arm weapon |
 | Space | jump thruster |
 | C | re-centre torso |
 | T | cycle target |
+| V | first / third person |
+| Hold Left Alt | free-look (camera only, aim stays put) |
 | E | interact (salvage, sell, exit) |
 | Esc | release / capture mouse |
 
